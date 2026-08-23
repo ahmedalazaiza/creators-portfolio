@@ -91,6 +91,21 @@ export interface Follow {
   createdAt?: string;
 }
 
+export interface Collection {
+  id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  isPrivate?: boolean;
+  projectIds: string[];
+  projects?: Project[];
+  coverImage?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type FeedType = 'for-you' | 'following';
+
 export type SortOption = 'featured' | 'appreciations' | 'views' | 'newest';
 
 export interface ProjectFilters {
@@ -99,4 +114,5 @@ export interface ProjectFilters {
   searchQuery?: string;
   sortBy?: SortOption;
   color?: string;
+  feedType?: FeedType;
 }

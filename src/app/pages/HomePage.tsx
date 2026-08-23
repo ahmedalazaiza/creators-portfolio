@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams, Link } from "react-router";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Sparkles,
   Search,
@@ -16,22 +16,26 @@ import {
   Award,
   Filter,
   ArrowRight,
+  Rss,
+  UserCheck,
 } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
 import { useCreator } from "../hooks/useCreator";
 import { useAuth } from "../context/AuthContext";
 import ProjectCard from "../components/ProjectCard";
 import FilterBar from "../components/FilterBar";
-import { SortOption } from "../types";
+import { SortOption, FeedType } from "../types";
 
 export default function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get("category") || "all";
+  const feedParam = (searchParams.get("feed") as FeedType) || "for-you";
 
   const [activeCategory, setActiveCategory] = useState(categoryParam);
   const [activeTool, setActiveTool] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
+  const [activeFeed, setActiveFeed] = useState<FeedType>(feedParam);
 
   const { user } = useAuth();
   const { allCreators, toggleFollow } = useCreator();
@@ -41,14 +45,28 @@ export default function HomePage() {
     setActiveCategory(categoryParam);
   }, [categoryParam]);
 
+  useEffect(() => {
+    setActiveFeed(feedParam);
+  }, [feedParam]);
+
   const handleCategorySelect = (slug: string) => {
     setActiveCategory(slug);
     if (slug === "all") {
       searchParams.delete("category");
       setSearchParams(searchParams);
     } else {
-      setSearchParams({ category: slug });
+      setSearchParams({ category: slug, feed: activeFeed });
     }
+  };
+
+  const handleFeedChange = (feed: FeedType) => {
+    setActiveFeed(feed);
+    if (feed === "for-you") {
+      searchParams.delete("feed");
+    } else {
+      searchParams.set("feed", feed);
+    }
+    setSearchParams(searchParams);
   };
 
   const handleClearFilters = () => {
@@ -56,7 +74,8 @@ export default function HomePage() {
     setActiveTool("");
     setSearchQuery("");
     setSortBy("featured");
-    setSearchParams({});
+    searchParams.delete("category");
+    setSearchParams(searchParams);
   };
 
   const activeFilterCount = useMemo(() => {
@@ -74,6 +93,22 @@ export default function HomePage() {
     searchQuery,
     sortBy,
   });
+
+  // Following Feed Filter: filter projects created by creators currently followed
+  const displayedFeedProjects = useMemo(() => {
+    if (activeFeed === "following") {
+      const followedCreatorIds = allCreators
+        .filter((c) => c.isFollowing)
+        .map((c) => c.id);
+
+      return projects.filter(
+        (p) =>
+          followedCreatorIds.includes(p.userId) ||
+          allCreators.some((c) => c.isFollowing && c.username === p.creator.username)
+      );
+    }
+    return projects;
+  }, [projects, activeFeed, allCreators]);
 
   return (
     <motion.main
@@ -254,49 +289,109 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Main Behance Multi-Column Feed Grid */}
-      <section className="pt-6 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Results Counter Bar */}
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-xs font-mono text-muted-foreground">
-            Explore <strong className="text-foreground">{projects.length}</strong> case studies
-            {activeCategory !== "all" && (
-              <span>
-                {" "}in <span className="text-primary font-bold">{activeCategory}</span>
-              </span>
-            )}
+      {/* Main Behance Feed Stage with Feed Tabs (For You vs Following) */}
+      <section className="pt-6 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+        {/* Feed Switcher Row */}
+        <div className="flex items-center justify-between border-b border-border pb-2.5">
+          <div className="flex items-center gap-6">
+            {/* For You Tab */}
+            <button
+              onClick={() => handleFeedChange("for-you")}
+              className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer ${
+                activeFeed === "for-you"
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Compass size={14} />
+              <span>For You (Curated Discovery)</span>
+              {activeFeed === "for-you" && (
+                <motion.span
+                  layoutId="feedUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                />
+              )}
+            </button>
+
+            {/* Following Tab */}
+            <button
+              onClick={() => handleFeedChange("following")}
+              className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer ${
+                activeFeed === "following"
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <UserCheck size={14} />
+              <span>Following Feed</span>
+              {activeFeed === "following" && (
+                <motion.span
+                  layoutId="feedUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                />
+              )}
+            </button>
+          </div>
+
+          <span className="hidden sm:inline-block text-[11px] font-mono text-muted-foreground">
+            Showing <strong className="text-foreground">{displayedFeedProjects.length}</strong> masterworks
           </span>
         </div>
 
         {/* Behance Discovery Grid (4-5 columns) */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-5 gap-y-7">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
               <div key={n} className="space-y-2.5">
                 <div className="aspect-[4/3] rounded-xl bg-muted/40 animate-pulse border border-border" />
                 <div className="h-4 bg-muted/40 rounded w-2/3 animate-pulse" />
               </div>
             ))}
           </div>
-        ) : projects.length === 0 ? (
-          <div className="py-20 text-center max-w-md mx-auto space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto text-muted-foreground">
-              <Search size={20} />
+        ) : displayedFeedProjects.length === 0 ? (
+          activeFeed === "following" ? (
+            /* Empty Following Feed State */
+            <div className="py-20 text-center max-w-md mx-auto space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                <Users size={24} />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-foreground">
+                  Your Following Feed is Empty
+                </h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  You haven't followed any creators yet. Follow leading designers to see their latest published masterworks right here!
+                </p>
+              </div>
+              <Link
+                to="/creators"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md hover:opacity-90 cursor-pointer"
+              >
+                <Users size={14} />
+                <span>Explore & Follow Creators</span>
+              </Link>
             </div>
-            <h3 className="text-base font-bold text-foreground">No projects found</h3>
-            <p className="text-xs text-muted-foreground">
-              Try adjusting your creative category or software filters.
-            </p>
-            <button
-              onClick={handleClearFilters}
-              className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md cursor-pointer"
-            >
-              Reset Filters
-            </button>
-          </div>
+          ) : (
+            /* General Empty State */
+            <div className="py-20 text-center max-w-md mx-auto space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto text-muted-foreground">
+                <Search size={20} />
+              </div>
+              <h3 className="text-base font-bold text-foreground">No projects found</h3>
+              <p className="text-xs text-muted-foreground">
+                Try adjusting your creative category or software filters.
+              </p>
+              <button
+                onClick={handleClearFilters}
+                className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            </div>
+          )
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-5 gap-y-7">
-            {projects.map((project, idx) => (
+            {displayedFeedProjects.map((project, idx) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 10 }}

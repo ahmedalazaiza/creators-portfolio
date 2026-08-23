@@ -24,12 +24,15 @@ import {
   Award,
   Layers,
   Wrench,
+  FolderHeart,
+  ArrowUpRight,
 } from "lucide-react";
 import { useCreator } from "../hooks/useCreator";
 import { useAuth } from "../context/AuthContext";
+import { useCollections } from "../hooks/useCollections";
 import ProjectCard from "../components/ProjectCard";
 
-type TabType = "work" | "moodboards" | "appreciations" | "followers" | "about";
+type TabType = "work" | "moodboards" | "appreciations" | "followers";
 
 export default function CreatorProfilePage() {
   const { username } = useParams<{ username: string }>();
@@ -46,6 +49,7 @@ export default function CreatorProfilePage() {
   } = useCreator(username);
 
   const { user } = useAuth();
+  const { collections } = useCollections();
 
   if (!creator) {
     return (
@@ -58,17 +62,17 @@ export default function CreatorProfilePage() {
             We couldn't find a portfolio for @{username}.
           </p>
           <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-md"
+            to="/creators"
+            className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-bold text-xs"
           >
-            Back to Discover
+            Explore Leading Creators
           </Link>
         </div>
       </div>
     );
   }
 
-  const isCurrentUser = user?.username === creator.username || user?.id === creator.id;
+  const isOwnProfile = user?.username?.toLowerCase() === creator.username.toLowerCase();
 
   return (
     <motion.main
@@ -78,92 +82,76 @@ export default function CreatorProfilePage() {
       transition={{ duration: 0.2 }}
       className="min-h-screen pt-14 sm:pt-16 pb-20 bg-background"
     >
-      {/* Behance Wide Header Banner */}
-      <div className="relative h-36 sm:h-52 w-full bg-muted/40 overflow-hidden border-b border-border/40">
-        {creator.bannerUrl ? (
+      {/* Banner / Backdrop Header */}
+      <div className="relative h-44 sm:h-60 w-full overflow-hidden bg-gradient-to-r from-[#1E45FB]/25 via-background to-[#CDF22B]/20 border-b border-border">
+        {creator.bannerUrl && (
           <img
             src={creator.bannerUrl}
-            alt="Cover"
-            className="w-full h-full object-cover"
+            alt="Banner"
+            className="w-full h-full object-cover opacity-60"
           />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-r from-muted via-primary/10 to-muted" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/20" />
       </div>
 
-      {/* Behance 2-Column Profile Layout */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
+      {/* Main Behance 2-Column Layout */}
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 -mt-20 sm:-mt-24 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Behance Creator Sidebar Card (4 cols) */}
-          <aside className="lg:col-span-4 space-y-5">
-            <div className="p-5 rounded-2xl border border-border bg-card shadow-md space-y-4">
-              {/* Avatar + Verified Status */}
-              <div className="flex flex-col items-center text-center space-y-2">
-                <div className="relative">
-                  <img
-                    src={creator.avatarUrl}
-                    alt={creator.fullName}
-                    className="w-24 h-24 rounded-2xl object-cover border-4 border-background bg-card shadow-lg"
-                  />
-                  {creator.availableForWork && (
-                    <span
-                      className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-background shadow-sm"
-                      title="Available for freelance"
-                    />
-                  )}
-                </div>
-
-                <div className="space-y-0.5">
-                  <div className="flex items-center justify-center gap-1.5">
-                    <h1 className="text-lg sm:text-xl font-display font-extrabold text-foreground">
-                      {creator.fullName}
-                    </h1>
-                    <span className="text-primary" title="Verified Pro Creator">
-                      <Award size={16} />
-                    </span>
-                  </div>
-                  <span className="text-xs font-mono text-primary font-semibold">
-                    @{creator.username}
-                  </span>
-                </div>
-
-                {creator.headline && (
-                  <p className="text-xs text-muted-foreground leading-snug">
-                    {creator.headline}
-                  </p>
-                )}
-
-                {creator.availableForWork ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Available for Work
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-mono text-muted-foreground bg-muted/40 px-2 py-0.5 rounded-full">
-                    Currently Booked
+          {/* Left Column: Creator Identity & Bio (4 cols) */}
+          <aside className="lg:col-span-4 space-y-6">
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-md space-y-5">
+              {/* Avatar + Availability Status */}
+              <div className="relative inline-block">
+                <img
+                  src={creator.avatarUrl}
+                  alt={creator.fullName}
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover border-2 border-background shadow-xl ring-2 ring-border"
+                />
+                {creator.availableForWork && (
+                  <span
+                    className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-full bg-emerald-500 text-black text-[10px] font-mono font-bold tracking-tight shadow-md flex items-center gap-1 border border-background"
+                    title="Available for freelance commissions"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+                    Available
                   </span>
                 )}
               </div>
 
-              {/* Action Buttons: Follow & Hire */}
+              {/* Creator Name & Title */}
+              <div className="space-y-1">
+                <h1 className="text-xl sm:text-2xl font-display font-extrabold text-foreground tracking-tight flex items-center gap-2">
+                  <span>{creator.fullName}</span>
+                  <Award size={18} className="text-primary fill-primary/20 shrink-0" />
+                </h1>
+                <p className="text-xs text-primary font-mono font-bold">
+                  @{creator.username}
+                </p>
+                {creator.headline && (
+                  <p className="text-xs text-muted-foreground font-medium pt-1">
+                    {creator.headline}
+                  </p>
+                )}
+              </div>
+
+              {/* Primary Follow & Action Bar */}
               <div className="flex items-center gap-2 pt-1">
-                {isCurrentUser ? (
+                {isOwnProfile ? (
                   <Link
                     to="/dashboard/settings"
-                    className="w-full py-2 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-bold text-center transition-all"
+                    className="flex-1 py-2 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold text-center transition-colors shadow-xs"
                   >
-                    Edit Profile
+                    Edit Studio Profile
                   </Link>
                 ) : (
                   <>
                     <motion.button
-                      whileTap={{ scale: 0.96 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => toggleFollow(creator.id)}
-                      className={`flex-1 py-2 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      className={`flex-1 py-2 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm ${
                         isFollowing
-                          ? "border border-border bg-muted text-muted-foreground"
-                          : "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(170,255,56,0.3)] hover:opacity-90"
+                          ? "bg-muted text-muted-foreground border border-border"
+                          : "bg-primary text-primary-foreground hover:opacity-90 shadow-[0_0_15px_rgba(205,242,43,0.25)]"
                       }`}
                     >
                       {isFollowing ? (
@@ -190,7 +178,7 @@ export default function CreatorProfilePage() {
               {/* Behance Creator Stats Grid */}
               <div className="grid grid-cols-2 gap-2 pt-3 border-t border-border text-center">
                 <div className="p-2.5 rounded-xl bg-muted/20 border border-border/50">
-                  <span className="text-[10px] font-mono text-muted-foreground block uppercase">
+                  <span className="text-[10px] font-mono text-muted-foreground block uppercase font-bold">
                     Project Views
                   </span>
                   <span className="text-sm font-bold font-mono text-foreground">
@@ -199,7 +187,7 @@ export default function CreatorProfilePage() {
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-muted/20 border border-border/50">
-                  <span className="text-[10px] font-mono text-muted-foreground block uppercase">
+                  <span className="text-[10px] font-mono text-muted-foreground block uppercase font-bold">
                     Appreciations
                   </span>
                   <span className="text-sm font-bold font-mono text-foreground">
@@ -208,7 +196,7 @@ export default function CreatorProfilePage() {
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-muted/20 border border-border/50">
-                  <span className="text-[10px] font-mono text-muted-foreground block uppercase">
+                  <span className="text-[10px] font-mono text-muted-foreground block uppercase font-bold">
                     Followers
                   </span>
                   <span className="text-sm font-bold font-mono text-foreground">
@@ -217,7 +205,7 @@ export default function CreatorProfilePage() {
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-muted/20 border border-border/50">
-                  <span className="text-[10px] font-mono text-muted-foreground block uppercase">
+                  <span className="text-[10px] font-mono text-muted-foreground block uppercase font-bold">
                     Following
                   </span>
                   <span className="text-sm font-bold font-mono text-foreground">
@@ -250,10 +238,10 @@ export default function CreatorProfilePage() {
                   <div className="flex items-center gap-2">
                     <Globe size={13} className="text-primary" />
                     <a
-                      href={creator.website}
+                      href={creator.website.startsWith("http") ? creator.website : `https://${creator.website}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-primary transition-colors truncate"
+                      className="hover:underline hover:text-foreground truncate"
                     >
                       {creator.website.replace(/^https?:\/\//, "")}
                     </a>
@@ -261,27 +249,27 @@ export default function CreatorProfilePage() {
                 )}
               </div>
 
-              {/* Skills & Software */}
+              {/* Skills Chips */}
               {creator.skills && creator.skills.length > 0 && (
                 <div className="pt-3 border-t border-border space-y-2">
                   <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
-                    Focus Areas & Tools
+                    Creative Specialties
                   </span>
-                  <div className="flex flex-wrap gap-1">
-                    {creator.skills.map((s) => (
+                  <div className="flex flex-wrap gap-1.5">
+                    {creator.skills.map((skill) => (
                       <span
-                        key={s}
-                        className="px-2 py-0.5 rounded-md border border-primary/20 bg-primary/10 text-primary text-[10px] font-semibold"
+                        key={skill}
+                        className="px-2 py-0.5 rounded-md bg-muted/50 border border-border text-foreground text-[11px] font-medium"
                       >
-                        {s}
+                        {skill}
                       </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Social Links */}
-              <div className="pt-3 border-t border-border flex items-center justify-center gap-2 text-muted-foreground">
+              {/* Social Channels */}
+              <div className="pt-3 border-t border-border flex items-center gap-2 text-muted-foreground">
                 {creator.socialLinks?.twitter && (
                   <a
                     href={creator.socialLinks.twitter}
@@ -357,7 +345,7 @@ export default function CreatorProfilePage() {
                 }`}
               >
                 <Bookmark size={14} />
-                <span>Moodboards ({savedProjects.length})</span>
+                <span>Moodboards & Collections ({collections.length})</span>
                 {activeTab === "moodboards" && (
                   <motion.span
                     layoutId="profileTabLine"
@@ -432,17 +420,61 @@ export default function CreatorProfilePage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
+                  className="space-y-8"
                 >
-                  {savedProjects.length === 0 ? (
-                    <div className="py-16 text-center text-muted-foreground text-xs space-y-2">
-                      <p>No saved projects in your moodboard.</p>
-                      <p className="text-[11px]">Click the bookmark icon on any project to curate it here.</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                      {savedProjects.map((p) => (
-                        <ProjectCard key={p.id} project={p} />
+                  {/* Curated Collections / Moodboards Cards */}
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground font-mono">
+                      Curated Moodboards ({collections.length})
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {collections.map((col) => (
+                        <div
+                          key={col.id}
+                          className="group rounded-2xl border border-border bg-card p-4 space-y-3 hover:border-primary/50 transition-all"
+                        >
+                          <div className="relative aspect-[16/10] rounded-xl bg-muted/40 overflow-hidden border border-border">
+                            {col.coverImage ? (
+                              <img
+                                src={col.coverImage}
+                                alt={col.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                <FolderHeart size={24} />
+                              </div>
+                            )}
+                            <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-white font-mono text-[10px]">
+                              {col.projectIds.length} items
+                            </span>
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                              {col.title}
+                            </h4>
+                            {col.description && (
+                              <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
+                                {col.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Individual Bookmarked Works */}
+                  {savedProjects.length > 0 && (
+                    <div className="space-y-4 pt-4 border-t border-border">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground font-mono">
+                        Direct Bookmarked Items ({savedProjects.length})
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                        {savedProjects.map((p) => (
+                          <ProjectCard key={p.id} project={p} />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </motion.div>

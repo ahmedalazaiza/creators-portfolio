@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // Pages
 import HomePage from "./pages/HomePage";
+import SearchPage from "./pages/SearchPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import CreatorProfilePage from "./pages/CreatorProfilePage";
 import CreatorsPage from "./pages/CreatorsPage";
@@ -47,6 +48,9 @@ function AppContent({
             <Route path="/" element={<HomePage />} />
             <Route path="/explore" element={<Navigate to="/" replace />} />
             <Route path="/discover" element={<Navigate to="/" replace />} />
+
+            {/* Dedicated Search & Deep Discovery */}
+            <Route path="/search" element={<SearchPage />} />
 
             {/* Creators Hub */}
             <Route path="/creators" element={<CreatorsPage />} />

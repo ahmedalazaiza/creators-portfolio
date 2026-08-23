@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
-import { Search, X, ArrowUpRight, Sparkles, User, Tag } from "lucide-react";
+import { Search, X, ArrowUpRight, Sparkles, User, Tag, ArrowRight } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
 import { MOCK_CREATORS } from "../data/mockData";
 import { CATEGORIES } from "../data/categories";
@@ -31,9 +31,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         if (isOpen) onClose();
-        else {
-          // Open handled externally or we can toggle
-        }
       }
       if (e.key === "Escape" && isOpen) {
         onClose();
@@ -71,9 +68,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const matchedCategories = q
     ? CATEGORIES.filter(
         (c) =>
-          c.slug !== "all" &&
-          (c.name.toLowerCase().includes(q) ||
-            c.description?.toLowerCase().includes(q))
+          c.name.toLowerCase().includes(q) ||
+          c.slug.toLowerCase().includes(q) ||
+          c.description?.toLowerCase().includes(q)
       ).slice(0, 3)
     : [];
 
@@ -90,6 +87,14 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const handleSelectCategory = (slug: string) => {
     onClose();
     navigate(`/?category=${slug}`);
+  };
+
+  const handleFullSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      onClose();
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    }
   };
 
   return (
@@ -113,64 +118,78 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           className="relative w-full max-w-2xl bg-card border border-border rounded-3xl shadow-2xl overflow-hidden z-10"
         >
           {/* Search Input Bar */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-border bg-muted/20">
-            <Search size={20} className="text-muted-foreground shrink-0" />
+          <form onSubmit={handleFullSearch} className="flex items-center gap-3 px-6 py-4 border-b border-border bg-muted/20">
+            <Search size={20} className="text-primary shrink-0" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search masterworks, tools (Figma, Blender), creators, fields..."
-              className="w-full bg-transparent text-foreground placeholder:text-muted-foreground text-base focus:outline-none"
+              className="w-full bg-transparent text-foreground placeholder:text-muted-foreground text-sm focus:outline-none"
             />
             {query && (
               <button
+                type="button"
                 onClick={() => setQuery("")}
                 className="text-muted-foreground hover:text-foreground p-1"
               >
                 <X size={16} />
               </button>
             )}
-            <kbd className="hidden sm:inline-block font-mono text-[10px] px-2 py-1 rounded bg-muted text-muted-foreground border border-border">
-              ESC
-            </kbd>
-          </div>
+            <button
+              type="submit"
+              className="hidden sm:inline-flex items-center gap-1 font-mono text-xs px-2.5 py-1 rounded-full bg-primary text-primary-foreground font-bold cursor-pointer"
+            >
+              Search <ArrowRight size={11} />
+            </button>
+          </form>
 
           {/* Results or Suggestions */}
           <div className="max-h-[60vh] overflow-y-auto p-4 sm:p-6 space-y-6">
-            {q === "" ? (
-              <div>
-                <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-widest mb-3">
-                  <Sparkles size={14} className="text-primary" /> Popular Creative Fields
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => handleSelectCategory(cat.slug)}
-                      className="flex items-center justify-between p-3 rounded-2xl border border-border bg-muted/10 hover:bg-primary/10 hover:border-primary/40 text-left text-xs font-medium text-foreground transition-all group"
-                    >
-                      <span className="truncate">{cat.name}</span>
-                      <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 text-primary transition-opacity shrink-0" />
-                    </button>
-                  ))}
+            {!query ? (
+              <>
+                {/* Popular Disciplines */}
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                    <Sparkles size={14} className="text-primary" /> Popular Disciplines
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {CATEGORIES.slice(0, 6).map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => handleSelectCategory(cat.slug)}
+                        className="px-3.5 py-2 rounded-full border border-border hover:border-primary/50 hover:bg-muted/40 text-xs font-semibold text-foreground transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <span>{cat.name}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="mt-6 flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-widest mb-3">
-                  <Tag size={14} /> Trending Tags & Tools
+                {/* Popular Software Tags */}
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                    <Tag size={14} className="text-primary" /> Popular Software & Tools
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {["Figma", "Blender", "Cinema 4D", "Spline", "After Effects", "Midjourney"].map(
+                      (tool) => (
+                        <button
+                          key={tool}
+                          onClick={() => {
+                            onClose();
+                            navigate(`/search?tool=${encodeURIComponent(tool)}`);
+                          }}
+                          className="px-3 py-1.5 rounded-full bg-muted/40 hover:bg-primary hover:text-primary-foreground text-xs font-medium transition-colors cursor-pointer"
+                        >
+                          {tool}
+                        </button>
+                      )
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {["Figma", "Blender", "Design System", "Octane Render", "Brutalism", "Typography", "RTL Design", "Architectural"].map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => setQuery(tag)}
-                      className="px-3 py-1.5 rounded-full border border-border bg-card text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
-                    >
-                      #{tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              </>
             ) : (
               <>
                 {/* Matched Creators */}
@@ -179,7 +198,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-wider mb-2">
                       <User size={14} /> Creators
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       {matchedCreators.map((creator) => (
                         <button
                           key={creator.id}
@@ -190,13 +209,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             <img
                               src={creator.avatarUrl}
                               alt={creator.fullName}
-                              className="w-9 h-9 rounded-full object-cover border border-border"
+                              className="w-10 h-10 rounded-full object-cover border border-border"
                             />
                             <div>
-                              <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                              <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
                                 {creator.fullName}
                               </div>
-                              <div className="text-xs text-muted-foreground">
+                              <div className="text-xs text-muted-foreground font-mono">
                                 @{creator.username} · {creator.location}
                               </div>
                             </div>
@@ -246,19 +265,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                   </div>
                 )}
 
-                {/* Empty State */}
-                {matchedProjects.length === 0 &&
-                  matchedCreators.length === 0 &&
-                  matchedCategories.length === 0 && (
-                    <div className="py-12 text-center text-muted-foreground">
-                      <p className="text-sm mb-2 font-display font-medium text-foreground">
-                        No matches found for "{query}"
-                      </p>
-                      <p className="text-xs">
-                        Try searching by field, software tool, or creator name.
-                      </p>
-                    </div>
-                  )}
+                {/* Full Search Results Button */}
+                <div className="pt-2 border-t border-border">
+                  <button
+                    onClick={handleFullSearch}
+                    className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                  >
+                    <span>View all matching results on Search Page for "{query}"</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
               </>
             )}
           </div>
