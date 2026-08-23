@@ -94,7 +94,7 @@ export default function ProjectDetailPage() {
         particleCount: 45,
         spread: 60,
         origin: { y: 0.8 },
-        colors: ["#CDF22B", "#1E45FB", "#ffffff"],
+        colors: ["#CDF22B", "#090D16", "#ffffff", "#bfe61e"],
       });
     }
   };

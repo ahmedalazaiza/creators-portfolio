@@ -115,7 +115,7 @@ export default function SearchPage() {
       className="min-h-screen pt-14 sm:pt-16 pb-20 bg-background"
     >
       {/* Search Header Stage */}
-      <section className="border-b border-border/40 bg-gradient-to-b from-[#1E45FB]/10 via-card/20 to-background py-8">
+      <section className="border-b border-border/40 bg-gradient-to-b from-[#CDF22B]/15 via-card/20 to-background py-8">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <div className="max-w-2xl mx-auto space-y-3 text-center">
             <h1 className="text-2xl sm:text-4xl font-display font-extrabold text-foreground tracking-tight">

@@ -26,7 +26,7 @@ export default function CreatorsPage() {
     >
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto space-y-3">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-mono font-medium">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-xs font-mono font-semibold border border-[#CDF22B]/40">
           <Users size={13} />
           <span>Creators Community</span>
         </div>
@@ -47,13 +47,13 @@ export default function CreatorsPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search by name, skill, or specialty..."
-          className="w-full pl-11 pr-4 py-3 rounded-2xl glass-card border border-slate-200/80 dark:border-slate-800/80 text-foreground placeholder:text-muted-foreground text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all"
+          className="w-full pl-11 pr-4 py-3 rounded-2xl glass-card border border-slate-200/80 dark:border-slate-800/80 text-foreground placeholder:text-muted-foreground text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#CDF22B]/30 focus:border-[#CDF22B] shadow-sm transition-all"
         />
       </div>
 
       {/* Empty State / Directory Placeholder */}
       <div className="glass-card rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 p-12 sm:p-16 text-center max-w-xl mx-auto space-y-4 shadow-sm">
-        <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto shadow-inner">
+        <div className="w-14 h-14 rounded-2xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto shadow-inner">
           <UserPlus size={24} />
         </div>
 
@@ -69,7 +69,7 @@ export default function CreatorsPage() {
         {!isLoggedIn && (
           <Link
             to="/signup"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 hover:opacity-95 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full btn-primary text-xs font-bold shadow-md cursor-pointer"
           >
             <span>Create Your Creator Profile</span>
             <ArrowRight size={14} />

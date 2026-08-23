@@ -1,6 +1,6 @@
 {
-  "short_name": "Azaiza Gallery",
-  "name": "Azaiza Gallery — Curated Creators Portfolios",
+  "short_name": "Portfolios",
+  "name": "Portfolios — Creative Showcase Platform",
   "icons": [
     {
       "src": "/favicon.ico",
@@ -9,8 +9,8 @@
     }
   ],
   "start_url": "/",
-  "background_color": "#0d111a",
-  "theme_color": "#0057ff",
+  "background_color": "#f8fafc",
+  "theme_color": "#CDF22B",
   "display": "standalone",
   "orientation": "portrait"
 }

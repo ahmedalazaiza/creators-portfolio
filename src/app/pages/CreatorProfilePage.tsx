@@ -137,7 +137,7 @@ export default function CreatorProfilePage() {
 
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 pt-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-1.5">
-                <MapPin size={13} className="text-[#1E45FB]" />
+                <MapPin size={13} className="text-foreground" />
                 <span>{profileUser.location}</span>
               </div>
               <div className="flex items-center gap-1.5">

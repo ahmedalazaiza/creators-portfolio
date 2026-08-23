@@ -131,7 +131,7 @@ export default function HomePage() {
             to="/dashboard"
             className="px-6 py-3 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-800 shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
           >
-            <Compass size={15} className="text-[#1E45FB]" />
+            <Compass size={15} className="text-foreground" />
             <span>Creator Studio</span>
           </Link>
         </motion.div>

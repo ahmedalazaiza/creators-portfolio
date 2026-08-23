@@ -452,7 +452,7 @@ export default function ProjectEditorPage() {
               >
                 <div className="w-14 h-14 rounded-2xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto group-hover:scale-105 transition-transform">
                   {uploadingCover ? (
-                    <Loader2 size={24} className="animate-spin text-indigo-600" />
+                    <Loader2 size={24} className="animate-spin text-slate-900 dark:text-[#CDF22B]" />
                   ) : (
                     <UploadCloud size={26} />
                   )}
@@ -553,7 +553,7 @@ export default function ProjectEditorPage() {
                   className="aspect-video rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-[#CDF22B] flex flex-col items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   {uploadingGallery ? (
-                    <Loader2 size={18} className="animate-spin text-indigo-500" />
+                    <Loader2 size={18} className="animate-spin text-slate-900 dark:text-[#CDF22B]" />
                   ) : (
                     <>
                       <Plus size={18} />

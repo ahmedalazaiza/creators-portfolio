@@ -149,7 +149,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
                       >
-                        <User size={14} className="text-[#1E45FB]" />
+                        <User size={14} className="text-foreground" />
                         <span>My Profile</span>
                       </Link>
 

@@ -74,7 +74,7 @@ export default function DashboardPage() {
             to="/profile"
             className="px-4 py-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground text-xs font-semibold border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1.5 transition-colors"
           >
-            <User size={14} className="text-[#1E45FB]" />
+            <User size={14} className="text-foreground" />
             <span>Public Profile</span>
           </Link>
 

@@ -20,7 +20,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           animate={{ opacity: 1, scale: 1 }}
           className="glass-card p-6 rounded-3xl flex flex-col items-center gap-3 text-center"
         >
-          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center animate-pulse">
+          <div className="w-10 h-10 rounded-2xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center animate-pulse">
             <Sparkles size={20} />
           </div>
           <span className="text-xs font-medium text-muted-foreground">

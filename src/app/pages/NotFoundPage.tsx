@@ -11,7 +11,7 @@ export default function NotFoundPage() {
         animate={{ opacity: 1, scale: 1 }}
         className="glass-card rounded-3xl p-10 sm:p-12 max-w-md w-full text-center space-y-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 relative overflow-hidden"
       >
-        <div className="w-16 h-16 rounded-3xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto text-2xl font-bold font-mono">
+        <div className="w-16 h-16 rounded-3xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto text-2xl font-bold font-mono">
           404
         </div>
 
@@ -27,7 +27,7 @@ export default function NotFoundPage() {
         <div className="flex items-center justify-center gap-3 pt-2">
           <Link
             to="/"
-            className="px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 hover:opacity-95 flex items-center gap-2"
+            className="px-6 py-2.5 rounded-full btn-primary text-xs font-bold shadow-md active:scale-95 flex items-center gap-2"
           >
             <ArrowLeft size={14} />
             <span>Return Home</span>

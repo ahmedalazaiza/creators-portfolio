@@ -84,7 +84,7 @@ export default function AuthPage() {
     <div className="min-h-[90vh] flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
       {/* Soft Ambient Brand Glow in Background */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#CDF22B]/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#1E45FB]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-slate-200/40 dark:bg-slate-800/40 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main Glass Card Container */}
       <motion.div
