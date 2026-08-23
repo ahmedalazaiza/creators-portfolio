@@ -24,12 +24,6 @@ import NotFoundPage from "./pages/NotFoundPage";
 export const API_BASE: string =
   (import.meta as any).env?.VITE_API_URL ?? "https://api.yourdomain.com";
 
-function ProfileRedirect() {
-  const { user } = useAuth();
-  const username = user?.username || "ahmed_azaiza";
-  return <Navigate to={`/@${username}`} replace />;
-}
-
 function PageTitleHandler() {
   const location = useLocation();
   const { language } = useLanguage();
@@ -52,7 +46,13 @@ function PageTitleHandler() {
         : "Discover Leading Creators & Designers — Azaiza Gallery";
     } else if (path.startsWith("/project/")) {
       document.title = isAr ? "دراسة حالة — معرض العزايزة" : "Case Study — Azaiza Gallery";
-    } else if (path.startsWith("/@") || path.startsWith("/profile")) {
+    } else if (
+      path === "/profile" ||
+      path === "/my-profile" ||
+      path.startsWith("/creator/") ||
+      path.startsWith("/user/") ||
+      path.startsWith("/@")
+    ) {
       document.title = isAr ? "ملف المبدع — معرض العزايزة" : "Creator Portfolio — Azaiza Gallery";
     } else if (path === "/dashboard") {
       document.title = isAr ? "استوديو المبدع والتحليلات — معرض العزايزة" : "Creator Studio & Analytics — Azaiza Gallery";
@@ -60,7 +60,7 @@ function PageTitleHandler() {
       document.title = isAr ? "إنشاء دراسة حالة جديدة — معرض العزايزة" : "Create New Case Study — Azaiza Gallery";
     } else if (path.startsWith("/dashboard/edit/")) {
       document.title = isAr ? "تعديل دراسة الحالة — معرض العزايزة" : "Edit Case Study — Azaiza Gallery";
-    } else if (path === "/dashboard/settings") {
+    } else if (path === "/dashboard/settings" || path === "/settings") {
       document.title = isAr ? "إعدادات الحساب والملف — معرض العزايزة" : "Account & Profile Settings — Azaiza Gallery";
     } else {
       document.title = isAr ? "معرض العزايزة" : "Azaiza Gallery";
@@ -88,41 +88,44 @@ function AppContent({
       <div className="flex-1">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            {/* Explore / Home */}
+            {/* 1. Explore / Home Routes */}
             <Route path="/" element={<HomePage />} />
-            <Route path="/explore" element={<Navigate to="/" replace />} />
-            <Route path="/discover" element={<Navigate to="/" replace />} />
+            <Route path="/explore" element={<HomePage />} />
+            <Route path="/discover" element={<HomePage />} />
 
-            {/* Dedicated Search & Deep Discovery */}
+            {/* 2. Deep Search & Discover */}
             <Route path="/search" element={<SearchPage />} />
 
-            {/* Creators Hub */}
+            {/* 3. Creators Directory Hub */}
             <Route path="/creators" element={<CreatorsPage />} />
 
-            {/* Project Case Study */}
+            {/* 4. Project Case Study Canvas */}
             <Route path="/project/:slug" element={<ProjectDetailPage />} />
+            <Route path="/p/:slug" element={<ProjectDetailPage />} />
 
-            {/* My Profile Shortcut & Creator Profiles */}
-            <Route path="/profile" element={<ProfileRedirect />} />
-            <Route path="/my-profile" element={<ProfileRedirect />} />
-            <Route path="/@:username" element={<CreatorProfilePage />} />
-            <Route path="/user/:username" element={<CreatorProfilePage />} />
-            <Route path="/creator/:username" element={<CreatorProfilePage />} />
-
-            {/* Authentication */}
-            <Route path="/login" element={<AuthPage />} />
-            <Route path="/signup" element={<AuthPage />} />
-
-            {/* Creator Dashboard & Studio */}
+            {/* 5. Creator Studio & Dashboard */}
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/dashboard/new" element={<ProjectEditorPage />} />
             <Route path="/dashboard/edit/:id" element={<ProjectEditorPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
 
-            {/* Legacy aliases */}
-            <Route path="/adashboard" element={<Navigate to="/dashboard" replace />} />
+            {/* 6. Authentication */}
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/signup" element={<AuthPage />} />
 
-            {/* 404 */}
+            {/* 7. Profile Routes (Direct & Parameterized) */}
+            <Route path="/profile" element={<CreatorProfilePage />} />
+            <Route path="/my-profile" element={<CreatorProfilePage />} />
+            <Route path="/profile/:username" element={<CreatorProfilePage />} />
+            <Route path="/creator/:username" element={<CreatorProfilePage />} />
+            <Route path="/user/:username" element={<CreatorProfilePage />} />
+            <Route path="/u/:username" element={<CreatorProfilePage />} />
+
+            {/* 8. Top-level username route for /@username or /username */}
+            <Route path="/:username" element={<CreatorProfilePage />} />
+
+            {/* 9. 404 Fallback */}
             <Route path="/404" element={<NotFoundPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

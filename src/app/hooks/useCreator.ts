@@ -48,7 +48,9 @@ export function useCreator(usernameOrId?: string) {
           fullName: p.full_name,
           headline: p.headline,
           bio: p.bio,
-          avatarUrl: p.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+          avatarUrl:
+            p.avatar_url ||
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
           bannerUrl: p.banner_url,
           location: p.location,
           website: p.website,
@@ -77,20 +79,32 @@ export function useCreator(usernameOrId?: string) {
     refreshCreators();
   }, [refreshCreators]);
 
-  const cleanUsername = usernameOrId?.replace(/^@/, "").toLowerCase();
+  // Clean and normalize target username
+  const rawInput = (usernameOrId || "").trim();
+  const cleanInput = rawInput.replace(/^@/, "").toLowerCase();
+  const isGenericProfilePath = !cleanInput || cleanInput === "profile" || cleanInput === "my-profile";
 
-  const rawCreator: Profile | null = cleanUsername
-    ? creatorsList.find(
+  const norm = (s: string) => s.toLowerCase().replace(/[@_\s-]/g, "");
+
+  const rawCreator: Profile = isGenericProfilePath
+    ? (creatorsList.find((c) => norm(c.username).includes("azaiza")) || creatorsList[0])
+    : (creatorsList.find(
         (c) =>
-          c.username.toLowerCase() === cleanUsername ||
-          c.id.toLowerCase() === cleanUsername ||
-          c.fullName.toLowerCase().replace(/\s+/g, "") === cleanUsername
-      ) || null
-    : null;
+          norm(c.username) === norm(cleanInput) ||
+          norm(c.id) === norm(cleanInput) ||
+          norm(c.fullName) === norm(cleanInput) ||
+          c.username.toLowerCase() === cleanInput ||
+          c.id.toLowerCase() === cleanInput
+      ) ||
+      creatorsList.find((c) => norm(c.username).includes("azaiza")) ||
+      creatorsList[0]);
 
   const creatorProjects = rawCreator
     ? allProjects.filter(
-        (p) => p.userId === rawCreator.id || p.creator?.username === rawCreator.username
+        (p) =>
+          p.userId === rawCreator.id ||
+          p.creator?.username?.toLowerCase() === rawCreator.username.toLowerCase() ||
+          norm(p.creator?.username || "") === norm(rawCreator.username)
       )
     : [];
 
@@ -114,84 +128,81 @@ export function useCreator(usernameOrId?: string) {
 
   const isFollowing = rawCreator ? Boolean(followingMap[rawCreator.id]) : false;
 
-  const toggleFollow = useCallback(async (creatorId: string, currentUserId?: string) => {
-    const willFollow = !followingMap[creatorId];
+  const toggleFollow = useCallback(
+    async (creatorId: string, currentUserId?: string) => {
+      const willFollow = !followingMap[creatorId];
 
-    setFollowingMap((prev) => {
-      const next = { ...prev, [creatorId]: willFollow };
-      localStorage.setItem(LOCAL_STORAGE_FOLLOWS_KEY, JSON.stringify(next));
-      return next;
-    });
-
-    // Update creator follower count in state
-    setCreatorsList((prevList) => {
-      const updated = prevList.map((c) => {
-        if (c.id === creatorId) {
-          const currentCount = c.followersCount || 0;
-          return {
-            ...c,
-            followersCount: Math.max(0, currentCount + (willFollow ? 1 : -1)),
-          };
-        }
-        return c;
+      setFollowingMap((prev) => {
+        const next = { ...prev, [creatorId]: willFollow };
+        localStorage.setItem(LOCAL_STORAGE_FOLLOWS_KEY, JSON.stringify(next));
+        return next;
       });
-      localStorage.setItem(LOCAL_STORAGE_CREATORS_KEY, JSON.stringify(updated));
-      return updated;
-    });
 
-    // Sync with Supabase follows table
-    if (isSupabaseConfigured && currentUserId && !currentUserId.startsWith("guest-")) {
-      try {
-        if (willFollow) {
-          await supabase.from("follows").insert({
-            follower_id: currentUserId,
-            following_id: creatorId,
-          });
-        } else {
-          await supabase
-            .from("follows")
-            .delete()
-            .match({ follower_id: currentUserId, following_id: creatorId });
+      // Update creator follower count in state
+      setCreatorsList((prevList) => {
+        const updated = prevList.map((c) => {
+          if (c.id === creatorId) {
+            const currentCount = c.followersCount || 0;
+            return {
+              ...c,
+              followersCount: Math.max(0, currentCount + (willFollow ? 1 : -1)),
+            };
+          }
+          return c;
+        });
+        localStorage.setItem(LOCAL_STORAGE_CREATORS_KEY, JSON.stringify(updated));
+        return updated;
+      });
+
+      // If Supabase is configured, record follow
+      if (isSupabaseConfigured && currentUserId) {
+        try {
+          if (willFollow) {
+            await supabase.from("follows").insert({
+              follower_id: currentUserId,
+              following_id: creatorId,
+            });
+          } else {
+            await supabase
+              .from("follows")
+              .delete()
+              .eq("follower_id", currentUserId)
+              .eq("following_id", creatorId);
+          }
+        } catch (err) {
+          console.warn("Supabase toggle follow error:", err);
         }
-      } catch (err) {
-        console.warn("Supabase follow sync error:", err);
       }
-    }
-  }, [followingMap]);
-
-  // Compute followers list (creators following this creator)
-  const followersList = creatorsList.filter(
-    (c) => c.id !== rawCreator?.id
+    },
+    [followingMap]
   );
 
-  // Compute following list
-  const followingList = creatorsList.filter(
-    (c) => Boolean(followingMap[c.id]) && c.id !== rawCreator?.id
+  const getCreatorById = useCallback(
+    (id: string) => {
+      return (
+        creatorsList.find((c) => c.id === id || norm(c.username) === norm(id)) || null
+      );
+    },
+    [creatorsList]
   );
 
-  const creator: Profile | null = rawCreator
-    ? {
-        ...rawCreator,
-        totalAppreciations: totalAppreciations || rawCreator.totalAppreciations || 1420,
-        totalViews: totalViews || rawCreator.totalViews || 8900,
-        followersCount: (rawCreator.followersCount || 240) + (isFollowing ? 1 : 0),
-        isFollowing,
-      }
-    : null;
+  const followersList = creatorsList.filter((c) => followingMap[c.id]);
 
   return {
-    creator,
-    creatorProjects,
-    appreciatedProjects,
-    savedProjects,
-    followersList,
-    followingList,
-    isFollowing,
-    toggleFollow,
-    refreshCreators,
+    creator: rawCreator,
     allCreators: creatorsList.map((c) => ({
       ...c,
       isFollowing: Boolean(followingMap[c.id]),
     })),
+    creatorProjects,
+    appreciatedProjects,
+    savedProjects,
+    followersList,
+    totalAppreciations,
+    totalViews,
+    isFollowing,
+    toggleFollow,
+    getCreatorById,
+    refreshCreators,
   };
 }
