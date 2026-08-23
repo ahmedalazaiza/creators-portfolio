@@ -100,7 +100,7 @@ export function useProjects(filters?: ProjectFilters) {
           category: item.category,
           categoryId: item.category_id,
           coverImage: item.cover_image,
-          accentColor: item.accent_color || "#CDF22B",
+          accentColor: item.accent_color || "#0057ff",
           year: item.year || "2025",
           tools: item.tools || [],
           tags: item.tags || [],
@@ -442,7 +442,7 @@ export function useProjects(filters?: ProjectFilters) {
         coverImage:
           projectData.coverImage ||
           "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80",
-        accentColor: projectData.accentColor || "#CDF22B",
+        accentColor: projectData.accentColor || "#0057ff",
         year: projectData.year || new Date().getFullYear().toString(),
         tools: projectData.tools || ["Figma"],
         tags: projectData.tags || ["Design"],

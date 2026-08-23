@@ -38,7 +38,7 @@ export default function OnboardingModal() {
       particleCount: 70,
       spread: 55,
       origin: { y: 0.6 },
-      colors: ["#CDF22B", "#1E45FB", "#ffffff"],
+      colors: ["#0057ff", "#38bdf8", "#ffffff"],
     });
   };
 
@@ -185,7 +185,7 @@ export default function OnboardingModal() {
                 <button
                   type="button"
                   onClick={handleFinish}
-                  className="px-7 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_20px_rgba(205,242,43,0.35)] hover:opacity-90 flex items-center gap-1.5 cursor-pointer"
+                  className="px-7 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_20px_rgba(0,87,255,0.35)] hover:opacity-90 flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>Start Exploring Gallery</span>
                   <Check size={14} />

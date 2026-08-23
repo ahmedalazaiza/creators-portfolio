@@ -533,12 +533,12 @@ export default function DashboardPage() {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1E45FB" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#1E45FB" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#0057ff" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#0057ff" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="colorAppreciations" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#CDF22B" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#CDF22B" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <XAxis
@@ -566,7 +566,7 @@ export default function DashboardPage() {
                     <Area
                       type="monotone"
                       dataKey="views"
-                      stroke="#1E45FB"
+                      stroke="#0057ff"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorViews)"
@@ -575,7 +575,7 @@ export default function DashboardPage() {
                     <Area
                       type="monotone"
                       dataKey="appreciations"
-                      stroke="#CDF22B"
+                      stroke="#38bdf8"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorAppreciations)"

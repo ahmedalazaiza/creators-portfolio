@@ -27,14 +27,14 @@ import { CATEGORIES, POPULAR_TOOLS } from "../data/categories";
 import { uploadImageToSupabase } from "../../lib/supabase";
 
 const COLOR_PRESETS = [
-  "#CDF22B", // Volt Lime
-  "#1E45FB", // Cobalt Blue
-  "#00F2FE", // Cyan
-  "#FF007A", // Neon Pink
-  "#7928CA", // Purple
-  "#FF6B00", // Orange
-  "#10B981", // Emerald
-  "#E11D48", // Rose
+  "#0057ff", // Royal Blue
+  "#2563eb", // Electric Blue
+  "#0284c7", // Sky Blue
+  "#06b6d4", // Cyan
+  "#6366f1", // Indigo
+  "#8b5cf6", // Purple
+  "#10b981", // Emerald
+  "#e11d48", // Rose
 ];
 
 export default function ProjectEditorPage() {
@@ -51,7 +51,7 @@ export default function ProjectEditorPage() {
   const [slug, setSlug] = useState("");
   const [categoryId, setCategoryId] = useState("ui-ux");
   const [year, setYear] = useState(new Date().getFullYear().toString());
-  const [accentColor, setAccentColor] = useState("#CDF22B");
+  const [accentColor, setAccentColor] = useState("#0057ff");
   const [description, setDescription] = useState("");
   const [fullDescription, setFullDescription] = useState("");
   const [coverImage, setCoverImage] = useState("");
@@ -577,7 +577,7 @@ export default function ProjectEditorPage() {
                     style={{ backgroundColor: color }}
                   >
                     {accentColor === color && (
-                      <Check size={13} className={color === "#CDF22B" ? "text-black" : "text-white"} />
+                      <Check size={13} className="text-white" />
                     )}
                   </button>
                 ))}
@@ -585,7 +585,7 @@ export default function ProjectEditorPage() {
                   type="text"
                   value={accentColor}
                   onChange={(e) => setAccentColor(e.target.value)}
-                  placeholder="#CDF22B"
+                  placeholder="#0057ff"
                   className="w-24 px-2.5 py-1 rounded-lg border border-border bg-input-background text-foreground text-xs font-mono ml-2"
                 />
               </div>

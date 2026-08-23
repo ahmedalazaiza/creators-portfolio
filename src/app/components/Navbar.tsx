@@ -176,7 +176,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               aria-label="Toggle theme"
               className="p-2 rounded-full border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
             >
-              {isDark ? <Sun size={15} className="text-[#CDF22B]" /> : <Moon size={15} />}
+              {isDark ? <Sun size={15} className="text-[#0057ff]" /> : <Moon size={15} />}
             </button>
 
             {/* Notifications Bell */}

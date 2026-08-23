@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSearchParams, Link } from "react-router";
+import { useSearchParams, Link, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Sparkles,
@@ -20,6 +20,11 @@ import {
   UserCheck,
   Zap,
   Bookmark,
+  SlidersHorizontal,
+  ChevronDown,
+  Image as ImageIcon,
+  Briefcase,
+  Camera,
 } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
 import { useCreator } from "../hooks/useCreator";
@@ -40,11 +45,14 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [activeFeed, setActiveFeed] = useState<FeedType>(feedParam);
+  const [searchTab, setSearchTab] = useState<"projects" | "people" | "assets" | "images">("projects");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const { user } = useAuth();
   const { allCreators, toggleFollow } = useCreator();
   const { t } = useLanguage();
   const { recommendedProjects } = useRecommendations();
+  const navigate = useNavigate();
 
   // Sync category param with URL
   useEffect(() => {
@@ -82,6 +90,15 @@ export default function HomePage() {
     setSortBy("featured");
     searchParams.delete("category");
     setSearchParams(searchParams);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTab === "people") {
+      navigate(`/creators?q=${encodeURIComponent(searchQuery)}`);
+    } else {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}&category=${activeCategory}`);
+    }
   };
 
   const activeFilterCount = useMemo(() => {
@@ -122,204 +139,371 @@ export default function HomePage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="min-h-screen pt-14 sm:pt-16 pb-16"
+      className="min-h-screen pt-14 sm:pt-16 pb-16 bg-background text-foreground"
     >
-      {/* Hero Showcase Section */}
-      <section className="relative overflow-hidden pt-6 sm:pt-10 pb-8 sm:pb-12 border-b border-border/40 bg-gradient-to-b from-[#1E45FB]/12 via-card/30 to-background">
-        <div className="absolute -top-12 left-1/4 w-80 sm:w-96 h-80 sm:h-96 bg-[#1E45FB]/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-72 sm:w-80 h-72 sm:h-80 bg-[#CDF22B]/15 rounded-full blur-3xl pointer-events-none" />
+      {/* Behance Hero Showcase Section with Floating Cards Layout */}
+      <section className="relative overflow-hidden pt-8 sm:pt-14 pb-12 sm:pb-20 border-b border-border/40 bg-gradient-to-b from-[#0057ff]/6 via-background to-background">
+        {/* Soft Background Accent Glows */}
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#0057ff]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-[#0057ff]/8 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-4">
-            {/* Pill Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#CDF22B]/40 bg-[#CDF22B]/10 text-primary text-[11px] font-mono font-bold tracking-wide shadow-[0_0_15px_rgba(205,242,43,0.15)]"
-            >
-              <Sparkles size={12} className="text-[#CDF22B]" />
-              <span>{t("hero.badge", "Azaiza Gallery — Curated Creative Benchmark")}</span>
-            </motion.div>
-
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.05 }}
-              className="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold text-foreground tracking-tight leading-[1.15]"
-            >
-              {t("hero.title1", "Discover & Showcase")} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1E45FB] via-foreground to-[#CDF22B]">
-                {t("hero.title2", "Visionary Craft")}
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.1 }}
-              className="text-muted-foreground text-xs sm:text-sm lg:text-base leading-relaxed max-w-xl"
-            >
-              {t(
-                "hero.subtitle",
-                "Explore benchmark case studies in UI/UX systems, 3D CGI direction, spatial architecture, and brand identity from verified creators worldwide."
-              )}
-            </motion.p>
-
-            {/* Action Hub */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.15 }}
-              className="pt-2 flex flex-wrap items-center justify-center gap-3"
-            >
-              <Link
-                to="/creators"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1E45FB] text-white font-bold text-xs shadow-[0_0_20px_rgba(30,69,251,0.35)] hover:opacity-90 active:scale-95 transition-all cursor-pointer"
-              >
-                <Users size={14} />
-                <span>{t("hero.exploreBtn", "Explore Top Creators")}</span>
-                <ArrowRight size={13} />
-              </Link>
-
-              <Link
-                to={user ? "/dashboard/new" : "/signup"}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-primary/50 bg-[#CDF22B] text-[#070a14] font-bold text-xs shadow-[0_0_20px_rgba(205,242,43,0.3)] hover:opacity-90 active:scale-95 transition-all cursor-pointer"
-              >
-                <Plus size={14} />
-                <span>{t("hero.shareBtn", "Share Masterwork")}</span>
-              </Link>
-            </motion.div>
-
-            {/* Metrics Ribbon */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.2 }}
-              className="flex flex-wrap items-center justify-center gap-6 pt-4 border-t border-border/40 text-xs font-mono text-muted-foreground"
-            >
-              <div className="flex items-center gap-1.5">
-                <Compass size={13} className="text-[#1E45FB] dark:text-[#CDF22B]" />
-                <span className="font-bold text-foreground">2,800+</span> {t("hero.curatedWorks", "Curated Works")}
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Users size={13} className="text-[#1E45FB] dark:text-[#CDF22B]" />
-                <span className="font-bold text-foreground">420+</span> {t("hero.creators", "Visionary Creators")}
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Heart size={13} className="text-rose-500 fill-rose-500/20" />
-                <span className="font-bold text-foreground">125K</span> {t("hero.appreciations", "Appreciations")}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sticky Filter Bar */}
-      <div className="sticky top-14 sm:top-16 z-30 bg-background/95 backdrop-blur-md border-b border-border py-3 shadow-xs">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <FilterBar
-            activeCategory={activeCategory}
-            onSelectCategory={handleCategorySelect}
-            activeTool={activeTool}
-            onSelectTool={setActiveTool}
-            sortBy={sortBy}
-            onSelectSort={setSortBy}
-            onClearFilters={handleClearFilters}
-            activeFilterCount={activeFilterCount}
-          />
-        </div>
-      </div>
-
-      {/* Recommended for You Spotlight (Smart Recommendations) */}
-      {recommendedProjects.length > 0 && !searchQuery && activeCategory === "all" && activeFeed === "for-you" && (
-        <section className="py-5 border-b border-border/30 bg-card/30">
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-bold text-foreground">
-                <Zap size={14} className="text-primary fill-primary/20" />
-                <span>{t("feed.recommendedForYou", "Recommended For You")}</span>
-                <span className="text-[10px] font-mono text-muted-foreground">· AI Curated Match</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              {recommendedProjects.slice(0, 4).map((p) => (
-                <ProjectCard key={p.id} project={p} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Featured Creators Carousel */}
-      <section id="creators" className="py-4 border-b border-border/30 bg-card/20">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
-              <Flame size={14} className="text-amber-400" />
-              <span>Recommended Creators to Follow</span>
-            </div>
-            <Link
-              to="/creators"
-              className="text-[11px] font-mono text-primary hover:underline flex items-center gap-1"
-            >
-              View all creators <ArrowUpRight size={11} />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-            {allCreators.slice(0, 4).map((creator) => {
-              const following = creator.isFollowing;
-              return (
-                <div
-                  key={creator.id}
-                  className="flex items-center justify-between p-2.5 rounded-xl border border-border bg-card hover:border-primary/40 transition-all group"
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-6 lg:gap-4 min-h-[460px]">
+            {/* Left Floating Visual Collage (3 Columns on desktop) */}
+            <div className="hidden lg:grid grid-cols-2 gap-3.5 col-span-3 items-center">
+              <div className="space-y-3.5 -mt-6">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
                 >
-                  <Link
-                    to={`/@${creator.username}`}
-                    className="flex items-center gap-2.5 min-w-0"
-                  >
-                    <div className="relative shrink-0">
-                      <img
-                        src={creator.avatarUrl}
-                        alt={creator.fullName}
-                        className="w-8 h-8 rounded-full object-cover border border-border"
-                      />
-                      {creator.availableForWork && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-background" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                        {creator.fullName}
-                      </div>
-                      <div className="text-[10px] text-muted-foreground truncate">
-                        @{creator.username}
-                      </div>
-                    </div>
-                  </Link>
+                  <img
+                    src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=500&q=80"
+                    alt="Editorial publication"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
 
-                  <button
-                    onClick={() => toggleFollow(creator.id)}
-                    className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-bold transition-all cursor-pointer ${
-                      following
-                        ? "bg-muted text-muted-foreground border border-border"
-                        : "bg-primary text-primary-foreground hover:opacity-90 shadow-sm"
-                    }`}
-                  >
-                    {following ? "Following" : "Follow"}
-                  </button>
-                </div>
-              );
-            })}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=500&q=80"
+                    alt="Ceramic craft design"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=500&q=80"
+                    alt="Brand packaging design"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+              </div>
+
+              <div className="space-y-3.5 mt-4">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.15 }}
+                  className="rounded-2xl overflow-hidden aspect-[4/3] border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80"
+                    alt="Ocean aerial texture"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.25 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=500&q=80"
+                    alt="Futuristic neon vector character"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.35 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=500&q=80"
+                    alt="Modern architecture"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Center Hero Typography & Call-To-Action (6 Columns on desktop) */}
+            <div className="col-span-1 lg:col-span-6 flex flex-col items-center text-center px-2 sm:px-6 space-y-5">
+              {/* Main Headline (Behance Style) */}
+              <motion.h1
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="text-4xl sm:text-6xl lg:text-[68px] font-display font-extrabold text-foreground tracking-tight leading-[1.08]"
+              >
+                The World’s <br />
+                <span className="text-[#0057ff] dark:text-[#2f70ff]">
+                  Best Creators
+                </span> <br />
+                Are On Azaiza
+              </motion.h1>
+
+              {/* Subtitle */}
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="text-muted-foreground text-sm sm:text-base max-w-lg leading-relaxed"
+              >
+                A comprehensive platform to help hirers and creators navigate the creative world from discovering inspiration, to connecting with one another
+              </motion.p>
+
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.18 }}
+                className="pt-2 flex flex-wrap items-center justify-center gap-3"
+              >
+                <Link
+                  to="/creators"
+                  className="px-6 sm:px-7 py-3 rounded-full bg-[#0057ff] hover:bg-[#004cdb] text-white font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(0,87,255,0.35)] active:scale-95 transition-all cursor-pointer flex items-center gap-2"
+                >
+                  <Users size={15} />
+                  <span>Hire a Freelancer</span>
+                </Link>
+
+                <Link
+                  to={user ? "/dashboard/new" : "/signup"}
+                  className="px-6 sm:px-7 py-3 rounded-full border border-border bg-card hover:bg-muted text-foreground font-bold text-xs sm:text-sm shadow-2xs active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Plus size={15} className="text-[#0057ff]" />
+                  <span>Share Your Work</span>
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Right Floating Visual Collage (3 Columns on desktop) */}
+            <div className="hidden lg:grid grid-cols-2 gap-3.5 col-span-3 items-center">
+              <div className="space-y-3.5 -mt-4">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.12 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=500&q=80"
+                    alt="Pastel alpine mountain landscape"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.22 }}
+                  className="rounded-2xl overflow-hidden aspect-[4/3] border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"
+                    alt="3D typography 2024 art"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.32 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=500&q=80"
+                    alt="Monolithic skyscraper"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+              </div>
+
+              <div className="space-y-3.5 mt-6">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.18 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=500&q=80"
+                    alt="Kinetic abstract poster"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.28 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80"
+                    alt="Retro gaming and tech isometric"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.38 }}
+                  className="rounded-2xl overflow-hidden aspect-square border border-border/60 bg-card shadow-sm hover:scale-105 hover:shadow-md transition-all group"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=80"
+                    alt="Isometric urban design architecture"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Main Behance Feed Stage with Feed Tabs */}
-      <section className="pt-6 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+      {/* Behance Filter & Unified Search Ribbon (Matching Exact Screenshot) */}
+      <section className="sticky top-14 sm:top-16 z-30 bg-background/95 backdrop-blur-md border-b border-border py-3 shadow-xs">
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {/* Filter Toggle Pill Button */}
+            <button
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              className={`px-4 py-2.5 rounded-full border text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 ${
+                filtersOpen || activeFilterCount > 0
+                  ? "border-[#0057ff] bg-[#0057ff]/10 text-[#0057ff]"
+                  : "border-border bg-card hover:bg-muted text-foreground"
+              }`}
+            >
+              <SlidersHorizontal size={14} className="text-[#0057ff]" />
+              <span>Filter</span>
+              {activeFilterCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-[#0057ff] text-white text-[10px] flex items-center justify-center font-mono font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+
+            {/* Center Pill Search Input with Internal Tabs */}
+            <form
+              onSubmit={handleSearchSubmit}
+              className="flex-1 flex items-center px-4 py-1.5 rounded-full border border-border bg-muted/40 hover:bg-muted/60 focus-within:bg-card focus-within:border-[#0057ff] focus-within:ring-2 focus-within:ring-[#0057ff]/20 transition-all shadow-inner"
+            >
+              <Search size={15} className="text-muted-foreground mr-2.5 shrink-0" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search Azaiza masterworks, creators, 3D, Figma..."
+                className="w-full bg-transparent text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
+              />
+
+              {/* Inside Pill Tabs: Projects | People | Assets | Images */}
+              <div className="hidden md:flex items-center gap-1 pl-2 border-l border-border shrink-0 text-[11px] font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setSearchTab("projects")}
+                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                    searchTab === "projects"
+                      ? "bg-card text-foreground shadow-xs font-bold border border-border"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Projects
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSearchTab("people")}
+                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                    searchTab === "people"
+                      ? "bg-card text-foreground shadow-xs font-bold border border-border"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  People
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSearchTab("assets")}
+                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                    searchTab === "assets"
+                      ? "bg-card text-foreground shadow-xs font-bold border border-border"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Assets
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSearchTab("images")}
+                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                    searchTab === "images"
+                      ? "bg-card text-foreground shadow-xs font-bold border border-border"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Images
+                </button>
+              </div>
+            </form>
+
+            {/* Right Sort Dropdown */}
+            <div className="relative shrink-0 hidden sm:block">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                aria-label="Sort projects"
+                className="appearance-none px-4 py-2.5 pr-8 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-bold focus:outline-none cursor-pointer"
+              >
+                <option value="featured">Recommended ▾</option>
+                <option value="most-appreciated">Most Appreciated</option>
+                <option value="most-viewed">Most Viewed</option>
+                <option value="newest">Newest First</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Expandable Category and Software Filter Bar */}
+          <AnimatePresence>
+            {filtersOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="pt-3 overflow-hidden"
+              >
+                <FilterBar
+                  activeCategory={activeCategory}
+                  onSelectCategory={handleCategorySelect}
+                  activeTool={activeTool}
+                  onSelectTool={setActiveTool}
+                  sortBy={sortBy}
+                  onSelectSort={setSortBy}
+                  onClearFilters={handleClearFilters}
+                  activeFilterCount={activeFilterCount}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </section>
+
+      {/* Main Behance Discovery Feed Stage */}
+      <section className="pt-6 max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Feed Switcher Row */}
         <div className="flex items-center justify-between border-b border-border pb-2.5">
           <div className="flex items-center gap-6">
@@ -328,7 +512,7 @@ export default function HomePage() {
               onClick={() => handleFeedChange("for-you")}
               className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer ${
                 activeFeed === "for-you"
-                  ? "text-primary"
+                  ? "text-[#0057ff]"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -337,7 +521,7 @@ export default function HomePage() {
               {activeFeed === "for-you" && (
                 <motion.span
                   layoutId="feedUnderline"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0057ff]"
                 />
               )}
             </button>
@@ -347,7 +531,7 @@ export default function HomePage() {
               onClick={() => handleFeedChange("following")}
               className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer ${
                 activeFeed === "following"
-                  ? "text-primary"
+                  ? "text-[#0057ff]"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -356,7 +540,7 @@ export default function HomePage() {
               {activeFeed === "following" && (
                 <motion.span
                   layoutId="feedUnderline"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0057ff]"
                 />
               )}
             </button>
@@ -380,7 +564,7 @@ export default function HomePage() {
         ) : displayedFeedProjects.length === 0 ? (
           activeFeed === "following" ? (
             <div className="py-20 text-center max-w-md mx-auto space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
+              <div className="w-14 h-14 rounded-2xl bg-[#0057ff]/10 text-[#0057ff] flex items-center justify-center mx-auto">
                 <Users size={24} />
               </div>
               <div className="space-y-1">
@@ -388,12 +572,15 @@ export default function HomePage() {
                   {t("feed.emptyFollowing", "Your Following Feed is Empty")}
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  {t("feed.emptyFollowingDesc", "You haven't followed any creators yet. Follow leading designers to see their latest published masterworks right here!")}
+                  {t(
+                    "feed.emptyFollowingDesc",
+                    "You haven't followed any creators yet. Follow leading designers to see their latest published masterworks right here!"
+                  )}
                 </p>
               </div>
               <Link
                 to="/creators"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md hover:opacity-90 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#0057ff] text-white text-xs font-bold shadow-md hover:bg-[#004cdb] cursor-pointer"
               >
                 <Users size={14} />
                 <span>{t("feed.exploreCreators", "Explore & Follow Creators")}</span>
@@ -410,7 +597,7 @@ export default function HomePage() {
               </p>
               <button
                 onClick={handleClearFilters}
-                className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md cursor-pointer"
+                className="px-4 py-2 rounded-full bg-[#0057ff] text-white text-xs font-bold shadow-md cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -430,44 +617,6 @@ export default function HomePage() {
             ))}
           </div>
         )}
-
-        {/* CTA Showcase Banner */}
-        <section className="mt-14 relative rounded-2xl overflow-hidden border border-primary/25 bg-card/90 shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1E45FB]/15 via-card to-[#CDF22B]/15 pointer-events-none" />
-          <div className="relative z-10 px-6 py-8 sm:px-12 sm:py-10 text-center max-w-2xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-primary text-[11px] font-mono font-bold">
-              <Sparkles size={12} />
-              <span>Share Your Work on Azaiza Gallery</span>
-            </div>
-
-            <h2 className="text-xl sm:text-3xl font-display font-extrabold text-foreground tracking-tight">
-              Ready to showcase your craft to the world?
-            </h2>
-
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Publish rich case studies, get discovered by creative directors, and join a thriving community of over 420+ designers.
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                to={user ? "/dashboard/new" : "/signup"}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-[0_0_20px_rgba(205,242,43,0.3)] hover:opacity-90 transition-all cursor-pointer"
-              >
-                <Plus size={14} />
-                <span>Publish Project</span>
-                <ArrowUpRight size={14} />
-              </Link>
-
-              <Link
-                to="/creators"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold transition-all cursor-pointer"
-              >
-                <Users size={13} className="text-primary" />
-                <span>Discover Creators</span>
-              </Link>
-            </div>
-          </div>
-        </section>
       </section>
     </motion.main>
   );

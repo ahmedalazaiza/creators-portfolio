@@ -91,7 +91,7 @@ export default function CreatorProfilePage() {
         className="min-h-screen pt-14 sm:pt-16 pb-20 bg-background"
       >
         {/* Banner / Backdrop Header */}
-        <div className="relative h-44 sm:h-60 w-full overflow-hidden bg-gradient-to-r from-[#1E45FB]/25 via-background to-[#CDF22B]/20 border-b border-border">
+        <div className="relative h-44 sm:h-60 w-full overflow-hidden bg-gradient-to-r from-[#0057ff]/25 via-background to-[#0057ff]/10 border-b border-border">
           {creator.bannerUrl && (
             <img
               src={creator.bannerUrl}

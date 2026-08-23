@@ -76,8 +76,8 @@ export default function CreatorsPage() {
       {/* Hero Header Stage */}
       <section className="relative overflow-hidden pt-8 pb-10 border-b border-border/40 bg-gradient-to-b from-[#1E45FB]/10 via-background to-background">
         {/* Glow Spheres */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#1E45FB]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#CDF22B]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#0057ff]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#0057ff]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-[11px] font-mono font-bold">
@@ -87,7 +87,7 @@ export default function CreatorsPage() {
 
           <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-foreground tracking-tight">
             Visionary Creators <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1E45FB] via-foreground to-[#CDF22B]">
+            <span className="text-[#0057ff] dark:text-[#2f70ff]">
               Leading Global Design
             </span>
           </h1>
