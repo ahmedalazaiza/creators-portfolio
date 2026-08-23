@@ -18,6 +18,11 @@ export interface Profile {
     behance?: string;
     github?: string;
   };
+  customButton?: {
+    label: string;
+    url: string;
+  };
+  featuredProjectIds?: string[];
   followersCount?: number;
   followingCount?: number;
   totalAppreciations?: number;
@@ -61,6 +66,7 @@ export interface Project {
   userId: string;
   status: 'published' | 'draft' | 'archived';
   isFeatured?: boolean;
+  isPinnedToProfile?: boolean;
   viewsCount: number;
   appreciationsCount: number;
   isAppreciated?: boolean;
@@ -102,6 +108,39 @@ export interface Collection {
   coverImage?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Inquiry {
+  id: string;
+  creatorId: string;
+  clientName: string;
+  clientEmail: string;
+  companyName?: string;
+  budgetRange: string;
+  projectTimeline: string;
+  projectBrief: string;
+  status: 'unread' | 'read' | 'contacted' | 'archived';
+  createdAt: string;
+}
+
+export type NotificationType =
+  | 'appreciation'
+  | 'comment'
+  | 'follow'
+  | 'inquiry'
+  | 'curated';
+
+export interface NotificationItem {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  actorName: string;
+  actorAvatar: string;
+  title: string;
+  description: string;
+  targetUrl: string;
+  isRead: boolean;
+  createdAt: string;
 }
 
 export type FeedType = 'for-you' | 'following';

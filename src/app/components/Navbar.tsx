@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -21,9 +21,14 @@ import {
   Flame,
   Award,
   Users,
+  Check,
+  Heart,
+  UserPlus,
+  Mail,
 } from "lucide-react";
 import { useScrolled } from "../hooks/useScrolled";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../hooks/useNotifications";
 import SearchModal from "./SearchModal";
 
 interface NavbarProps {
@@ -37,14 +42,17 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
   const isHome = location.pathname === "/";
 
   const mainNavItems = [
     { label: "Explore", path: "/" },
+    { label: "Search", path: "/search" },
     { label: "Creators", path: "/creators" },
     { label: "UI/UX", path: "/?category=ui-ux" },
     { label: "3D & Motion", path: "/?category=3d-motion" },
@@ -56,6 +64,12 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
     setProfileDropdownOpen(false);
     await signOut();
     navigate("/");
+  };
+
+  const handleNotificationClick = (notif: any) => {
+    markAsRead(notif.id);
+    setNotificationsOpen(false);
+    navigate(notif.targetUrl);
   };
 
   return (
@@ -137,7 +151,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              className="md:hidden p-2 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground"
+              className="md:hidden p-2 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground cursor-pointer"
             >
               <Search size={16} />
             </button>
@@ -159,7 +173,9 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 className="p-2 rounded-full border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer relative"
               >
                 <Bell size={15} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary ring-2 ring-background" />
+                )}
               </button>
 
               <AnimatePresence>
@@ -168,23 +184,63 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                     initial={{ opacity: 0, scale: 0.95, y: 5 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 5 }}
-                    className="absolute right-0 mt-2 w-72 p-3 rounded-2xl border border-border bg-popover shadow-xl z-50 text-xs space-y-2"
+                    className="absolute right-0 mt-2 w-80 p-3 rounded-2xl border border-border bg-popover shadow-2xl z-50 text-xs space-y-2.5"
                   >
                     <div className="flex items-center justify-between pb-2 border-b border-border font-bold text-foreground">
-                      <span>Activity & Notifications</span>
-                      <span className="text-[10px] font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                        2 New
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span>Activity & Alerts</span>
+                        {unreadCount > 0 && (
+                          <span className="text-[10px] font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded-full font-bold">
+                            {unreadCount} New
+                          </span>
+                        )}
+                      </div>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-[10px] text-muted-foreground hover:text-primary transition-colors cursor-pointer font-mono"
+                        >
+                          Mark all read
+                        </button>
+                      )}
                     </div>
-                    <div className="space-y-2">
-                      <div className="p-2 rounded-xl bg-muted/40 hover:bg-muted transition-colors">
-                        <p className="font-semibold text-foreground">Zaid Al-Khatib appreciated your project</p>
-                        <span className="text-[10px] font-mono text-muted-foreground">10 minutes ago</span>
-                      </div>
-                      <div className="p-2 rounded-xl bg-muted/40 hover:bg-muted transition-colors">
-                        <p className="font-semibold text-foreground">Nour Design started following you</p>
-                        <span className="text-[10px] font-mono text-muted-foreground">1 hour ago</span>
-                      </div>
+
+                    {/* Notifications List */}
+                    <div className="space-y-1.5 max-h-72 overflow-y-auto pr-0.5">
+                      {notifications.length === 0 ? (
+                        <div className="py-6 text-center text-muted-foreground text-xs">
+                          No notifications yet
+                        </div>
+                      ) : (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            onClick={() => handleNotificationClick(notif)}
+                            className={`p-2.5 rounded-xl transition-all cursor-pointer flex items-start gap-2.5 ${
+                              notif.isRead
+                                ? "bg-card/40 hover:bg-muted/50 border border-transparent"
+                                : "bg-primary/5 hover:bg-primary/10 border border-primary/20 shadow-xs"
+                            }`}
+                          >
+                            <img
+                              src={notif.actorAvatar}
+                              alt={notif.actorName}
+                              className="w-8 h-8 rounded-full object-cover border border-border shrink-0 mt-0.5"
+                            />
+                            <div className="min-w-0 flex-1 space-y-0.5">
+                              <p className="text-[11px] font-bold text-foreground truncate">
+                                {notif.title}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground line-clamp-2 leading-relaxed">
+                                {notif.description}
+                              </p>
+                            </div>
+                            {!notif.isRead && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1" />
+                            )}
+                          </div>
+                        ))
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -250,7 +306,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                       className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
                     >
                       <LayoutDashboard size={14} className="text-primary" />
-                      <span>Creator Studio</span>
+                      <span>Creator Studio & Insights</span>
                     </Link>
 
                     <Link
@@ -308,10 +364,9 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Toggle menu"
-              className="xl:hidden p-2 rounded-full border border-border bg-card text-foreground"
+              className="xl:hidden p-2 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground"
             >
-              {menuOpen ? <X size={17} /> : <Menu size={17} />}
+              {menuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>
@@ -325,42 +380,24 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               exit={{ height: 0, opacity: 0 }}
               className="xl:hidden border-t border-border bg-background px-4 py-4 space-y-3"
             >
-              <div className="space-y-1">
+              <div className="grid grid-cols-2 gap-2">
                 {mainNavItems.map((item) => (
                   <Link
                     key={item.label}
                     to={item.path}
                     onClick={() => setMenuOpen(false)}
-                    className="block px-3 py-2 rounded-xl text-xs font-bold text-foreground hover:bg-muted transition-colors"
+                    className="p-2.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground text-center"
                   >
                     {item.label}
                   </Link>
                 ))}
-                <Link
-                  to="/profile"
-                  onClick={() => setMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-muted transition-colors"
-                >
-                  My Profile
-                </Link>
-              </div>
-
-              <div className="pt-3 border-t border-border flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Appearance</span>
-                <button
-                  onClick={onToggleTheme}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-xs font-semibold text-foreground"
-                >
-                  {isDark ? <Sun size={13} className="text-[#CDF22B]" /> : <Moon size={13} />}
-                  <span>{isDark ? "Light Mode" : "Dark Mode"}</span>
-                </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </header>
 
-      {/* Global Cmd+K Search Modal */}
+      {/* Full-Featured Global Search Modal */}
       <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
