@@ -72,12 +72,26 @@ export interface Project {
 export interface Comment {
   id: string;
   projectId: string;
+  userId?: string;
   user: Profile;
   content: string;
   createdAt: string;
 }
 
-export type SortOption = 'featured' | 'trending' | 'appreciated' | 'recent';
+export interface Appreciation {
+  id?: string;
+  userId: string;
+  projectId: string;
+  createdAt?: string;
+}
+
+export interface Follow {
+  followerId: string;
+  followingId: string;
+  createdAt?: string;
+}
+
+export type SortOption = 'featured' | 'appreciations' | 'views' | 'newest';
 
 export interface ProjectFilters {
   category?: string;

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router";
-import { motion } from "motion/react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams, Link } from "react-router";
+import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowLeft,
+  Upload,
   Image as ImageIcon,
   Plus,
   Trash2,
@@ -13,145 +14,214 @@ import {
   Wrench,
   Tag,
   Palette,
+  Calendar,
+  AlertCircle,
+  FileText,
+  Loader2,
+  ExternalLink,
+  ChevronDown,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../hooks/useProjects";
+import { useAuth } from "../context/AuthContext";
 import { CATEGORIES, POPULAR_TOOLS } from "../data/categories";
+import { uploadImageToSupabase } from "../../lib/supabase";
+
+const COLOR_PRESETS = [
+  "#CDF22B", // Volt Lime
+  "#1E45FB", // Cobalt Blue
+  "#00F2FE", // Cyan
+  "#FF007A", // Neon Pink
+  "#7928CA", // Purple
+  "#FF6B00", // Orange
+  "#10B981", // Emerald
+  "#E11D48", // Rose
+];
 
 export default function ProjectEditorPage() {
-  const { id } = useParams<{ id?: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { allProjects, saveProject } = useProjects();
+  const { allProjects, saveProject, deleteProject } = useProjects();
 
-  const isEdit = Boolean(id);
-  const existingProject = isEdit ? allProjects.find((p) => p.id === id) : null;
+  const isEditing = Boolean(id);
+  const existingProject = id ? allProjects.find((p) => p.id === id || p.slug === id) : null;
 
+  // Form State
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
-  const [category, setCategory] = useState("UI/UX & Product Design");
   const [categoryId, setCategoryId] = useState("ui-ux");
-  const [year, setYear] = useState(String(new Date().getFullYear()));
-  const [accentColor, setAccentColor] = useState("#aaff38");
+  const [year, setYear] = useState(new Date().getFullYear().toString());
+  const [accentColor, setAccentColor] = useState("#CDF22B");
   const [description, setDescription] = useState("");
   const [fullDescription, setFullDescription] = useState("");
-  const [coverImage, setCoverImage] = useState(
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1400&q=80"
-  );
+  const [coverImage, setCoverImage] = useState("");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
-  const [newImageUrl, setNewImageUrl] = useState("");
   const [tools, setTools] = useState<string[]>(["Figma"]);
   const [toolInput, setToolInput] = useState("");
-  const [tags, setTags] = useState<string[]>(["Design", "UX"]);
+  const [tags, setTags] = useState<string[]>(["Design", "UI/UX"]);
   const [tagInput, setTagInput] = useState("");
   const [status, setStatus] = useState<"published" | "draft">("published");
 
-  // Load existing project for editing
+  // UI State
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  // Load existing project if in edit mode
   useEffect(() => {
     if (existingProject) {
-      setTitle(existingProject.title);
-      setSlug(existingProject.slug);
-      setCategory(existingProject.category);
+      setTitle(existingProject.title || "");
+      setSlug(existingProject.slug || "");
       setCategoryId(existingProject.categoryId || "ui-ux");
       setYear(existingProject.year || "2025");
-      setAccentColor(existingProject.accentColor || "#aaff38");
-      setDescription(existingProject.description);
-      setFullDescription(existingProject.fullDescription || existingProject.description);
-      setCoverImage(existingProject.coverImage);
+      setAccentColor(existingProject.accentColor || "#CDF22B");
+      setDescription(existingProject.description || "");
+      setFullDescription(existingProject.fullDescription || "");
+      setCoverImage(existingProject.coverImage || "");
       setGalleryImages(existingProject.images || []);
-      setTools(existingProject.tools || []);
-      setTags(existingProject.tags || []);
+      setTools(existingProject.tools || ["Figma"]);
+      setTags(existingProject.tags || ["Design"]);
       setStatus(existingProject.status === "draft" ? "draft" : "published");
     }
   }, [existingProject]);
 
-  // Auto slug generation
+  // Auto-generate slug when typing title (if creating new)
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setTitle(val);
-    if (!isEdit) {
-      const generated = val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-      setSlug(generated);
+    if (!isEditing) {
+      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""));
     }
   };
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const catSlug = e.target.value;
-    const found = CATEGORIES.find((c) => c.slug === catSlug);
-    if (found) {
-      setCategoryId(found.slug);
-      setCategory(found.name);
+  // Upload Cover Image
+  const handleCoverFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingCover(true);
+    setErrorMessage("");
+    try {
+      const publicUrl = await uploadImageToSupabase(file, "project-images");
+      setCoverImage(publicUrl);
+    } catch (err: any) {
+      setErrorMessage("Failed to upload cover image. Please try again.");
+    } finally {
+      setUploadingCover(false);
     }
   };
 
-  const handleAddGalleryImage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newImageUrl.trim()) {
-      setGalleryImages((prev) => [...prev, newImageUrl.trim()]);
-      setNewImageUrl("");
+  // Upload Gallery Images
+  const handleGalleryFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingGallery(true);
+    setErrorMessage("");
+    try {
+      const uploadPromises = Array.from(files).map((f) =>
+        uploadImageToSupabase(f, "project-images")
+      );
+      const urls = await Promise.all(uploadPromises);
+      setGalleryImages((prev) => [...prev, ...urls]);
+    } catch (err: any) {
+      setErrorMessage("Failed to upload some gallery images.");
+    } finally {
+      setUploadingGallery(false);
     }
   };
 
-  const handleRemoveGalleryImage = (index: number) => {
-    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+  const removeGalleryImage = (indexToRemove: number) => {
+    setGalleryImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
-  const handleAddTool = (toolName: string) => {
-    if (toolName.trim() && !tools.includes(toolName.trim())) {
-      setTools((prev) => [...prev, toolName.trim()]);
+  // Add Tool
+  const handleAddTool = (toolToAdd?: string) => {
+    const t = (toolToAdd || toolInput).trim();
+    if (t && !tools.includes(t)) {
+      setTools((prev) => [...prev, t]);
       setToolInput("");
     }
   };
 
-  const handleRemoveTool = (tool: string) => {
-    setTools((prev) => prev.filter((t) => t !== tool));
+  const removeTool = (toolToRemove: string) => {
+    setTools((prev) => prev.filter((t) => t !== toolToRemove));
   };
 
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && tagInput.trim()) {
-      e.preventDefault();
-      if (!tags.includes(tagInput.trim())) {
-        setTags((prev) => [...prev, tagInput.trim()]);
-      }
+  // Add Tag
+  const handleAddTag = () => {
+    const t = tagInput.trim().replace(/^#/, "");
+    if (t && !tags.includes(t)) {
+      setTags((prev) => [...prev, t]);
       setTagInput("");
     }
   };
 
-  const handleRemoveTag = (tag: string) => {
-    setTags((prev) => prev.filter((t) => t !== tag));
+  const removeTag = (tagToRemove: string) => {
+    setTags((prev) => prev.filter((t) => t !== tagToRemove));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Save / Publish
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !coverImage.trim()) {
-      alert("Please provide at least a project title and cover image URL.");
+    if (!title.trim()) {
+      setErrorMessage("Please provide a project title.");
+      return;
+    }
+    if (!coverImage.trim()) {
+      setErrorMessage("Please upload or provide a cover image.");
+      return;
+    }
+    if (!description.trim()) {
+      setErrorMessage("Please write a short description.");
       return;
     }
 
-    const savedId = saveProject(
-      {
-        id: isEdit ? id : undefined,
-        title,
-        slug: slug || `project-${Date.now()}`,
-        category,
-        categoryId,
-        year,
-        accentColor,
-        description,
-        fullDescription,
-        coverImage,
-        images: galleryImages,
-        tools,
-        tags,
-        status,
-      },
-      user
-    );
+    setIsSaving(true);
+    setErrorMessage("");
 
-    navigate(`/project/${slug || savedId}`);
+    const categoryObj = CATEGORIES.find((c) => c.slug === categoryId);
+    const categoryName = categoryObj ? categoryObj.name : "UI/UX Design";
+
+    try {
+      const savedProject = await saveProject(
+        {
+          id: existingProject?.id,
+          title: title.trim(),
+          slug: slug.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          category: categoryName,
+          categoryId,
+          year,
+          accentColor,
+          description: description.trim(),
+          fullDescription: fullDescription.trim(),
+          coverImage,
+          images: galleryImages,
+          tools,
+          tags,
+          status,
+        },
+        user
+      );
+
+      navigate(`/project/${savedProject.slug || savedProject.id}`);
+    } catch (err: any) {
+      setErrorMessage("Failed to save project. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (existingProject) {
+      await deleteProject(existingProject.id);
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -159,286 +229,405 @@ export default function ProjectEditorPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="min-h-screen pt-16 sm:pt-20 pb-16"
+      transition={{ duration: 0.2 }}
+      className="min-h-screen pt-14 sm:pt-16 pb-20 bg-background"
     >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-10 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-6 border-b border-border">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Top Header & Breadcrumb */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
           <div className="space-y-1">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-2"
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-1"
             >
-              <ArrowLeft size={14} /> Back to Creator Studio
+              <ArrowLeft size={13} />
+              <span>Back to Studio Dashboard</span>
             </Link>
-            <h1 className="text-3xl font-display font-extrabold text-foreground">
-              {isEdit ? "Edit Case Study" : "Publish Masterwork"}
+            <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-foreground tracking-tight">
+              {isEditing ? "Edit Case Study" : "Create Masterwork Case Study"}
             </h1>
+            <p className="text-xs text-muted-foreground">
+              Publish high-res screens, define your creative process, and showcase your craftsmanship.
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Quick Actions */}
+          <div className="flex items-center gap-2.5">
+            {isEditing && (
+              <button
+                type="button"
+                onClick={() => setDeleteModalOpen(true)}
+                className="px-3.5 py-2 rounded-full border border-destructive/30 text-destructive hover:bg-destructive/10 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 size={13} />
+                <span>Delete</span>
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={() => setStatus(status === "published" ? "draft" : "published")}
-              className={`px-4 py-2 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
-                status === "published"
-                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                  : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-              }`}
+              onClick={handleSubmit}
+              disabled={isSaving}
+              className="px-6 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_20px_rgba(205,242,43,0.3)] hover:opacity-90 active:scale-95 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-2"
             >
-              {status === "published" ? "● Status: Published" : "○ Status: Draft"}
+              {isSaving ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Publishing...</span>
+                </>
+              ) : (
+                <>
+                  <Check size={14} />
+                  <span>{status === "published" ? "Publish Project" : "Save as Draft"}</span>
+                </>
+              )}
             </button>
           </div>
         </div>
 
-        {/* Project Form */}
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Main Details */}
-          <div className="p-6 sm:p-8 rounded-3xl border border-border bg-card space-y-6">
-            <h3 className="text-base font-bold font-display text-foreground border-b border-border pb-3">
-              1. General Information
-            </h3>
+        {/* Error Alert */}
+        {errorMessage && (
+          <div className="p-3.5 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive text-xs flex items-center gap-2">
+            <AlertCircle size={15} className="shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        {/* Form Container */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 1. Basic Metadata Section */}
+          <div className="p-5 sm:p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
+            <h2 className="text-sm font-bold font-display text-foreground flex items-center gap-2">
+              <FileText size={16} className="text-primary" />
+              <span>Project Core Essentials</span>
+            </h2>
 
             {/* Title */}
-            <div>
-              <label className="block text-xs font-mono uppercase text-muted-foreground mb-2">
-                Project Title *
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-foreground">
+                Project Title <span className="text-destructive">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={handleTitleChange}
-                placeholder="e.g. Saudi National Portal — Enterprise Digital Experience"
-                className="w-full px-4 py-3 rounded-2xl border border-border bg-input-background text-foreground text-sm font-semibold focus:outline-none focus:border-primary/60"
+                placeholder="e.g. Lumina — Spatial Reality OS Interface"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-input-background text-foreground text-xs font-semibold placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all"
               />
             </div>
 
-            {/* URL Slug & Year */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-mono uppercase text-muted-foreground mb-2">
-                  URL Slug
+            {/* Slug + Category + Year */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Category */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-foreground">
+                  Creative Field
                 </label>
-                <div className="flex items-center rounded-2xl border border-border bg-input-background px-3">
-                  <span className="text-xs font-mono text-muted-foreground">/project/</span>
-                  <input
-                    type="text"
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    className="w-full py-3 px-1 bg-transparent text-foreground text-xs font-mono focus:outline-none"
-                  />
+                <div className="relative">
+                  <select
+                    value={categoryId}
+                    onChange={(e) => setCategoryId(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-input-background text-foreground text-xs font-medium focus:outline-none focus:border-primary/60 appearance-none cursor-pointer pr-8"
+                  >
+                    {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => (
+                      <option key={cat.id} value={cat.slug}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-2.5 top-3 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-mono uppercase text-muted-foreground mb-2">
-                  Year
+              {/* Year */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-foreground">
+                  Production Year
                 </label>
                 <input
                   type="text"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl border border-border bg-input-background text-foreground text-xs font-mono focus:outline-none focus:border-primary/60"
+                  placeholder="2025"
+                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-input-background text-foreground text-xs font-medium focus:outline-none focus:border-primary/60"
+                />
+              </div>
+
+              {/* Custom Slug */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-foreground">
+                  URL Slug
+                </label>
+                <input
+                  type="text"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  placeholder="lumina-spatial-os"
+                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-input-background text-foreground text-xs font-mono focus:outline-none focus:border-primary/60"
                 />
               </div>
             </div>
 
-            {/* Category & Accent Color */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-mono uppercase text-muted-foreground mb-2">
-                  Creative Field
-                </label>
-                <select
-                  value={categoryId}
-                  onChange={handleCategoryChange}
-                  className="w-full px-4 py-3 rounded-2xl border border-border bg-input-background text-foreground text-xs font-medium focus:outline-none focus:border-primary/60"
-                >
-                  {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => (
-                    <option key={cat.id} value={cat.slug}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono uppercase text-muted-foreground mb-2">
-                  Accent Color
-                </label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    value={accentColor}
-                    onChange={(e) => setAccentColor(e.target.value)}
-                    className="w-12 h-11 rounded-xl border border-border bg-input-background cursor-pointer p-1"
-                  />
-                  <input
-                    type="text"
-                    value={accentColor}
-                    onChange={(e) => setAccentColor(e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl border border-border bg-input-background text-foreground text-xs font-mono focus:outline-none focus:border-primary/60"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Short Summary Description */}
-            <div>
-              <label className="block text-xs font-mono uppercase text-muted-foreground mb-2">
-                Short Teaser Description (Card view) *
+            {/* Short Elevator Description */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-foreground">
+                Short Summary (Card Caption) <span className="text-destructive">*</span>
               </label>
               <textarea
                 required
                 rows={2}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="A concise 1-2 sentence hook highlighting the scope and impact."
-                className="w-full px-4 py-3 rounded-2xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60 resize-none"
+                placeholder="A concise 1-2 sentence description explaining the visual objective and highlight of this masterwork..."
+                className="w-full p-3 rounded-xl border border-border bg-input-background text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 resize-none"
               />
             </div>
 
             {/* Full Case Study Narrative */}
-            <div>
-              <label className="block text-xs font-mono uppercase text-muted-foreground mb-2">
-                Detailed Case Study Narrative (Markdown supported)
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-foreground">
+                In-Depth Narrative & Design Process
               </label>
               <textarea
-                rows={6}
+                rows={5}
                 value={fullDescription}
                 onChange={(e) => setFullDescription(e.target.value)}
-                placeholder="Explain the client background, design challenges, typography systems, iterative milestones, and measurable outcomes..."
-                className="w-full px-4 py-3 rounded-2xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60"
+                placeholder="Explain the background, challenges, art direction, typography choices, and technical execution..."
+                className="w-full p-3 rounded-xl border border-border bg-input-background text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-primary/60"
               />
             </div>
           </div>
 
-          {/* Visual Assets & Images */}
-          <div className="p-6 sm:p-8 rounded-3xl border border-border bg-card space-y-6">
-            <h3 className="text-base font-bold font-display text-foreground border-b border-border pb-3">
-              2. Visual Presentation & Gallery
-            </h3>
+          {/* 2. Media & Visual Assets Section */}
+          <div className="p-5 sm:p-6 rounded-2xl border border-border bg-card shadow-sm space-y-5">
+            <h2 className="text-sm font-bold font-display text-foreground flex items-center gap-2">
+              <ImageIcon size={16} className="text-primary" />
+              <span>Cover & Gallery Media</span>
+            </h2>
 
-            {/* Cover Image */}
-            <div>
-              <label className="block text-xs font-mono uppercase text-muted-foreground mb-2">
-                Cover Image URL *
+            {/* Cover Image Upload (Required) */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-foreground">
+                Project Cover Thumbnail (Required) <span className="text-destructive">*</span>
               </label>
-              <input
-                type="url"
-                required
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full px-4 py-3 rounded-2xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60"
-              />
 
-              {/* Cover Preview */}
-              {coverImage && (
-                <div className="mt-4 rounded-2xl overflow-hidden border border-border bg-muted/20 h-48 sm:h-64 relative">
+              {coverImage ? (
+                <div className="relative rounded-xl overflow-hidden border border-border bg-muted/30 aspect-[16/9] max-h-72 group">
                   <img
                     src={coverImage}
                     alt="Cover preview"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-white text-[11px] font-mono">
-                    Cover Preview
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => coverInputRef.current?.click()}
+                      className="px-3.5 py-1.5 rounded-full bg-white text-black text-xs font-bold shadow-md hover:bg-white/90 cursor-pointer"
+                    >
+                      Change Cover
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCoverImage("")}
+                      className="px-3.5 py-1.5 rounded-full bg-destructive text-white text-xs font-bold shadow-md hover:bg-destructive/90 cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => coverInputRef.current?.click()}
+                  className="border-2 border-dashed border-border hover:border-primary/60 rounded-2xl p-8 text-center bg-muted/20 hover:bg-muted/40 transition-all cursor-pointer flex flex-col items-center justify-center space-y-2"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                    {uploadingCover ? (
+                      <Loader2 size={22} className="animate-spin text-primary" />
+                    ) : (
+                      <Upload size={22} />
+                    )}
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-bold text-foreground">
+                      {uploadingCover ? "Uploading to Supabase..." : "Click or Drag to Upload Cover"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground font-mono">
+                      PNG, JPG, WebP up to 10MB (Stored in Supabase Storage)
+                    </p>
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Gallery Images Strip */}
-            <div className="space-y-4 pt-4 border-t border-border">
-              <label className="block text-xs font-mono uppercase text-muted-foreground">
-                Multi-Image Case Study Gallery ({galleryImages.length})
-              </label>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleCoverFileUpload}
+                className="hidden"
+              />
 
-              {/* Add image form */}
-              <div className="flex gap-2">
+              {/* Direct URL input option */}
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-[11px] text-muted-foreground">or image URL:</span>
                 <input
                   type="url"
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  placeholder="Paste image URL (Unsplash or hosted link)..."
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60"
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="flex-1 px-3 py-1.5 rounded-lg border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60 font-mono"
                 />
+              </div>
+            </div>
+
+            {/* Gallery Images Upload */}
+            <div className="space-y-3 pt-3 border-t border-border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="block text-xs font-bold text-foreground">
+                    Case Study Multi-Image Gallery ({galleryImages.length})
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">
+                    Upload full screens, responsive breakdowns, and zoomed details.
+                  </span>
+                </div>
+
                 <button
                   type="button"
-                  onClick={handleAddGalleryImage}
-                  className="px-4 py-2.5 rounded-xl bg-card border border-border hover:border-primary/60 text-foreground font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                  onClick={() => galleryInputRef.current?.click()}
+                  disabled={uploadingGallery}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold transition-all cursor-pointer"
                 >
-                  <Plus size={14} /> Add Image
+                  {uploadingGallery ? (
+                    <Loader2 size={13} className="animate-spin text-primary" />
+                  ) : (
+                    <Plus size={13} className="text-primary" />
+                  )}
+                  <span>Add Images</span>
                 </button>
               </div>
 
-              {/* Gallery Image Previews */}
-              {galleryImages.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+              <input
+                ref={galleryInputRef}
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleGalleryFilesUpload}
+                className="hidden"
+              />
+
+              {/* Gallery Grid Preview */}
+              {galleryImages.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {galleryImages.map((img, idx) => (
                     <div
                       key={idx}
-                      className="relative rounded-xl overflow-hidden border border-border group aspect-[3/2] bg-muted/20"
+                      className="relative rounded-xl overflow-hidden border border-border aspect-[4/3] group bg-muted/30"
                     >
                       <img
                         src={img}
                         alt={`Gallery ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
+                      <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 text-white text-[10px] font-mono">
+                        #{idx + 1}
+                      </div>
                       <button
                         type="button"
-                        onClick={() => handleRemoveGalleryImage(idx)}
-                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/80 text-white hover:text-destructive flex items-center justify-center transition-colors"
+                        onClick={() => removeGalleryImage(idx)}
+                        className="absolute top-1.5 right-1.5 p-1 rounded-full bg-destructive text-white hover:opacity-90 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        title="Remove image"
                       >
                         <Trash2 size={12} />
                       </button>
                     </div>
                   ))}
                 </div>
+              ) : (
+                <div className="p-5 rounded-xl border border-dashed border-border text-center text-xs text-muted-foreground bg-muted/10">
+                  No additional gallery screens added yet.
+                </div>
               )}
             </div>
           </div>
 
-          {/* Software & Tags */}
-          <div className="p-6 sm:p-8 rounded-3xl border border-border bg-card space-y-6">
-            <h3 className="text-base font-bold font-display text-foreground border-b border-border pb-3">
-              3. Tools & Search Tags
-            </h3>
+          {/* 3. Styling & Classification */}
+          <div className="p-5 sm:p-6 rounded-2xl border border-border bg-card shadow-sm space-y-5">
+            <h2 className="text-sm font-bold font-display text-foreground flex items-center gap-2">
+              <Palette size={16} className="text-primary" />
+              <span>Creative Tools, Tags & Palette</span>
+            </h2>
 
-            {/* Tools */}
-            <div className="space-y-3">
-              <label className="block text-xs font-mono uppercase text-muted-foreground">
-                Software & Tools Used
+            {/* Accent Color Presets */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-foreground">
+                Brand Palette Accent
+              </label>
+              <div className="flex flex-wrap items-center gap-2">
+                {COLOR_PRESETS.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setAccentColor(color)}
+                    className={`w-7 h-7 rounded-lg border transition-all cursor-pointer flex items-center justify-center ${
+                      accentColor === color
+                        ? "border-foreground scale-110 shadow-md ring-2 ring-primary/40"
+                        : "border-transparent hover:scale-105"
+                    }`}
+                    style={{ backgroundColor: color }}
+                  >
+                    {accentColor === color && (
+                      <Check size={13} className={color === "#CDF22B" ? "text-black" : "text-white"} />
+                    )}
+                  </button>
+                ))}
+                <input
+                  type="text"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  placeholder="#CDF22B"
+                  className="w-24 px-2.5 py-1 rounded-lg border border-border bg-input-background text-foreground text-xs font-mono ml-2"
+                />
+              </div>
+            </div>
+
+            {/* Software / Tools Tag Manager */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-foreground flex items-center gap-1">
+                <Wrench size={13} className="text-primary" />
+                <span>Software & Tools Used</span>
               </label>
 
-              {/* Suggestions */}
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {POPULAR_TOOLS.map((t) => (
+              {/* Preset Chips to click */}
+              <div className="flex flex-wrap gap-1.5 pb-1">
+                {POPULAR_TOOLS.slice(0, 8).map((tool) => (
                   <button
-                    key={t}
+                    key={tool}
                     type="button"
-                    onClick={() => handleAddTool(t)}
-                    className="px-2.5 py-1 rounded-lg border border-border/80 bg-muted/20 hover:bg-primary/10 hover:border-primary/40 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => handleAddTool(tool)}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all cursor-pointer ${
+                      tools.includes(tool)
+                        ? "border-primary bg-primary text-primary-foreground font-bold"
+                        : "border-border bg-muted/30 text-muted-foreground hover:text-foreground"
+                    }`}
                   >
-                    + {t}
+                    + {tool}
                   </button>
                 ))}
               </div>
 
-              {/* Selected Tools */}
-              <div className="flex flex-wrap gap-1.5 p-3 rounded-2xl border border-border bg-input-background min-h-12 items-center">
-                {tools.map((tool) => (
+              {/* Active Tools Chips */}
+              <div className="flex flex-wrap gap-1.5 items-center p-2.5 rounded-xl border border-border bg-input-background">
+                {tools.map((t) => (
                   <span
-                    key={tool}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-card border border-border text-foreground text-xs font-medium"
+                    key={t}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-card border border-border text-foreground text-xs font-semibold shadow-xs"
                   >
-                    {tool}
+                    {t}
                     <button
                       type="button"
-                      onClick={() => handleRemoveTool(tool)}
-                      className="hover:text-destructive"
+                      onClick={() => removeTool(t)}
+                      className="hover:text-destructive transition-colors cursor-pointer"
                     >
                       ×
                     </button>
@@ -451,31 +640,33 @@ export default function ProjectEditorPage() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
-                      handleAddTool(toolInput);
+                      handleAddTool();
                     }
                   }}
-                  placeholder="Type custom tool & hit enter..."
-                  className="flex-1 bg-transparent px-2 py-1 text-xs text-foreground focus:outline-none min-w-36"
+                  placeholder="Type tool & enter..."
+                  className="flex-1 min-w-[120px] bg-transparent text-foreground text-xs focus:outline-none"
                 />
               </div>
             </div>
 
-            {/* Tags */}
-            <div className="space-y-3 pt-4 border-t border-border">
-              <label className="block text-xs font-mono uppercase text-muted-foreground">
-                Search Tags & Keywords (hit Enter to add)
+            {/* Tags Manager */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-foreground flex items-center gap-1">
+                <Tag size={13} className="text-primary" />
+                <span>Search Keywords & Tags</span>
               </label>
-              <div className="flex flex-wrap gap-1.5 p-3 rounded-2xl border border-border bg-input-background min-h-12 items-center">
+
+              <div className="flex flex-wrap gap-1.5 items-center p-2.5 rounded-xl border border-border bg-input-background">
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium"
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold"
                   >
                     #{tag}
                     <button
                       type="button"
-                      onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-destructive"
+                      onClick={() => removeTag(tag)}
+                      className="hover:text-destructive transition-colors cursor-pointer"
                     >
                       ×
                     </button>
@@ -485,33 +676,121 @@ export default function ProjectEditorPage() {
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleAddTag}
-                  placeholder="Add tags..."
-                  className="flex-1 bg-transparent px-2 py-1 text-xs text-foreground focus:outline-none min-w-28"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddTag();
+                    }
+                  }}
+                  placeholder="Add hashtag & press enter..."
+                  className="flex-1 min-w-[120px] bg-transparent text-foreground text-xs focus:outline-none"
                 />
+              </div>
+            </div>
+
+            {/* Status Option */}
+            <div className="space-y-2 pt-2 border-t border-border">
+              <label className="block text-xs font-bold text-foreground">
+                Publication Visibility
+              </label>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                  <input
+                    type="radio"
+                    name="status"
+                    checked={status === "published"}
+                    onChange={() => setStatus("published")}
+                    className="accent-primary"
+                  />
+                  <span>Published (Visible on Explore Feed & Profile)</span>
+                </label>
+                <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                  <input
+                    type="radio"
+                    name="status"
+                    checked={status === "draft"}
+                    onChange={() => setStatus("draft")}
+                    className="accent-primary"
+                  />
+                  <span>Draft (Private to your Studio Dashboard)</span>
+                </label>
               </div>
             </div>
           </div>
 
-          {/* Submit CTA */}
-          <div className="flex items-center justify-end gap-4 pt-4">
+          {/* Submit Action Bar */}
+          <div className="flex items-center justify-between pt-2">
             <Link
               to="/dashboard"
-              className="px-6 py-3 rounded-full border border-border bg-card text-foreground font-semibold text-xs hover:bg-muted transition-colors"
+              className="px-4 py-2 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground text-xs font-semibold transition-colors"
             >
               Cancel
             </Link>
 
             <button
               type="submit"
-              className="px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-[0_0_25px_rgba(170,255,56,0.35)] hover:opacity-90 active:scale-98 transition-all flex items-center gap-2 cursor-pointer"
+              disabled={isSaving}
+              className="px-7 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_20px_rgba(205,242,43,0.3)] hover:opacity-90 active:scale-95 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-2"
             >
-              <Check size={16} />
-              <span>{isEdit ? "Save Changes" : "Publish Masterwork"}</span>
+              {isSaving ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Saving to Supabase...</span>
+                </>
+              ) : (
+                <>
+                  <Check size={14} />
+                  <span>{isEditing ? "Save Changes" : "Publish Masterwork"}</span>
+                </>
+              )}
             </button>
           </div>
         </form>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteModalOpen(false)}
+              className="absolute inset-0 bg-black/70 backdrop-blur-xs"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative rounded-2xl border border-border bg-card p-6 max-w-sm w-full space-y-4 shadow-2xl z-10"
+            >
+              <h3 className="text-base font-bold text-foreground">
+                Delete this case study?
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                This action cannot be undone. The project will be removed from your portfolio and the explore feed.
+              </p>
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDeleteModalOpen(false)}
+                  className="px-4 py-1.5 rounded-full border border-border text-xs font-semibold text-foreground hover:bg-muted"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="px-4 py-1.5 rounded-full bg-destructive text-white text-xs font-bold hover:opacity-90"
+                >
+                  Delete Project
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.main>
   );
 }

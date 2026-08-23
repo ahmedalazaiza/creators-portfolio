@@ -277,19 +277,22 @@ ON CONFLICT (id) DO UPDATE SET
   display_order = EXCLUDED.display_order;
 
 -- ==============================================================================
--- Storage Buckets (Optional for direct file uploads)
+-- Storage Buckets (For direct case study and avatar image uploads)
 -- ==============================================================================
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('projects', 'projects', true), ('avatars', 'avatars', true)
+VALUES
+  ('project-images', 'project-images', true),
+  ('projects', 'projects', true),
+  ('avatars', 'avatars', true)
 ON CONFLICT (id) DO NOTHING;
 
 DROP POLICY IF EXISTS "Public can view project images" ON storage.objects;
 CREATE POLICY "Public can view project images" ON storage.objects
-  FOR SELECT USING (bucket_id IN ('projects', 'avatars'));
+  FOR SELECT USING (bucket_id IN ('project-images', 'projects', 'avatars'));
 
 DROP POLICY IF EXISTS "Authenticated users can upload images" ON storage.objects;
 CREATE POLICY "Authenticated users can upload images" ON storage.objects
   FOR INSERT WITH CHECK (
-    bucket_id IN ('projects', 'avatars')
+    bucket_id IN ('project-images', 'projects', 'avatars')
     AND auth.role() = 'authenticated'
   );
