@@ -1,436 +1,184 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useSearchParams, Link, useNavigate } from "react-router";
-import { motion, AnimatePresence } from "motion/react";
+import React, { useState } from "react";
+import { Link } from "react-router";
+import { motion } from "motion/react";
 import {
+  Sparkles,
   Search,
+  ArrowRight,
+  Plus,
+  Layers,
+  Compass,
   Users,
   Eye,
   Heart,
-  Plus,
-  Compass,
-  SlidersHorizontal,
-  ChevronRight,
-  ChevronLeft,
-  Sparkles,
-  Zap,
-  Award,
-  ThumbsUp,
+  FolderPlus,
 } from "lucide-react";
-import { useProjects } from "../hooks/useProjects";
-import { useCreator } from "../hooks/useCreator";
 import { useAuth } from "../context/AuthContext";
-import { useLanguage } from "../context/LanguageContext";
-import ProjectCard from "../components/ProjectCard";
-import { SortOption, FeedType } from "../types";
-
-// Category Badges with Image Thumbnails (Matching Screenshot 1)
-const CATEGORY_BADGES = [
-  {
-    id: "for-you",
-    slug: "for-you",
-    name: "For You",
-    icon: "⭐",
-    bgImage: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=300&q=80",
-    isFeed: true,
-  },
-  {
-    id: "following",
-    slug: "following",
-    name: "Following",
-    icon: "🤍",
-    bgImage: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80",
-    isFeed: true,
-  },
-  {
-    id: "best-of",
-    slug: "all",
-    name: "Best of Azaiza",
-    icon: "🏆",
-    bgImage: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "graphic-design",
-    slug: "branding",
-    name: "Graphic Design",
-    bgImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "photography",
-    slug: "photography",
-    name: "Photography",
-    bgImage: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "illustration",
-    slug: "illustration",
-    name: "Illustration",
-    bgImage: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "3d-art",
-    slug: "3d-motion",
-    name: "3D Art",
-    bgImage: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "ui-ux",
-    slug: "ui-ux",
-    name: "UI/UX",
-    bgImage: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "motion",
-    slug: "3d-motion",
-    name: "Motion",
-    bgImage: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "architecture",
-    slug: "architecture",
-    name: "Architecture",
-    bgImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "product-design",
-    slug: "product-design",
-    name: "Product Design",
-    bgImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=300&q=80",
-  },
-  {
-    id: "fashion",
-    slug: "fashion",
-    name: "Fashion",
-    bgImage: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=300&q=80",
-  },
-];
 
 export default function HomePage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const categoryParam = searchParams.get("category") || "all";
-  const feedParam = (searchParams.get("feed") as FeedType) || "for-you";
-
-  const [activeCategory, setActiveCategory] = useState(categoryParam);
-  const [activeFeed, setActiveFeed] = useState<FeedType>(feedParam);
-  const [activeBadgeId, setActiveBadgeId] = useState<string>("for-you");
+  const { isLoggedIn, user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("featured");
-  const [searchTab, setSearchTab] = useState<"projects" | "people" | "assets" | "images">("projects");
 
-  const { user } = useAuth();
-  const { allCreators } = useCreator();
-  const { t } = useLanguage();
-  const navigate = useNavigate();
-  const badgesScrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setActiveCategory(categoryParam);
-  }, [categoryParam]);
-
-  useEffect(() => {
-    setActiveFeed(feedParam);
-  }, [feedParam]);
-
-  const handleBadgeClick = (badge: typeof CATEGORY_BADGES[0]) => {
-    setActiveBadgeId(badge.id);
-    if (badge.isFeed) {
-      setActiveFeed(badge.slug as FeedType);
-      setActiveCategory("all");
-      setSearchParams({ feed: badge.slug });
-    } else {
-      setActiveCategory(badge.slug);
-      setActiveFeed("for-you");
-      if (badge.slug === "all") {
-        searchParams.delete("category");
-        searchParams.delete("feed");
-        setSearchParams(searchParams);
-      } else {
-        setSearchParams({ category: badge.slug });
-      }
-    }
-  };
-
-  const scrollBadges = (dir: "left" | "right") => {
-    if (badgesScrollRef.current) {
-      badgesScrollRef.current.scrollBy({
-        left: dir === "left" ? -280 : 280,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchTab === "people") {
-      navigate(`/creators?q=${encodeURIComponent(searchQuery)}`);
-    } else {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}&category=${activeCategory}`);
-    }
-  };
-
-  const { projects, loading } = useProjects({
-    category: activeCategory,
-    searchQuery,
-    sortBy,
-  });
-
-  // Following Feed Filter
-  const displayedProjects = useMemo(() => {
-    if (activeFeed === "following") {
-      const followedCreatorIds = allCreators
-        .filter((c) => c.isFollowing)
-        .map((c) => c.id);
-
-      return projects.filter(
-        (p) =>
-          followedCreatorIds.includes(p.userId) ||
-          allCreators.some((c) => c.isFollowing && c.username === p.creator.username)
-      );
-    }
-    return projects;
-  }, [projects, activeFeed, allCreators]);
+  const categories = [
+    "All Categories",
+    "UI/UX Systems",
+    "3D & CGI Motion",
+    "Brand Identity",
+    "Visual Art",
+    "Typography",
+    "Photography",
+  ];
+  const [activeCategory, setActiveCategory] = useState("All Categories");
 
   return (
     <motion.main
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="min-h-screen pt-14 sm:pt-16 pb-20 bg-background text-foreground"
+      transition={{ duration: 0.3 }}
+      className="min-h-screen pt-20 pb-24 relative overflow-hidden"
     >
-      {/* Behance Unified Search & Filter Header Ribbon (Screenshot 1) */}
-      <div className="border-b border-border bg-background sticky top-14 sm:top-16 z-30 py-3 shadow-2xs">
-        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            {/* Filter Toggle Pill Button */}
-            <button
-              onClick={() => {
-                setActiveCategory("all");
-                setActiveFeed("for-you");
-                setActiveBadgeId("for-you");
-                searchParams.delete("category");
-                searchParams.delete("feed");
-                setSearchParams(searchParams);
-              }}
-              className="px-4 py-2.5 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0"
+      {/* Background Pastel Atmospheric Gradients */}
+      <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-sky-500/10 via-indigo-500/10 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+
+      {/* Hero Section */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-12 sm:pb-16 text-center space-y-6">
+        {/* Soft Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 shadow-xs text-xs font-medium text-muted-foreground backdrop-blur-md"
+        >
+          <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+          <span>Next-Generation Creative Showcase Platform</span>
+        </motion.div>
+
+        {/* Main Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="text-4xl sm:text-6xl lg:text-7xl font-bold font-display tracking-tight text-foreground leading-[1.1]"
+        >
+          Where creativity finds its{" "}
+          <span className="pastel-gradient-text">calm, pure space.</span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto leading-relaxed"
+        >
+          A completely free, modern portfolio platform for designers, artists, and creators to share case studies, gain inspiration, and connect effortlessly.
+        </motion.p>
+
+        {/* Call to action buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="flex flex-wrap items-center justify-center gap-3 pt-2"
+        >
+          {isLoggedIn ? (
+            <Link
+              to="/create"
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-500/25 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
-              <SlidersHorizontal size={14} className="text-[#0057ff]" />
-              <span>Filter</span>
-            </button>
-
-            {/* Center Pill Search Input with Internal Tabs */}
-            <form
-              onSubmit={handleSearchSubmit}
-              className="flex-1 flex items-center px-4 py-1.5 rounded-full border border-border bg-muted/40 hover:bg-muted/60 focus-within:bg-card focus-within:border-[#0057ff] focus-within:ring-2 focus-within:ring-[#0057ff]/20 transition-all shadow-inner"
+              <Plus size={16} />
+              <span>Create New Project</span>
+            </Link>
+          ) : (
+            <Link
+              to="/signup"
+              className="px-6 py-3 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-500/25 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
-              <Search size={15} className="text-muted-foreground mr-2.5 shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Behance..."
-                className="w-full bg-transparent text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
-              />
+              <span>Get Started for Free</span>
+              <ArrowRight size={15} />
+            </Link>
+          )}
 
-              {/* Inside Pill Tabs: Projects | People | Assets | Images */}
-              <div className="hidden md:flex items-center gap-1 pl-2 border-l border-border shrink-0 text-[11px] font-semibold">
-                <button
-                  type="button"
-                  onClick={() => setSearchTab("projects")}
-                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                    searchTab === "projects"
-                      ? "bg-card text-foreground shadow-xs font-bold border border-border"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Projects
-                </button>
+          <Link
+            to="/dashboard"
+            className="px-6 py-3 rounded-full glass-card hover:bg-white dark:hover:bg-slate-800 text-foreground text-xs sm:text-sm font-semibold border border-slate-200/80 dark:border-slate-800/80 shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <Compass size={15} className="text-indigo-500" />
+            <span>Open Studio</span>
+          </Link>
+        </motion.div>
+      </section>
 
-                <button
-                  type="button"
-                  onClick={() => setSearchTab("people")}
-                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                    searchTab === "people"
-                      ? "bg-card text-foreground shadow-xs font-bold border border-border"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  People
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSearchTab("assets")}
-                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                    searchTab === "assets"
-                      ? "bg-card text-foreground shadow-xs font-bold border border-border"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Assets
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSearchTab("images")}
-                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                    searchTab === "images"
-                      ? "bg-card text-foreground shadow-xs font-bold border border-border"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Images
-                </button>
-              </div>
-            </form>
-
-            {/* Right Sort Dropdown */}
-            <div className="relative shrink-0 hidden sm:block">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortOption)}
-                aria-label="Sort projects"
-                className="appearance-none px-4 py-2.5 pr-8 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-bold focus:outline-none cursor-pointer"
-              >
-                <option value="featured">Recommended ▾</option>
-                <option value="most-appreciated">Most Appreciated</option>
-                <option value="most-viewed">Most Viewed</option>
-                <option value="newest">Newest First</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Dark Image Category Badges Carousel Row (Screenshot 1 Exact) */}
-          <div className="relative flex items-center pt-1">
-            <div
-              ref={badgesScrollRef}
-              className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 w-full scroll-smooth"
-            >
-              {CATEGORY_BADGES.map((badge) => {
-                const isActive = activeBadgeId === badge.id;
-                return (
-                  <button
-                    key={badge.id}
-                    onClick={() => handleBadgeClick(badge)}
-                    className={`relative shrink-0 h-10 px-4 rounded-lg overflow-hidden border transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 font-bold text-xs group ${
-                      isActive
-                        ? "border-[#0057ff] ring-2 ring-[#0057ff]/40 shadow-sm"
-                        : "border-border/80 hover:border-foreground/40"
-                    }`}
-                  >
-                    {/* Background Dark Image with Overlay */}
-                    <img
-                      src={badge.bgImage}
-                      alt={badge.name}
-                      className="absolute inset-0 w-full h-full object-cover brightness-[0.35] group-hover:scale-105 transition-transform duration-300 pointer-events-none"
-                    />
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-
-                    {/* Badge Content */}
-                    <span className="relative z-10 text-white flex items-center gap-1.5 whitespace-nowrap drop-shadow-sm text-[12px]">
-                      {badge.icon && <span>{badge.icon}</span>}
-                      <span>{badge.name}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Scroll Next Arrow Button */}
-            <button
-              onClick={() => scrollBadges("right")}
-              aria-label="Scroll categories right"
-              className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/90 border border-border shadow-md items-center justify-center text-foreground hover:bg-muted cursor-pointer z-10"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
+      {/* Discovery Search & Category Filter */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Soft Search Input */}
+        <div className="max-w-2xl mx-auto relative flex items-center">
+          <Search size={18} className="absolute left-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search projects, categories, or keywords..."
+            className="w-full pl-12 pr-4 py-3.5 rounded-2xl glass-card border border-slate-200/80 dark:border-slate-800/80 text-foreground placeholder:text-muted-foreground text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-md transition-all"
+          />
         </div>
-      </div>
 
-      {/* Main Behance Project Grid (5 columns per row on large displays) */}
-      <section className="pt-6 max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-5 gap-y-7">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <div key={n} className="space-y-2">
-                <div className="aspect-[4/3] rounded-lg bg-muted/40 animate-pulse border border-border" />
-                <div className="h-4 bg-muted/40 rounded w-2/3 animate-pulse" />
-              </div>
-            ))}
-          </div>
-        ) : displayedProjects.length === 0 ? (
-          <div className="py-20 text-center max-w-md mx-auto space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#0057ff]/10 text-[#0057ff] flex items-center justify-center mx-auto">
-              <Users size={24} />
+        {/* Category Pills Carousel */}
+        <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar py-2">
+          {categories.map((cat) => {
+            const isActive = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer ${
+                  isActive
+                    ? "bg-indigo-600 text-white shadow-sm shadow-indigo-500/20 font-semibold"
+                    : "glass-card text-muted-foreground hover:text-foreground border border-slate-200/70 dark:border-slate-800/70 hover:border-indigo-300"
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Clean Empty Placeholder Grid (Ready for Phase 2) */}
+        <div className="pt-6">
+          <div className="glass-card rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 p-12 sm:p-16 text-center max-w-xl mx-auto space-y-4 shadow-sm">
+            <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto shadow-inner">
+              <FolderPlus size={26} />
             </div>
-            <div className="space-y-1">
-              <h3 className="text-base font-bold text-foreground">No projects found</h3>
-              <p className="text-xs text-muted-foreground">
-                Try selecting another category badge or clearing your search.
+
+            <div className="space-y-1.5">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground">
+                Foundation Ready — No Projects Yet
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                You have completed MVP 1 (Design System & Authentication). In the upcoming Phase 2, real projects will be uploaded and showcased right here!
               </p>
             </div>
-            <button
-              onClick={() => {
-                setActiveCategory("all");
-                setActiveFeed("for-you");
-                setActiveBadgeId("for-you");
-                setSearchQuery("");
-                setSearchParams({});
-              }}
-              className="px-5 py-2.5 rounded-full bg-[#0057ff] text-white text-xs font-bold shadow-md cursor-pointer"
-            >
-              Reset to All Projects
-            </button>
+
+            {isLoggedIn ? (
+              <Link
+                to="/create"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 hover:opacity-95 cursor-pointer"
+              >
+                <Plus size={14} />
+                <span>Create Test Project</span>
+              </Link>
+            ) : (
+              <Link
+                to="/signup"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 hover:opacity-95 cursor-pointer"
+              >
+                <span>Join & Start Creating</span>
+                <ArrowRight size={14} />
+              </Link>
+            )}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-5 gap-y-7">
-            {displayedProjects.map((project, idx) => {
-              // Insert Promotional Behance Pro Card at position 3 (like in Screenshot 1)
-              const showPromoCard = idx === 2;
-
-              return (
-                <React.Fragment key={project.id}>
-                  {showPromoCard && (
-                    <div className="flex flex-col space-y-2">
-                      <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gradient-to-br from-[#0c142b] via-[#10204d] to-[#0057ff]/60 border border-[#0057ff]/30 p-5 flex flex-col items-center justify-between text-center shadow-sm">
-                        <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-[#38bdf8] shadow-inner mt-1">
-                          <Zap size={20} className="fill-[#38bdf8]" />
-                        </div>
-
-                        <div className="space-y-1">
-                          <h4 className="text-white text-sm sm:text-base font-bold tracking-tight leading-snug">
-                            Boost your best work <br /> where it matters most.
-                          </h4>
-                        </div>
-
-                        <Link
-                          to={user ? "/dashboard" : "/signup"}
-                          className="px-4 py-2 rounded-full bg-white text-black hover:bg-white/90 text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
-                        >
-                          Start Free Trial
-                        </Link>
-                      </div>
-
-                      <div className="pt-0.5">
-                        <div className="text-[13px] font-bold text-foreground truncate">
-                          Do more with Azaiza Pro
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: Math.min(idx * 0.02, 0.2) }}
-                  >
-                    <ProjectCard project={project} />
-                  </motion.div>
-                </React.Fragment>
-              );
-            })}
-          </div>
-        )}
+        </div>
       </section>
     </motion.main>
   );

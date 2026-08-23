@@ -1,268 +1,248 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
-import { Profile } from "../types";
-import { MOCK_CREATORS } from "../data/mockData";
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  username: string;
+  fullName: string;
+  avatarUrl?: string;
+  headline?: string;
+  bio?: string;
+  location?: string;
+  website?: string;
+  createdAt?: string;
+}
 
 interface AuthContextType {
-  user: Profile | null;
+  user: UserProfile | null;
+  session: Session | null;
   loading: boolean;
-  isDemoUser: boolean;
-  signInWithEmail: (email: string, password: string) => Promise<{ error?: string }>;
-  signUpWithEmail: (email: string, password: string, username: string, fullName: string) => Promise<{ error?: string }>;
-  signInAsDemoUser: (creatorId?: string) => void;
+  signIn: (email: string, password: string) => Promise<{ error?: string }>;
+  signUp: (email: string, password: string, fullName: string, username: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
-  updateProfile: (updates: Partial<Profile>) => Promise<void>;
+  isLoggedIn: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_USER_KEY = "azaiza_gallery_current_user";
-const LOCAL_STORAGE_IS_DEMO_KEY = "azaiza_gallery_is_demo";
+const LOCAL_STORAGE_USER_KEY = "portfolios_user_profile";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<Profile | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    const cached = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isDemoUser, setIsDemoUser] = useState(false);
 
-  // Initialize auth state
+  // Fetch or construct profile
+  const fetchProfile = useCallback(async (userId: string, email?: string) => {
+    if (!isSupabaseConfigured) return;
+
+    try {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (profile && !error) {
+        const fullProfile: UserProfile = {
+          id: profile.id,
+          email: email || profile.email || "",
+          username: profile.username || (email ? email.split("@")[0] : "creator"),
+          fullName: profile.full_name || profile.username || "Creator",
+          avatarUrl: profile.avatar_url || `https://api.dicebear.com/7.x/shapes/svg?seed=${profile.username || userId}`,
+          headline: profile.headline,
+          bio: profile.bio,
+          location: profile.location,
+          website: profile.website,
+          createdAt: profile.created_at,
+        };
+        setUser(fullProfile);
+        localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(fullProfile));
+        return;
+      }
+    } catch (err) {
+      console.warn("Supabase fetch profile error:", err);
+    }
+
+    // Fallback if profile row not yet created
+    if (email) {
+      const basicProfile: UserProfile = {
+        id: userId,
+        email,
+        username: email.split("@")[0],
+        fullName: email.split("@")[0],
+        avatarUrl: `https://api.dicebear.com/7.x/shapes/svg?seed=${email}`,
+      };
+      setUser(basicProfile);
+      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(basicProfile));
+    }
+  }, []);
+
+  // Initialize Session and Listener
   useEffect(() => {
-    async function initAuth() {
-      setLoading(true);
+    let mounted = true;
 
-      // Check if user was in demo mode
-      const savedIsDemo = localStorage.getItem(LOCAL_STORAGE_IS_DEMO_KEY) === "true";
-      const savedUserData = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+    async function initSession() {
+      if (!isSupabaseConfigured) {
+        setLoading(false);
+        return;
+      }
 
-      if (savedIsDemo && savedUserData) {
-        try {
-          setUser(JSON.parse(savedUserData));
-          setIsDemoUser(true);
-          setLoading(false);
-          return;
-        } catch {
+      try {
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        if (mounted) {
+          if (initialSession?.user) {
+            setSession(initialSession);
+            await fetchProfile(initialSession.user.id, initialSession.user.email);
+          } else {
+            setSession(null);
+            setUser(null);
+            localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+          }
+        }
+      } catch (err) {
+        console.warn("Session init error:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    initSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, newSession) => {
+        if (!mounted) return;
+        setSession(newSession);
+        if (newSession?.user) {
+          await fetchProfile(newSession.user.id, newSession.user.email);
+        } else {
+          setUser(null);
           localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
         }
+        setLoading(false);
       }
+    );
 
-      if (isSupabaseConfigured) {
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session?.user) {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("*")
-              .eq("id", session.user.id)
-              .single();
+    return () => {
+      mounted = false;
+      subscription?.unsubscribe();
+    };
+  }, [fetchProfile]);
 
-            if (profile) {
-              setUser({
-                id: profile.id,
-                username: profile.username || session.user.email?.split("@")[0] || "creator",
-                fullName: profile.full_name || "Creator",
-                headline: profile.headline,
-                bio: profile.bio,
-                avatarUrl: profile.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-                bannerUrl: profile.banner_url,
-                location: profile.location,
-                website: profile.website,
-                availableForWork: profile.available_for_work ?? true,
-                skills: profile.skills || [],
-                socialLinks: profile.social_links || {},
-                followersCount: 0,
-                followingCount: 0,
-                totalAppreciations: 0,
-                totalViews: 0,
-              });
-              setIsDemoUser(false);
-            }
-          }
-        } catch (err) {
-          console.warn("Supabase session check error:", err);
-        }
-      } else {
-        // By default on initial load in development preview, start as the primary creator if not signed out
-        if (savedUserData) {
-          try {
-            setUser(JSON.parse(savedUserData));
-            setIsDemoUser(true);
-          } catch {
-            setUser(MOCK_CREATORS[0]);
-            setIsDemoUser(true);
-          }
-        } else {
-          // Pre-authenticate as default creator for instant full-experience browsing & dashboard access
-          setUser(MOCK_CREATORS[0]);
-          setIsDemoUser(true);
-          localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(MOCK_CREATORS[0]));
-          localStorage.setItem(LOCAL_STORAGE_IS_DEMO_KEY, "true");
-        }
-      }
-
-      setLoading(false);
-    }
-
-    initAuth();
-
-    if (isSupabaseConfigured) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        if (session?.user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
-
-          if (profile) {
-            setUser({
-              id: profile.id,
-              username: profile.username,
-              fullName: profile.full_name,
-              headline: profile.headline,
-              bio: profile.bio,
-              avatarUrl: profile.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-              bannerUrl: profile.banner_url,
-              location: profile.location,
-              website: profile.website,
-              availableForWork: profile.available_for_work ?? true,
-              skills: profile.skills || [],
-              socialLinks: profile.social_links || {},
-            });
-            setIsDemoUser(false);
-          }
-        } else if (!isDemoUser) {
-          setUser(null);
-        }
+  // Sign In
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
       });
 
-      return () => subscription.unsubscribe();
-    }
-  }, [isDemoUser]);
+      if (error) {
+        return { error: error.message };
+      }
 
-  const signInWithEmail = async (email: string, password: string): Promise<{ error?: string }> => {
-    if (!isSupabaseConfigured) {
-      // Find matching mock creator or create temporary session
-      const found = MOCK_CREATORS.find(c => c.username.toLowerCase() === email.split("@")[0].toLowerCase());
-      const selected = found || {
-        ...MOCK_CREATORS[0],
-        fullName: email.split("@")[0],
-        username: email.split("@")[0],
-      };
-      setUser(selected);
-      setIsDemoUser(true);
-      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(selected));
-      localStorage.setItem(LOCAL_STORAGE_IS_DEMO_KEY, "true");
+      if (data.session && data.user) {
+        setSession(data.session);
+        await fetchProfile(data.user.id, data.user.email);
+      }
+
       return {};
+    } catch (err: any) {
+      return { error: err.message || "Failed to sign in" };
     }
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: error.message };
-    return {};
   };
 
-  const signUpWithEmail = async (
+  // Sign Up
+  const signUp = async (
     email: string,
     password: string,
-    username: string,
-    fullName: string
-  ): Promise<{ error?: string }> => {
-    if (!isSupabaseConfigured) {
-      const newProfile: Profile = {
-        id: `user-${Date.now()}`,
-        username: username.toLowerCase().replace(/\s+/g, "_"),
-        fullName: fullName || "New Designer",
-        headline: "Creative Designer & Visual Storyteller",
-        bio: "Passionate creator exploring modern design, typography, and visual aesthetics.",
-        avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-        location: "Earth",
-        availableForWork: true,
-        skills: ["UI/UX", "Visual Design", "Figma"],
-        followersCount: 0,
-        followingCount: 0,
-        totalAppreciations: 0,
-        totalViews: 0,
-      };
-      setUser(newProfile);
-      setIsDemoUser(true);
-      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(newProfile));
-      localStorage.setItem(LOCAL_STORAGE_IS_DEMO_KEY, "true");
-      return {};
-    }
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          username,
-          full_name: fullName,
+    fullName: string,
+    username: string
+  ) => {
+    try {
+      const cleanUsername = username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            full_name: fullName.trim(),
+            username: cleanUsername,
+          },
         },
-      },
-    });
+      });
 
-    if (error) return { error: error.message };
-    return {};
-  };
-
-  const signInAsDemoUser = (creatorId?: string) => {
-    const target = MOCK_CREATORS.find(c => c.id === creatorId) || MOCK_CREATORS[0];
-    setUser(target);
-    setIsDemoUser(true);
-    localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(target));
-    localStorage.setItem(LOCAL_STORAGE_IS_DEMO_KEY, "true");
-  };
-
-  const signOut = async () => {
-    if (isSupabaseConfigured) {
-      await supabase.auth.signOut();
-    }
-    setUser(null);
-    setIsDemoUser(false);
-    localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
-    localStorage.removeItem(LOCAL_STORAGE_IS_DEMO_KEY);
-  };
-
-  const updateProfile = useCallback(async (updates: Partial<Profile>) => {
-    if (!user) return;
-    const updated = { ...user, ...updates };
-    setUser(updated);
-
-    if (isDemoUser || !isSupabaseConfigured) {
-      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(updated));
-    } else {
-      try {
-        await supabase
-          .from("profiles")
-          .update({
-            full_name: updated.fullName,
-            headline: updated.headline,
-            bio: updated.bio,
-            avatar_url: updated.avatarUrl,
-            banner_url: updated.bannerUrl,
-            location: updated.location,
-            website: updated.website,
-            available_for_work: updated.availableForWork,
-            skills: updated.skills,
-            social_links: updated.socialLinks,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", user.id);
-      } catch (err) {
-        console.error("Failed to update profile on Supabase:", err);
+      if (error) {
+        return { error: error.message };
       }
+
+      if (data.user) {
+        // Create initial profile in profiles table
+        try {
+          await supabase.from("profiles").upsert({
+            id: data.user.id,
+            username: cleanUsername,
+            full_name: fullName.trim(),
+            email: email.trim(),
+            avatar_url: `https://api.dicebear.com/7.x/shapes/svg?seed=${cleanUsername}`,
+            created_at: new Date().toISOString(),
+          });
+        } catch (dbErr) {
+          console.warn("Profile upsert error:", dbErr);
+        }
+
+        const newProfile: UserProfile = {
+          id: data.user.id,
+          email: email.trim(),
+          username: cleanUsername,
+          fullName: fullName.trim(),
+          avatarUrl: `https://api.dicebear.com/7.x/shapes/svg?seed=${cleanUsername}`,
+        };
+        setUser(newProfile);
+        localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(newProfile));
+      }
+
+      return {};
+    } catch (err: any) {
+      return { error: err.message || "Failed to sign up" };
     }
-  }, [user, isDemoUser]);
+  };
+
+  // Sign Out
+  const signOut = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn("Sign out error:", err);
+    } finally {
+      setUser(null);
+      setSession(null);
+      localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+    }
+  };
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        session,
         loading,
-        isDemoUser,
-        signInWithEmail,
-        signUpWithEmail,
-        signInAsDemoUser,
+        signIn,
+        signUp,
         signOut,
-        updateProfile,
+        isLoggedIn: Boolean(user || session),
       }}
     >
       {children}
