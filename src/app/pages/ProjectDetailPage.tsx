@@ -1,303 +1,550 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation, useNavigate, Link } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import { motion } from "motion/react";
-import { ChevronLeft, ArrowUpRight, Mail, ZoomIn } from "lucide-react";
-import { supabase } from "../../lib/supabase";
-import { Project } from "../types";
-import { FALLBACK_PROJECTS } from "../data/fallbackProjects";
+import {
+  ChevronLeft,
+  Eye,
+  Heart,
+  Bookmark,
+  Share2,
+  ZoomIn,
+  MessageSquare,
+  Sparkles,
+  Calendar,
+  Layers,
+  Wrench,
+  Tag,
+  Mail,
+  Check,
+  Send,
+  ArrowUpRight,
+  UserPlus,
+  UserCheck,
+  Award,
+  ThumbsUp,
+  ExternalLink,
+} from "lucide-react";
+import { useProjects } from "../hooks/useProjects";
+import { useCreator } from "../hooks/useCreator";
+import { useAuth } from "../context/AuthContext";
 import Lightbox from "../components/Lightbox";
+import ShareModal from "../components/ShareModal";
+import ProjectCard from "../components/ProjectCard";
 
 export default function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const {
+    getProjectBySlug,
+    toggleAppreciation,
+    toggleSave,
+    incrementViews,
+    getProjectComments,
+    addComment,
+    allProjects,
+  } = useProjects();
 
-  const [project, setProject] = useState<Project | null>(() => {
-    const passed = (location.state as { project?: Project })?.project;
-    if (passed) return passed;
-    return FALLBACK_PROJECTS.find(p => p.slug === slug || String(p.id) === slug) || null;
-  });
-  const [loading, setLoading] = useState(!project);
-  const [error, setError] = useState(false);
+  const project = getProjectBySlug(slug || "");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
+  const { isFollowing, toggleFollow } = useCreator(project?.creator?.username);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-
-    async function fetchProject() {
-      if (project && (project.slug === slug || String(project.id) === slug)) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(false);
-
-      try {
-        // Query by slug or by id
-        let query = supabase.from("projects").select("*");
-        if (slug && !isNaN(Number(slug))) {
-          query = query.or(`slug.eq.${slug},id.eq.${slug}`);
-        } else if (slug) {
-          query = query.eq("slug", slug);
-        }
-
-        const { data, error: sbError } = await query.single();
-
-        if (sbError || !data) {
-          const fallback = FALLBACK_PROJECTS.find(p => p.slug === slug || String(p.id) === slug);
-          if (fallback) {
-            setProject(fallback);
-          } else {
-            setError(true);
-          }
-        } else {
-          const mapped: Project = {
-            id: data.id,
-            slug: data.slug || String(data.id),
-            title: data.title || "",
-            category: data.category || "",
-            year: data.year || "",
-            description: data.description || "",
-            fullDescription: data.full_description || data.description || "",
-            tags: data.tags ? data.tags.split(",").map((t: string) => t.trim()) : [],
-            coverImage: data.cover_image || data.image_url || "/image.png",
-            accentColor: data.accent_color || "#4ade80",
-            images: data.images
-              ? data.images.split(",").map((img: string) => img.trim())
-              : [],
-          };
-          setProject(mapped);
-        }
-      } catch (e) {
-        const fallback = FALLBACK_PROJECTS.find(p => p.slug === slug || String(p.id) === slug);
-        if (fallback) {
-          setProject(fallback);
-        } else {
-          setError(true);
-        }
-      } finally {
-        setLoading(false);
-      }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (project) {
+      incrementViews(project.id);
     }
-
-    fetchProject();
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground text-sm font-mono">Loading project...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !project) {
+  if (!project) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20 px-6">
         <div className="text-center max-w-md">
-          <h1 className="text-4xl font-display font-bold text-foreground mb-4">Project Not Found</h1>
-          <p className="text-muted-foreground mb-8 text-sm">
-            The project you're looking for doesn't exist or may have been moved.
+          <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+            Project Not Found
+          </h1>
+          <p className="text-muted-foreground mb-5 text-xs">
+            The project you are looking for may have been removed or made private.
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-md"
           >
-            <ChevronLeft size={16} /> Back to portfolio
+            <ChevronLeft size={14} /> Back to Discover
           </Link>
         </div>
       </div>
     );
   }
 
-  const allImages = [project.coverImage, ...(project.images || [])].filter(Boolean);
+  const allImages = [project.coverImage, ...(project.images || [])].filter(
+    (img, idx, self) => self.indexOf(img) === idx && Boolean(img)
+  );
+
+  const comments = getProjectComments(project.id);
+  const creator = project.creator;
+
+  const handlePostComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    const commenter = user || {
+      id: "guest-user",
+      username: "guest_designer",
+      fullName: "Guest Designer",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+    };
+
+    addComment(project.id, commenter, commentText.trim());
+    setCommentText("");
+  };
+
+  const moreByCreator = allProjects
+    .filter((p) => p.userId === project.userId && p.id !== project.id)
+    .slice(0, 3);
+
+  const relatedProjects = allProjects
+    .filter(
+      (p) =>
+        p.id !== project.id &&
+        p.categoryId === project.categoryId &&
+        p.userId !== project.userId
+    )
+    .slice(0, 3);
+
+  const projectUrl = window.location.href;
 
   return (
     <motion.main
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="min-h-screen"
+      transition={{ duration: 0.2 }}
+      className="min-h-screen pt-14 sm:pt-16 pb-20 bg-background"
     >
-      {/* Hero Header */}
-      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-20 overflow-hidden">
-        {/* Subtle radial background glow */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse 700px 500px at 80% 20%, ${project.accentColor}15, transparent 70%)`,
-          }}
-        />
-
-        <div className="max-w-5xl mx-auto px-6 lg:px-10 relative z-10">
+      {/* Behance Top Project Header Strip */}
+      <div className="border-b border-border/40 bg-card/30 py-3">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <button
-            onClick={() => navigate("/")}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10 group"
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
           >
-            <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-            Back to portfolio
+            <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Discover</span>
           </button>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <span className="text-xs font-mono px-3 py-1.5 rounded-full border border-border bg-card text-muted-foreground font-medium">
-                {project.year}
-              </span>
-              <span className="text-xs font-mono px-3 py-1.5 rounded-full border border-border/50 text-muted-foreground font-medium">
+          {/* Quick Share / Like on top */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => toggleSave(project.id)}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                project.isSaved
+                  ? "border-amber-500 bg-amber-500/10 text-amber-400"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Bookmark size={12} className={project.isSaved ? "fill-amber-400" : ""} />
+              <span>{project.isSaved ? "Saved" : "Save"}</span>
+            </button>
+
+            <button
+              onClick={() => setShareOpen(true)}
+              className="p-1.5 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              title="Share"
+            >
+              <Share2 size={13} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Behance Case Study Grid (Content Left, Sticky Sidebar Right) */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column: Visual Case Study Canvas (Behance Presentation) */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Project Title & Overview Banner */}
+          <div className="space-y-3 pb-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-md bg-muted text-foreground font-semibold">
                 {project.category}
               </span>
+              {project.isFeatured && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary font-bold">
+                  <Sparkles size={11} /> Behance Curated
+                </span>
+              )}
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-display font-extrabold text-foreground leading-tight mb-6">
+            <h1 className="text-2xl sm:text-4xl font-display font-extrabold text-foreground tracking-tight leading-tight">
               {project.title}
             </h1>
 
-            <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed w-full max-w-full break-words whitespace-pre-line">
-              {project.fullDescription || project.description}
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              {project.description}
             </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Tags Bar */}
-      {project.tags && project.tags.length > 0 && (
-        <section className="py-6 border-y border-border bg-muted/20">
-          <div className="max-w-5xl mx-auto px-6 lg:px-10">
-            <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest shrink-0">
-                Tags ·
-              </span>
-              {project.tags.map(tag => (
-                <span
-                  key={tag}
-                  className="px-3 py-1.5 text-xs font-medium rounded-full border border-primary/20 bg-primary/10 text-primary"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
           </div>
-        </section>
-      )}
 
-      {/* Project Cover Image */}
-      {project.coverImage && (
-        <section className="py-12 max-w-5xl mx-auto px-6 lg:px-10">
+          {/* Cover Hero Canvas */}
           <div
             onClick={() => {
               setLightboxIndex(0);
               setLightboxOpen(true);
             }}
-            className="group relative rounded-3xl overflow-hidden border border-border bg-card shadow-lg cursor-zoom-in"
-            title="Click to view cover in Lightbox"
+            className="group relative rounded-xl overflow-hidden bg-card border border-border cursor-zoom-in shadow-md"
           >
             <img
               src={project.coverImage}
               alt={project.title}
-              className="w-full h-auto max-h-[600px] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
+              className="w-full h-auto max-h-[700px] object-cover transition-transform duration-500 group-hover:scale-[1.01]"
             />
-            <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-              <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-black/75 backdrop-blur-md text-white text-sm font-semibold border border-white/20 shadow-2xl">
-                <ZoomIn size={16} className="text-primary" /> Click to expand image
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/80 text-white text-xs font-semibold border border-white/20">
+                <ZoomIn size={13} className="text-primary" /> Full View
               </span>
             </div>
           </div>
-        </section>
-      )}
 
-      {/* Image Gallery */}
-      {project.images && project.images.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-5xl mx-auto px-6 lg:px-10">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl font-display font-bold text-foreground">Project Gallery</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">Click any image to open full resolution Lightbox</p>
-              </div>
-              <span className="text-xs font-mono text-primary bg-primary/10 border border-primary/20 px-3 py-1 rounded-full font-medium">
-                {project.images.length} Images
+          {/* Full Case Study Narrative */}
+          {project.fullDescription && (
+            <div className="p-6 rounded-xl border border-border bg-card/40 space-y-3">
+              <h3 className="text-sm font-bold text-foreground">
+                About the Case Study
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                {project.fullDescription}
+              </p>
+            </div>
+          )}
+
+          {/* Visual Showcase Stack */}
+          {project.images && project.images.length > 0 && (
+            <div className="space-y-5 pt-2">
+              {project.images.map((img, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => {
+                    setLightboxIndex(idx + 1);
+                    setLightboxOpen(true);
+                  }}
+                  className="group relative rounded-xl overflow-hidden bg-card border border-border cursor-zoom-in shadow-sm"
+                >
+                  <img
+                    src={img}
+                    alt={`${project.title} gallery ${idx + 1}`}
+                    loading="lazy"
+                    className="w-full h-auto max-h-[700px] object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/80 text-white text-xs font-semibold">
+                      <ZoomIn size={12} className="text-primary" /> View Lightbox
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Behance Bottom "Appreciate Project" Big Action Card */}
+          <div className="p-8 rounded-2xl border border-primary/30 bg-gradient-to-b from-card to-primary/5 text-center space-y-4 shadow-lg my-8">
+            <h3 className="text-lg font-display font-bold text-foreground">
+              Did you like this case study?
+            </h3>
+            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+              Show your appreciation to help this project get featured on the Behance leaderboard.
+            </p>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => toggleAppreciation(project.id)}
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold transition-all shadow-md cursor-pointer ${
+                project.isAppreciated
+                  ? "bg-rose-500 text-white shadow-rose-500/30"
+                  : "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(170,255,56,0.3)] hover:opacity-90"
+              }`}
+            >
+              <Heart
+                size={16}
+                className={project.isAppreciated ? "fill-white" : ""}
+              />
+              <span>
+                {project.isAppreciated ? "Appreciated" : "Appreciate Project"} (
+                {(project.appreciationsCount || 0).toLocaleString()})
               </span>
+            </motion.button>
+          </div>
+
+          {/* Comments Discussion */}
+          <section className="pt-4 border-t border-border space-y-4">
+            <div className="flex items-center gap-2">
+              <MessageSquare size={16} className="text-primary" />
+              <h3 className="text-sm font-bold text-foreground">
+                Discussion ({comments.length})
+              </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {project.images.map((src, i) => {
-                const imageIndex = project.coverImage ? i + 1 : i;
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{ duration: 0.4, delay: (i % 2) * 0.1 }}
-                    onClick={() => {
-                      setLightboxIndex(imageIndex);
-                      setLightboxOpen(true);
-                    }}
-                    className="group relative rounded-2xl overflow-hidden border border-border bg-card aspect-[3/2] cursor-zoom-in"
-                  >
+            <form onSubmit={handlePostComment} className="flex gap-2.5">
+              <img
+                src={
+                  user?.avatarUrl ||
+                  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
+                }
+                alt="Avatar"
+                className="w-7 h-7 rounded-full object-cover border border-border shrink-0"
+              />
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Give feedback or ask the designer a question..."
+                  className="w-full pl-3 pr-20 py-2 rounded-xl border border-border bg-card text-foreground text-xs focus:outline-none focus:border-primary/60"
+                />
+                <button
+                  type="submit"
+                  disabled={!commentText.trim()}
+                  className="absolute right-1.5 top-1.5 px-3 py-1 rounded-lg bg-primary text-primary-foreground text-[10px] font-bold disabled:opacity-40"
+                >
+                  Post
+                </button>
+              </div>
+            </form>
+
+            <div className="space-y-2.5 pt-1">
+              {comments.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex gap-2.5 p-3 rounded-xl border border-border/50 bg-card/30 text-xs"
+                >
+                  <Link to={`/@${c.user.username}`}>
                     <img
-                      src={src}
-                      alt={`${project.title} — screenshot ${i + 1}`}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      src={c.user.avatarUrl}
+                      alt={c.user.fullName}
+                      className="w-7 h-7 rounded-full object-cover border border-border"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-                      <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-semibold border border-white/20 shadow-lg">
-                        <ZoomIn size={14} className="text-primary" /> View Fullscreen
+                  </Link>
+                  <div className="flex-1 space-y-0.5">
+                    <div className="flex items-center justify-between">
+                      <Link
+                        to={`/@${c.user.username}`}
+                        className="font-bold text-foreground hover:text-primary transition-colors"
+                      >
+                        {c.user.fullName}
+                      </Link>
+                      <span className="text-[10px] font-mono text-muted-foreground">
+                        {new Date(c.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs font-mono opacity-80 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                      {String(i + 1).padStart(2, "0")} / {String(project.images.length).padStart(2, "0")}
-                    </div>
-                  </motion.div>
-                );
-              })}
+                    <p className="text-muted-foreground">{c.content}</p>
+                  </div>
+                </div>
+              ))}
             </div>
+          </section>
+        </div>
+
+        {/* Right Column: Sticky Behance Specification Sidebar */}
+        <div className="lg:col-span-4 space-y-5">
+          <div className="sticky top-20 space-y-5">
+            {/* Project Creator Box */}
+            <div className="p-4 rounded-xl border border-border bg-card shadow-sm space-y-3.5">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
+                Project Owner
+              </span>
+
+              <div className="flex items-center gap-3">
+                <Link to={`/@${creator.username}`}>
+                  <img
+                    src={creator.avatarUrl}
+                    alt={creator.fullName}
+                    className="w-11 h-11 rounded-full object-cover border-2 border-border hover:border-primary transition-all"
+                  />
+                </Link>
+                <div className="min-w-0">
+                  <Link
+                    to={`/@${creator.username}`}
+                    className="font-bold text-xs text-foreground hover:text-primary transition-colors truncate block"
+                  >
+                    {creator.fullName}
+                  </Link>
+                  <span className="text-[10px] font-mono text-muted-foreground block truncate">
+                    @{creator.username}
+                  </span>
+                  {creator.availableForWork && (
+                    <span className="inline-block text-[10px] font-mono text-emerald-400 font-semibold">
+                      ● Available for freelance
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  onClick={() => toggleFollow(creator.id)}
+                  className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    isFollowing
+                      ? "border border-border bg-muted text-muted-foreground"
+                      : "bg-primary text-primary-foreground shadow-sm hover:opacity-90"
+                  }`}
+                >
+                  {isFollowing ? (
+                    <>
+                      <UserCheck size={13} /> Following
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus size={13} /> Follow
+                    </>
+                  )}
+                </button>
+
+                <a
+                  href={`mailto:${creator.username}@designers.gallery?subject=Commission Request`}
+                  className="px-3.5 py-1.5 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold transition-colors flex items-center gap-1"
+                >
+                  <Mail size={12} /> Hire
+                </a>
+              </div>
+            </div>
+
+            {/* Project Metrics & Stats */}
+            <div className="p-4 rounded-xl border border-border bg-card space-y-3">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
+                Project Information
+              </span>
+
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="p-2.5 rounded-lg bg-muted/30 border border-border">
+                  <span className="text-[10px] font-mono text-muted-foreground block">
+                    Appreciations
+                  </span>
+                  <strong className="text-foreground font-mono">
+                    {(project.appreciationsCount || 0).toLocaleString()}
+                  </strong>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-muted/30 border border-border">
+                  <span className="text-[10px] font-mono text-muted-foreground block">
+                    Views
+                  </span>
+                  <strong className="text-foreground font-mono">
+                    {(project.viewsCount || 0).toLocaleString()}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Tools Badges */}
+              {project.tools && project.tools.length > 0 && (
+                <div className="pt-2 border-t border-border space-y-1.5">
+                  <span className="text-[10px] font-mono text-muted-foreground block">
+                    Software & Tools Used
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {project.tools.map((tool) => (
+                      <span
+                        key={tool}
+                        className="px-2 py-0.5 rounded-md border border-border bg-muted/40 text-foreground text-[10px] font-medium"
+                      >
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tags */}
+              {project.tags && project.tags.length > 0 && (
+                <div className="pt-2 border-t border-border space-y-1.5">
+                  <span className="text-[10px] font-mono text-muted-foreground block">
+                    Tags
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-primary text-[10px] font-semibold"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Published Date */}
+              <div className="pt-2 border-t border-border text-[10px] font-mono text-muted-foreground flex items-center justify-between">
+                <span>Published in</span>
+                <span className="text-foreground font-bold">{project.year || "2025"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* More by Creator Section */}
+      {moreByCreator.length > 0 && (
+        <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-14 pt-8 border-t border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-foreground">
+              More by {creator.fullName}
+            </h3>
+            <Link
+              to={`/@${creator.username}`}
+              className="text-xs text-primary font-mono hover:underline flex items-center gap-1"
+            >
+              View Profile <ArrowUpRight size={12} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {moreByCreator.map((p) => (
+              <ProjectCard key={p.id} project={p} />
+            ))}
           </div>
         </section>
       )}
 
-      {/* Next Step / CTA */}
-      <section className="py-20 border-t border-border bg-muted/20">
-        <div className="max-w-5xl mx-auto px-6 lg:px-10 text-center">
-          <h2 className="text-3xl lg:text-4xl font-display font-extrabold text-foreground mb-4">
-            Like what you see?
-          </h2>
-          <p className="text-muted-foreground mb-8 text-base">Let's discuss your next project.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
+      {/* You Might Also Like */}
+      {relatedProjects.length > 0 && (
+        <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-10 pt-8 border-t border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-foreground">
+              You Might Also Like
+            </h3>
             <Link
-              to="/"
-              className="flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-bold hover:shadow-[0_0_40px_rgba(170,255,56,0.25)] transition-all duration-300"
+              to={`/?category=${project.categoryId}`}
+              className="text-xs text-primary font-mono hover:underline flex items-center gap-1"
             >
-              View more work <ArrowUpRight size={16} />
+              Explore {project.category} <ArrowUpRight size={12} />
             </Link>
-            <a
-              href="mailto:ahmedazy.uxui@gmail.com"
-              className="flex items-center gap-2 px-8 py-4 rounded-full border border-border bg-card text-foreground font-semibold hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
-            >
-              <Mail size={16} /> Get in touch
-            </a>
           </div>
-        </div>
-      </section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {relatedProjects.map((p) => (
+              <ProjectCard key={p.id} project={p} />
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* Lightbox Component */}
+      {/* Fullscreen Lightbox */}
       <Lightbox
         isOpen={lightboxOpen}
         images={allImages}
         initialIndex={lightboxIndex}
         projectTitle={project.title}
         onClose={() => setLightboxOpen(false)}
+      />
+
+      {/* Share Dialog */}
+      <ShareModal
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+        title={project.title}
+        url={projectUrl}
       />
     </motion.main>
   );

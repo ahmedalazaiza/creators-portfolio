@@ -1,8 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
-import { Sun, Moon, ChevronLeft, Menu, X } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  Search,
+  Plus,
+  LayoutDashboard,
+  User,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  Sparkles,
+  Bell,
+  MessageSquare,
+  Bookmark,
+  FolderPlus,
+  Compass,
+  Flame,
+  Award,
+  Users,
+} from "lucide-react";
 import { useScrolled } from "../hooks/useScrolled";
+import { useAuth } from "../context/AuthContext";
+import SearchModal from "./SearchModal";
 
 interface NavbarProps {
   isDark: boolean;
@@ -10,230 +32,336 @@ interface NavbarProps {
 }
 
 export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
-  const isScrolled = useScrolled(40);
+  const isScrolled = useScrolled(20);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("hero");
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const isHome = location.pathname === "/";
-  const isProject = location.pathname.startsWith("/project");
-  const isDashboard = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/adashboard");
 
-  const navLinks = [
-    { label: "Home", id: "hero" },
-    { label: "About", id: "about" },
-    { label: "Services", id: "services" },
-    { label: "Experience", id: "experience" },
-    { label: "Work", id: "work" },
-    { label: "Contact", id: "contact" },
+  const mainNavItems = [
+    { label: "Explore", path: "/" },
+    { label: "Creators", path: "/creators" },
+    { label: "UI/UX", path: "/?category=ui-ux" },
+    { label: "3D & Motion", path: "/?category=3d-motion" },
+    { label: "Branding", path: "/?category=branding" },
+    { label: "Photography", path: "/?category=photography" },
   ];
 
-  // ScrollSpy to track active section
-  useEffect(() => {
-    if (!isHome) return;
-
-    const sectionIds = ["hero", "about", "services", "experience", "work", "contact"];
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 160;
-
-      // Near top of page
-      if (window.scrollY < 120) {
-        setActiveSection("hero");
-        return;
-      }
-
-      // Near bottom of page
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100) {
-        setActiveSection("contact");
-        return;
-      }
-
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sectionIds[i]);
-        if (el) {
-          const top = el.offsetTop;
-          if (scrollPosition >= top) {
-            setActiveSection(sectionIds[i]);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isHome]);
-
-  const handleNavClick = (sectionId: string) => {
-    setMenuOpen(false);
-    if (!isHome) {
-      navigate("/");
-      setTimeout(() => {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth" });
-        }
-      }, 150);
-    } else {
-      if (sectionId === "hero") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setActiveSection("hero");
-      } else {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth" });
-          setActiveSection(sectionId);
-        }
-      }
-    }
+  const handleSignOut = async () => {
+    setProfileDropdownOpen(false);
+    await signOut();
+    navigate("/");
   };
-
-  const handleLogoClick = (e: React.MouseEvent) => {
-    if (isHome) {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      setActiveSection("hero");
-    }
-  };
-
-  if (isDashboard) {
-    return null; // Dashboard has its own header
-  }
-
-  const solidBg = isScrolled || menuOpen;
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        solidBg
-          ? "bg-background/90 backdrop-blur-md border-b border-border shadow-sm"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-16 lg:h-20">
-        {/* Brand Logo */}
-        <Link
-          to="/"
-          onClick={handleLogoClick}
-          className="text-4xl text-foreground hover:opacity-80 transition-opacity leading-none"
-          style={{ fontFamily: "'Cookie', cursive" }}
-        >
-          Azaiza<span style={{ color: "#aaff38" }}>.</span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-7">
-          {isProject ? (
-            <Link
-              to="/"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
-            >
-              <ChevronLeft size={16} /> Back to home
-            </Link>
-          ) : (
-            navLinks.map(({ label, id }) => {
-              const isActive = isHome && activeSection === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => handleNavClick(id)}
-                  className={`text-sm transition-colors duration-200 relative py-1 font-medium ${
-                    isActive
-                      ? "text-primary font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {label}
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeNavIndicator"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_rgba(170,255,56,0.5)]"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </button>
-              );
-            })
-          )}
-        </div>
-
-        {/* Right side controls */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onToggleTheme}
-            aria-label="Toggle theme"
-            className="w-9 h-9 rounded-full flex items-center justify-center border border-border bg-card hover:border-primary/50 hover:bg-primary/10 transition-all duration-200"
-          >
-            {isDark ? <Sun size={16} className="text-primary" /> : <Moon size={16} className="text-foreground" />}
-          </button>
-
-          <button
-            className="hidden md:flex items-center gap-2 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
-            onClick={() => handleNavClick("contact")}
-          >
-            Hire Me
-          </button>
-
-          <button
-            className="md:hidden w-9 h-9 flex items-center justify-center text-foreground"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle mobile menu"
-          >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu dropdown */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border px-6 pb-6 pt-2 shadow-xl space-y-1"
-          >
-            {isProject ? (
-              <Link
-                to="/"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2 py-3 text-base text-foreground border-b border-border/50 font-medium"
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
+          isScrolled || menuOpen
+            ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm"
+            : "bg-background/80 backdrop-blur-md border-b border-border/40"
+        }`}
+      >
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16 gap-3 sm:gap-6">
+          {/* Left: Brand Logo & Navigation */}
+          <div className="flex items-center gap-6 shrink-0">
+            <Link to="/" className="flex items-center gap-2 group text-foreground">
+              <span
+                className="text-2xl sm:text-3xl text-foreground font-black tracking-tight"
+                style={{ fontFamily: "'Cookie', cursive" }}
               >
-                <ChevronLeft size={18} /> Back to home
-              </Link>
-            ) : (
-              navLinks.map(({ label, id }) => {
-                const isActive = isHome && activeSection === id;
+                Azaiza<span className="text-primary font-sans">.</span>
+              </span>
+              <span className="hidden md:inline-flex items-center text-[10px] font-mono px-2 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary font-bold">
+                PRO
+              </span>
+            </Link>
+
+            {/* Desktop Navigation Links */}
+            <nav className="hidden xl:flex items-center gap-5">
+              {mainNavItems.map((item) => {
+                const isActive =
+                  item.path === "/"
+                    ? isHome && !location.search
+                    : location.pathname === item.path ||
+                      (item.path.includes("?") &&
+                        location.search.includes(item.path.split("?")[1] || "none"));
+
                 return (
-                  <button
-                    key={id}
-                    onClick={() => handleNavClick(id)}
-                    className={`flex items-center justify-between w-full text-left py-2.5 px-3 rounded-xl text-base font-medium transition-colors ${
+                  <Link
+                    key={item.label}
+                    to={item.path}
+                    className={`text-xs font-bold transition-colors py-1 relative ${
                       isActive
-                        ? "text-primary bg-primary/10 font-semibold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <span>{label}</span>
-                    {isActive && <span className="w-2 h-2 rounded-full bg-primary" />}
-                  </button>
+                    {item.label}
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeNavTab"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                      />
+                    )}
+                  </Link>
                 );
-              })
-            )}
+              })}
+            </nav>
+          </div>
+
+          {/* Center: Global Search Trigger (Behance Style) */}
+          <div className="flex-1 max-w-xl hidden md:block">
             <button
-              className="mt-3 w-full py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
-              onClick={() => handleNavClick("contact")}
+              onClick={() => setSearchOpen(true)}
+              className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-full border border-border bg-muted/40 hover:bg-muted/70 text-muted-foreground text-xs transition-all shadow-inner group cursor-pointer"
             >
-              Hire Me
+              <div className="flex items-center gap-2.5">
+                <Search size={14} className="text-primary group-hover:scale-110 transition-transform" />
+                <span className="truncate">Search masterworks, creators, Figma, 3D...</span>
+              </div>
+              <kbd className="hidden lg:inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-mono text-muted-foreground bg-background border border-border rounded-md shadow-xs">
+                ⌘K
+              </kbd>
             </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+          </div>
+
+          {/* Right: Actions, Share Work Button, Notifications, Avatar */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Mobile Search Icon */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              className="md:hidden p-2 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground"
+            >
+              <Search size={16} />
+            </button>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={onToggleTheme}
+              aria-label="Toggle theme"
+              className="p-2 rounded-full border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer"
+            >
+              {isDark ? <Sun size={15} className="text-[#CDF22B]" /> : <Moon size={15} />}
+            </button>
+
+            {/* Notifications Bell */}
+            <div className="relative">
+              <button
+                onClick={() => setNotificationsOpen(!notificationsOpen)}
+                aria-label="Notifications"
+                className="p-2 rounded-full border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer relative"
+              >
+                <Bell size={15} />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
+              </button>
+
+              <AnimatePresence>
+                {notificationsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 5 }}
+                    className="absolute right-0 mt-2 w-72 p-3 rounded-2xl border border-border bg-popover shadow-xl z-50 text-xs space-y-2"
+                  >
+                    <div className="flex items-center justify-between pb-2 border-b border-border font-bold text-foreground">
+                      <span>Activity & Notifications</span>
+                      <span className="text-[10px] font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                        2 New
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="p-2 rounded-xl bg-muted/40 hover:bg-muted transition-colors">
+                        <p className="font-semibold text-foreground">Zaid Al-Khatib appreciated your project</p>
+                        <span className="text-[10px] font-mono text-muted-foreground">10 minutes ago</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-muted/40 hover:bg-muted transition-colors">
+                        <p className="font-semibold text-foreground">Nour Design started following you</p>
+                        <span className="text-[10px] font-mono text-muted-foreground">1 hour ago</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Share Your Work (Behance Primary Button) */}
+            <Link
+              to={user ? "/dashboard/new" : "/signup"}
+              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_15px_rgba(205,242,43,0.3)] hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+            >
+              <Plus size={14} />
+              <span className="hidden sm:inline">Share Work</span>
+            </Link>
+
+            {/* User Profile Avatar / Sign In */}
+            <div className="relative">
+              <button
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-1.5 p-0.5 rounded-full border border-border hover:border-primary transition-all cursor-pointer"
+                title="Account Menu"
+              >
+                <img
+                  src={
+                    user?.avatarUrl ||
+                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
+                  }
+                  alt={user?.fullName || "User Profile"}
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover"
+                />
+              </button>
+
+              <AnimatePresence>
+                {profileDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 5 }}
+                    className="absolute right-0 mt-2 w-56 p-2 rounded-2xl border border-border bg-popover shadow-2xl z-50 text-xs space-y-1"
+                  >
+                    {/* Identity Header */}
+                    <div className="p-2.5 pb-2 border-b border-border">
+                      <div className="font-bold text-foreground truncate">
+                        {user?.fullName || "Ahmed Al-Azaiza"}
+                      </div>
+                      <div className="text-[11px] font-mono text-primary truncate">
+                        @{user?.username || "ahmed_azaiza"}
+                      </div>
+                    </div>
+
+                    <Link
+                      to="/profile"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
+                    >
+                      <User size={14} className="text-primary" />
+                      <span>My Behance Profile</span>
+                    </Link>
+
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
+                    >
+                      <LayoutDashboard size={14} className="text-primary" />
+                      <span>Creator Studio</span>
+                    </Link>
+
+                    <Link
+                      to="/creators"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
+                    >
+                      <Users size={14} className="text-primary" />
+                      <span>Discover Creators</span>
+                    </Link>
+
+                    <Link
+                      to="/dashboard/new"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
+                    >
+                      <Plus size={14} className="text-primary" />
+                      <span>Publish Project</span>
+                    </Link>
+
+                    <Link
+                      to="/dashboard/settings"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
+                    >
+                      <Settings size={14} className="text-muted-foreground" />
+                      <span>Account Settings</span>
+                    </Link>
+
+                    <div className="pt-1 border-t border-border">
+                      {user ? (
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-destructive/10 text-destructive transition-colors font-semibold text-left cursor-pointer"
+                        >
+                          <LogOut size={14} />
+                          <span>Sign Out</span>
+                        </button>
+                      ) : (
+                        <Link
+                          to="/login"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-primary transition-colors font-semibold text-left"
+                        >
+                          <User size={14} />
+                          <span>Sign In / Register</span>
+                        </Link>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Mobile Hamburger Toggle */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+              className="xl:hidden p-2 rounded-full border border-border bg-card text-foreground"
+            >
+              {menuOpen ? <X size={17} /> : <Menu size={17} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Drawer */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="xl:hidden border-t border-border bg-background px-4 py-4 space-y-3"
+            >
+              <div className="space-y-1">
+                {mainNavItems.map((item) => (
+                  <Link
+                    key={item.label}
+                    to={item.path}
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-3 py-2 rounded-xl text-xs font-bold text-foreground hover:bg-muted transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <Link
+                  to="/profile"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-muted transition-colors"
+                >
+                  My Profile
+                </Link>
+              </div>
+
+              <div className="pt-3 border-t border-border flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Appearance</span>
+                <button
+                  onClick={onToggleTheme}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-xs font-semibold text-foreground"
+                >
+                  {isDark ? <Sun size={13} className="text-[#CDF22B]" /> : <Moon size={13} />}
+                  <span>{isDark ? "Light Mode" : "Dark Mode"}</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* Global Cmd+K Search Modal */}
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 }

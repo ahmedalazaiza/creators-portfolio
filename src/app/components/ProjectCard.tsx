@@ -1,7 +1,8 @@
-import React, { useState, useRef, useCallback } from "react";
-import { Link } from "react-router";
-import { ArrowUpRight } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { ArrowUpRight, Eye, Heart, Bookmark, Sparkles } from "lucide-react";
 import { Project } from "../types";
+import { useProjects } from "../hooks/useProjects";
 
 interface ProjectCardProps {
   project: Project;
@@ -9,98 +10,143 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   const [hovered, setHovered] = useState(false);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const cardRef = useRef<HTMLAnchorElement>(null);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (window.innerWidth < 768) return;
-    const card = cardRef.current;
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -8;
-    setTilt({ x, y });
-  }, []);
-
-  const resetTilt = () => {
-    setTilt({ x: 0, y: 0 });
-    setHovered(false);
-  };
+  const navigate = useNavigate();
+  const { toggleAppreciation, toggleSave } = useProjects();
 
   const projectUrl = `/project/${project.slug || project.id}`;
+  const creator = project.creator;
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleAppreciation(project.id);
+  };
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleSave(project.id);
+  };
+
+  const handleCreatorClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/@${creator.username}`);
+  };
 
   return (
-    <Link
-      ref={cardRef}
-      to={projectUrl}
-      state={{ project }}
+    <div
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={resetTilt}
-      onMouseMove={handleMouseMove}
-      className="block w-full max-w-full min-w-0 text-left group relative rounded-3xl overflow-hidden border border-border bg-card transition-all duration-300 hover:border-primary/40 hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.35)] will-change-transform"
-      style={{
-        transform:
-          window.innerWidth >= 768 && hovered
-            ? `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`
-            : "none",
-        transition: hovered
-          ? "transform 0.1s ease-out"
-          : "transform 0.4s ease-out, box-shadow 0.3s ease, border-color 0.3s ease",
-      }}
+      onMouseLeave={() => setHovered(false)}
+      className="group flex flex-col space-y-2.5 transition-all duration-200"
     >
-      {/* Image */}
-      <div className="relative h-48 sm:h-52 overflow-hidden bg-muted/30">
-        <img
-          src={project.coverImage}
-          alt={project.title}
-          loading="lazy"
-          className="w-full h-full max-w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent dark:from-black/70 dark:via-black/20 pointer-events-none" />
-        <div
-          className={`absolute inset-0 transition-opacity duration-300 pointer-events-none ${hovered ? "opacity-100" : "opacity-0"}`}
-          style={{
-            background: `linear-gradient(135deg, ${project.accentColor}22 0%, transparent 60%)`,
-          }}
-        />
-      </div>
-
-      {/* Content */}
-      <div className="p-5 sm:p-6 min-w-0">
-        <div className="flex items-center justify-between mb-3 gap-2">
-          <span className="text-xs font-mono text-primary bg-primary/10 px-2.5 py-1 rounded-full shrink-0 font-medium">
-            {project.year}
-          </span>
-          <ArrowUpRight
-            size={18}
-            className={`text-primary shrink-0 transition-all duration-300 ${
-              hovered ? "opacity-100 translate-x-0.5 -translate-y-0.5" : "opacity-0"
-            }`}
+      {/* Behance Project Card Thumbnail Canvas */}
+      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted/40 border border-border/60 group-hover:border-primary/50 group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.12)] transition-all">
+        <Link to={projectUrl} className="block w-full h-full">
+          <img
+            src={project.coverImage}
+            alt={project.title}
+            loading="lazy"
+            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
           />
-        </div>
-        <h3
-          className="text-lg font-display font-bold text-foreground mb-1.5 group-hover:text-primary transition-colors duration-300 truncate"
-          title={project.title}
+        </Link>
+
+        {/* Behance Hover Overlay with Quick Action Buttons */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 p-3.5 flex flex-col justify-between transition-opacity duration-200 pointer-events-none ${
+            hovered ? "opacity-100" : "opacity-0"
+          }`}
         >
-          {project.title}
-        </h3>
-        <p className="text-xs text-muted-foreground mb-4 leading-relaxed line-clamp-2 break-words">
-          {project.description}
-        </p>
-        <div className="text-xs text-muted-foreground font-mono break-words">
-          {project.category}
+          {/* Top Actions: Curated Pill + Save to Moodboard */}
+          <div className="flex items-center justify-between w-full">
+            {project.isFeatured ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-primary/40 text-primary text-[10px] font-mono font-bold">
+                <Sparkles size={11} /> Curated
+              </span>
+            ) : (
+              <span className="text-[10px] font-mono text-white/80 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-md">
+                {project.category}
+              </span>
+            )}
+
+            {/* Save to Moodboard Button */}
+            <button
+              onClick={handleSave}
+              className={`p-2 rounded-full backdrop-blur-md border pointer-events-auto transition-all cursor-pointer ${
+                project.isSaved
+                  ? "bg-amber-500 text-white border-amber-400"
+                  : "bg-black/60 hover:bg-black/90 text-white border-white/20 hover:border-white/40"
+              }`}
+              title={project.isSaved ? "Saved to Moodboard" : "Save to Moodboard"}
+            >
+              <Bookmark size={13} className={project.isSaved ? "fill-white" : ""} />
+            </button>
+          </div>
+
+          {/* Bottom Title on Image */}
+          <div className="w-full">
+            <Link
+              to={projectUrl}
+              className="text-white text-xs sm:text-sm font-display font-bold leading-snug line-clamp-1 hover:underline pointer-events-auto"
+            >
+              {project.title}
+            </Link>
+            <div className="text-[11px] text-white/80 font-mono mt-0.5">
+              by {creator.fullName}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Bottom accent bar */}
-      <div
-        className={`absolute bottom-0 left-0 right-0 h-0.5 transition-all duration-300 ${
-          hovered ? "opacity-100" : "opacity-0"
-        }`}
-        style={{
-          background: `linear-gradient(90deg, transparent, ${project.accentColor}, transparent)`,
-        }}
-      />
-    </Link>
+      {/* Behance Under-Thumbnail Strip: Creator Info & Stats */}
+      <div className="flex items-center justify-between gap-2 px-0.5">
+        {/* Creator Info */}
+        <button
+          onClick={handleCreatorClick}
+          className="flex items-center gap-2 min-w-0 text-left hover:opacity-80 transition-opacity cursor-pointer group/author"
+        >
+          <div className="relative shrink-0">
+            <img
+              src={creator.avatarUrl}
+              alt={creator.fullName}
+              className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-border"
+            />
+            {creator.availableForWork && (
+              <span
+                className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-background"
+                title="Available for freelance"
+              />
+            )}
+          </div>
+          <span className="text-xs font-semibold text-foreground group-hover/author:text-primary transition-colors truncate max-w-[130px] sm:max-w-[150px]">
+            {creator.fullName}
+          </span>
+        </button>
+
+        {/* Behance Metrics: Appreciations + Views */}
+        <div className="flex items-center gap-2 shrink-0 text-muted-foreground text-[11px] font-mono">
+          {/* Like Button */}
+          <button
+            onClick={handleLike}
+            className={`flex items-center gap-1 transition-colors cursor-pointer ${
+              project.isAppreciated ? "text-rose-500 font-bold" : "hover:text-rose-500"
+            }`}
+            title="Appreciate"
+          >
+            <Heart
+              size={12}
+              className={project.isAppreciated ? "fill-rose-500 text-rose-500" : ""}
+            />
+            <span>{(project.appreciationsCount || 0).toLocaleString()}</span>
+          </button>
+
+          {/* Views */}
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Eye size={12} />
+            <span>{(project.viewsCount || 0).toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
