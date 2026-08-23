@@ -11,37 +11,22 @@ import {
   Layers,
   Wrench,
   Tag,
-  ExternalLink,
+  User,
   MessageSquare,
-  Sparkles,
-  Award,
-  ZoomIn,
-  Check,
   Send,
-  Trash2,
-  UserPlus,
-  UserCheck,
-  Mail,
-  Palette,
-  FolderPlus,
-  ShieldAlert,
+  Sparkles,
+  Edit3,
+  Check,
+  AlertCircle,
 } from "lucide-react";
-import confetti from "canvas-confetti";
 import { useProjects } from "../hooks/useProjects";
-import { useCreator } from "../hooks/useCreator";
 import { useAuth } from "../context/AuthContext";
-import { useLanguage } from "../context/LanguageContext";
-import { useRecommendations } from "../hooks/useRecommendations";
-import Lightbox from "../components/Lightbox";
-import ShareModal from "../components/ShareModal";
-import HireModal from "../components/HireModal";
-import SaveToCollectionModal from "../components/SaveToCollectionModal";
-import ReportModal from "../components/ReportModal";
-import ProjectCard from "../components/ProjectCard";
+import confetti from "canvas-confetti";
 
 export default function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { user, isLoggedIn } = useAuth();
   const {
     getProjectBySlug,
     toggleAppreciation,
@@ -49,551 +34,376 @@ export default function ProjectDetailPage() {
     incrementViews,
     getProjectComments,
     addComment,
-    deleteComment,
   } = useProjects();
 
-  const { user } = useAuth();
-  const { t } = useLanguage();
-  const { getSimilarProjects } = useRecommendations();
+  const project = getProjectBySlug(slug || "");
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [copied, setCopied] = useState(false);
 
-  const project = slug ? getProjectBySlug(slug) : null;
-  const { isFollowing, toggleFollow } = useCreator(project?.creator.username);
-
-  const [commentInput, setCommentInput] = useState("");
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [shareOpen, setShareOpen] = useState(false);
-  const [hireModalOpen, setHireModalOpen] = useState(false);
-  const [saveModalOpen, setSaveModalOpen] = useState(false);
-  const [reportModalOpen, setReportModalOpen] = useState(false);
-
+  // Sync initial stats and increment view
   useEffect(() => {
     if (project) {
+      setIsLiked(Boolean(project.isAppreciated));
+      setLikesCount(project.appreciationsCount || 0);
+      setIsSaved(Boolean(project.isSaved));
       incrementViews(project.id);
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [project?.id]);
 
   if (!project) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-20 px-4">
-        <div className="text-center max-w-md space-y-4">
-          <h1 className="text-2xl font-display font-bold text-foreground">
-            Case Study Not Found
-          </h1>
+      <div className="min-h-[80vh] flex items-center justify-center p-4">
+        <div className="glass-card rounded-3xl p-8 text-center max-w-sm space-y-4 shadow-xl">
+          <AlertCircle size={32} className="text-rose-500 mx-auto" />
+          <h2 className="text-lg font-bold text-foreground">Project Not Found</h2>
           <p className="text-xs text-muted-foreground">
-            The project "{slug}" could not be found or has been moved by its creator.
+            The case study you are trying to view does not exist or may have been removed.
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full btn-primary text-xs font-bold"
           >
-            <ArrowLeft size={14} /> Back to Explore
+            <ArrowLeft size={14} />
+            <span>Return to Explore</span>
           </Link>
         </div>
       </div>
     );
   }
 
-  const creator = project.creator;
   const comments = getProjectComments(project.id);
-  const allImages = [project.coverImage, ...(project.images || [])];
-  const similarProjects = getSimilarProjects(project, 3);
+  const isOwner = user?.id === project.userId || user?.username === project.creator?.username;
 
-  const handleLike = () => {
+  // Handle Appreciate
+  const handleAppreciate = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
+    const nextState = !isLiked;
+    setIsLiked(nextState);
+    setLikesCount((prev) => Math.max(0, prev + (nextState ? 1 : -1)));
     toggleAppreciation(project.id, user?.id);
-    if (!project.isAppreciated) {
+
+    if (nextState) {
       confetti({
-        particleCount: 50,
-        spread: 45,
-        origin: { y: 0.7 },
-        colors: ["#0057ff", "#38bdf8", "#6366f1"],
+        particleCount: 45,
+        spread: 60,
+        origin: { y: 0.8 },
+        colors: ["#CDF22B", "#1E45FB", "#ffffff"],
       });
     }
   };
 
-  const handleAddComment = (e: React.FormEvent) => {
+  // Handle Comment Post
+  const handlePostComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentInput.trim()) return;
+    if (!commentText.trim()) return;
 
-    addComment(
+    if (!isLoggedIn || !user) {
+      navigate("/login");
+      return;
+    }
+
+    await addComment(
       project.id,
       {
-        id: user?.id || `guest-${Date.now()}`,
-        username: user?.username || "creative_guest",
-        fullName: user?.fullName || "Creative Guest",
-        avatarUrl:
-          user?.avatarUrl ||
-          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+        id: user.id,
+        username: user.username,
+        fullName: user.fullName,
+        avatarUrl: user.avatarUrl,
       },
-      commentInput.trim()
+      commentText.trim()
     );
 
-    setCommentInput("");
+    setCommentText("");
   };
 
+  // Handle Share
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const imagesToShow = project.images && project.images.length > 0 ? project.images : [project.coverImage];
+
   return (
-    <>
-      <motion.main
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="min-h-screen pt-14 sm:pt-16 pb-20 bg-background"
-      >
-        {/* Top Floating Mini Header */}
-        <div className="border-b border-border/60 bg-background/95 backdrop-blur-md sticky top-14 sm:top-16 z-20 py-2.5">
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+    <motion.main
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen pt-24 pb-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10"
+    >
+      {/* Top Navigation & Actions Bar */}
+      <div className="flex items-center justify-between">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft size={14} />
+          <span>Back to Explore</span>
+        </Link>
+
+        <div className="flex items-center gap-2">
+          {isOwner && (
             <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium"
+              to={`/project/edit/${project.id}`}
+              className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-foreground text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <ArrowLeft size={13} />
-              <span>Explore Gallery</span>
+              <Edit3 size={13} />
+              <span>Edit Project</span>
             </Link>
+          )}
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setReportModalOpen(true)}
-                className="p-1.5 rounded-full border border-border bg-card hover:bg-destructive/10 text-muted-foreground hover:text-destructive text-xs transition-colors cursor-pointer"
-                title="Report content"
-              >
-                <ShieldAlert size={14} />
-              </button>
+          <button
+            onClick={handleShare}
+            className="p-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Copy link"
+          >
+            {copied ? <Check size={15} className="text-emerald-500" /> : <Share2 size={15} />}
+          </button>
+        </div>
+      </div>
 
-              <button
-                onClick={() => setShareOpen(true)}
-                className="p-1.5 rounded-full border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground text-xs transition-colors cursor-pointer"
-                title="Share case study"
-              >
-                <Share2 size={14} />
-              </button>
-
-              <button
-                onClick={() => setSaveModalOpen(true)}
-                className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  project.isSaved
-                    ? "bg-amber-500 text-white border-amber-400"
-                    : "border-border bg-card hover:bg-muted text-foreground"
-                }`}
-              >
-                <Bookmark size={13} className={project.isSaved ? "fill-white" : ""} />
-                <span>Save</span>
-              </button>
-
-              <button
-                onClick={handleLike}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${
-                  project.isAppreciated
-                    ? "bg-rose-500 text-white shadow-rose-500/30"
-                    : "bg-primary text-primary-foreground hover:opacity-90 shadow-[0_0_15px_rgba(205,242,43,0.3)]"
-                }`}
-              >
-                <Heart
-                  size={13}
-                  className={project.isAppreciated ? "fill-white" : ""}
-                />
-                <span>Appreciate ({project.appreciationsCount || 0})</span>
-              </button>
-            </div>
-          </div>
+      {/* Project Header Info Card */}
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="px-3 py-1 rounded-full bg-[#CDF22B]/20 border border-[#CDF22B]/50 text-slate-900 dark:text-[#CDF22B] font-semibold">
+            {project.category}
+          </span>
+          {project.year && (
+            <span className="text-muted-foreground flex items-center gap-1 font-mono">
+              <Calendar size={12} /> {project.year}
+            </span>
+          )}
         </div>
 
-        {/* Behance 2-Column Case Study Layout */}
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left Column: Flowing Visuals (8 cols) */}
-            <div className="lg:col-span-8 space-y-6">
-              {/* Project Title & Short Narrative Header */}
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-bold">
-                    {project.category}
-                  </span>
-                  {project.isFeatured && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-black/80 border border-primary/40 text-primary text-xs font-mono font-bold">
-                      <Sparkles size={11} /> Curated Selection
-                    </span>
-                  )}
-                  <span className="text-xs font-mono text-muted-foreground">
-                    Published in {project.year}
-                  </span>
-                </div>
+        <h1 className="text-3xl sm:text-5xl font-bold font-display text-foreground tracking-tight leading-tight">
+          {project.title}
+        </h1>
 
-                <h1 className="text-2xl sm:text-4xl font-display font-extrabold text-foreground tracking-tight leading-tight">
-                  {project.title}
-                </h1>
+        {/* Creator Info Snippet */}
+        <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+          <Link
+            to={`/@${project.creator?.username || "creator"}`}
+            className="flex items-center gap-3 group"
+          >
+            <img
+              src={
+                project.creator?.avatarUrl ||
+                `https://api.dicebear.com/7.x/shapes/svg?seed=${project.creator?.username}`
+              }
+              alt={project.creator?.fullName || "Creator"}
+              className="w-10 h-10 rounded-full object-cover bg-slate-100 border border-white dark:border-slate-700 shadow-xs group-hover:scale-105 transition-transform"
+            />
+            <div>
+              <p className="text-xs font-bold text-foreground group-hover:text-[#CDF22B] transition-colors">
+                {project.creator?.fullName || "Creative Member"}
+              </p>
+              <p className="text-[11px] text-muted-foreground font-mono">
+                @{project.creator?.username || "creator"}
+              </p>
+            </div>
+          </Link>
 
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  {project.description}
-                </p>
+          {/* Appreciate CTA Button */}
+          <button
+            onClick={handleAppreciate}
+            className={`px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
+              isLiked
+                ? "bg-[#CDF22B] text-slate-900 shadow-md shadow-[#CDF22B]/30"
+                : "glass-card hover:bg-[#CDF22B] hover:text-slate-900 text-foreground border border-slate-200 dark:border-slate-800"
+            }`}
+          >
+            <Heart size={15} className={isLiked ? "fill-current" : ""} />
+            <span>{isLiked ? "Appreciated" : "Appreciate"}</span>
+            <span className="opacity-75 font-mono">({likesCount})</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Imagery Showcase (Cover + Gallery) */}
+      <div className="space-y-6">
+        {imagesToShow.map((imgUrl, index) => (
+          <div
+            key={index}
+            className="rounded-3xl overflow-hidden glass-card border border-slate-200/80 dark:border-slate-800/80 shadow-md bg-slate-100 dark:bg-slate-900"
+          >
+            <img
+              src={imgUrl}
+              alt={`${project.title} image ${index + 1}`}
+              loading="lazy"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Project Description & Narrative */}
+      <div className="glass-card rounded-3xl p-6 sm:p-10 border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-6">
+        <h2 className="text-base font-bold font-display text-foreground">
+          About This Project
+        </h2>
+        <div className="text-xs sm:text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
+          {project.fullDescription || project.description}
+        </div>
+
+        {/* Tools & Tags Metadata */}
+        <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
+          {project.tools && project.tools.length > 0 && (
+            <div className="space-y-1.5">
+              <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                <Wrench size={13} className="text-[#CDF22B]" />
+                <span>Tools Used</span>
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {project.tools.map((tool) => (
+                  <span
+                    key={tool}
+                    className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-foreground text-xs font-medium"
+                  >
+                    {tool}
+                  </span>
+                ))}
               </div>
+            </div>
+          )}
 
-              {/* Cover Hero Canvas */}
+          {project.tags && project.tags.length > 0 && (
+            <div className="space-y-1.5">
+              <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                <Tag size={13} className="text-[#CDF22B]" />
+                <span>Tags</span>
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {project.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="px-3 py-1 rounded-full bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-xs font-medium border border-[#CDF22B]/40"
+                  >
+                    #{t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Floating Bottom Appreciation Bar */}
+      <div className="glass-card rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800/80 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <div className="space-y-0.5">
+          <h3 className="text-sm font-bold text-foreground">
+            Enjoyed this case study?
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Show your appreciation to support {project.creator?.fullName || "the creator"}.
+          </p>
+        </div>
+
+        <button
+          onClick={handleAppreciate}
+          className="px-8 py-3 rounded-full btn-primary text-xs font-bold shadow-md active:scale-95 flex items-center gap-2 cursor-pointer"
+        >
+          <Heart size={16} className={isLiked ? "fill-current" : ""} />
+          <span>{isLiked ? "Appreciated" : "Give Appreciation"} ({likesCount})</span>
+        </button>
+      </div>
+
+      {/* Comments & Community Discussion Section */}
+      <div className="glass-card rounded-3xl p-6 sm:p-10 border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-6">
+        <div className="flex items-center gap-2">
+          <MessageSquare size={16} className="text-[#CDF22B]" />
+          <h3 className="text-base font-bold font-display text-foreground">
+            Comments & Feedback ({comments.length})
+          </h3>
+        </div>
+
+        {/* Comment Input */}
+        {isLoggedIn ? (
+          <form onSubmit={handlePostComment} className="flex gap-3">
+            <img
+              src={
+                user?.avatarUrl ||
+                `https://api.dicebear.com/7.x/shapes/svg?seed=${user?.username}`
+              }
+              alt={user?.fullName}
+              className="w-8 h-8 rounded-full object-cover bg-slate-100 shrink-0"
+            />
+            <div className="flex-1 flex gap-2">
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Share thoughtful feedback or ask a question..."
+                className="flex-1 px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
+              />
+              <button
+                type="submit"
+                disabled={!commentText.trim()}
+                className="px-5 py-2.5 rounded-2xl btn-primary text-xs font-bold active:scale-95 disabled:opacity-40 cursor-pointer"
+              >
+                <Send size={14} />
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-center space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Sign in to join the conversation and leave feedback for this project.
+            </p>
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full btn-primary text-xs font-bold"
+            >
+              Sign In to Comment
+            </Link>
+          </div>
+        )}
+
+        {/* Comments List */}
+        <div className="space-y-4 pt-2">
+          {comments.length > 0 ? (
+            comments.map((c) => (
               <div
-                onClick={() => {
-                  setLightboxIndex(0);
-                  setLightboxOpen(true);
-                }}
-                className="group relative rounded-2xl overflow-hidden bg-card border border-border cursor-zoom-in shadow-md"
+                key={c.id}
+                className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/60"
               >
                 <img
-                  src={project.coverImage}
-                  alt={project.title}
-                  className="w-full h-auto max-h-[700px] object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                  src={
+                    c.user?.avatarUrl ||
+                    `https://api.dicebear.com/7.x/shapes/svg?seed=${c.user?.username || "anon"}`
+                  }
+                  alt={c.user?.fullName}
+                  className="w-7 h-7 rounded-full object-cover bg-slate-100 shrink-0"
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
-                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/80 text-white text-xs font-semibold border border-white/20">
-                    <ZoomIn size={13} className="text-primary" /> Full Screen View
-                  </span>
-                </div>
-              </div>
-
-              {/* Full Case Study Narrative */}
-              {project.fullDescription && (
-                <div className="p-6 rounded-2xl border border-border bg-card/40 space-y-3">
-                  <h3 className="text-sm font-bold text-foreground">
-                    Art Direction & Technical Approach
-                  </h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {project.fullDescription}
+                <div className="space-y-1 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-foreground">
+                      {c.user?.fullName}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-mono">
+                      {new Date(c.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground/90 leading-relaxed">
+                    {c.content}
                   </p>
                 </div>
-              )}
-
-              {/* Visual Showcase Stack */}
-              {project.images && project.images.length > 0 && (
-                <div className="space-y-6 pt-2">
-                  {project.images.map((img, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => {
-                        setLightboxIndex(idx + 1);
-                        setLightboxOpen(true);
-                      }}
-                      className="group relative rounded-2xl overflow-hidden bg-card border border-border cursor-zoom-in shadow-sm"
-                    >
-                      <img
-                        src={img}
-                        alt={`${project.title} gallery ${idx + 1}`}
-                        loading="lazy"
-                        className="w-full h-auto max-h-[700px] object-cover transition-transform duration-500 group-hover:scale-[1.01]"
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/80 text-white text-xs font-semibold">
-                          <ZoomIn size={12} className="text-primary" /> View Lightbox
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Behance Bottom "Appreciate Project" Big Action Card */}
-              <div className="p-8 rounded-3xl border border-primary/30 bg-gradient-to-b from-card to-primary/5 text-center space-y-4 shadow-lg my-8">
-                <h3 className="text-lg font-display font-bold text-foreground">
-                  Did this case study inspire you?
-                </h3>
-                <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                  Show your appreciation to help this project get discovered by art directors and curators globally.
-                </p>
-
-                <div className="flex items-center justify-center gap-3 pt-2">
-                  <button
-                    onClick={handleLike}
-                    className={`px-8 py-3 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shadow-lg ${
-                      project.isAppreciated
-                        ? "bg-rose-500 text-white shadow-rose-500/30"
-                        : "bg-primary text-primary-foreground hover:opacity-90 shadow-[0_0_25px_rgba(205,242,43,0.4)]"
-                    }`}
-                  >
-                    <Heart
-                      size={16}
-                      className={project.isAppreciated ? "fill-white" : ""}
-                    />
-                    <span>{project.isAppreciated ? "Appreciated" : "Appreciate"} ({project.appreciationsCount || 0})</span>
-                  </button>
-
-                  <button
-                    onClick={() => setSaveModalOpen(true)}
-                    className="p-3 rounded-full border border-border bg-card hover:bg-muted text-foreground transition-all cursor-pointer shadow-md"
-                    title="Save to Moodboard"
-                  >
-                    <Bookmark size={16} className={project.isSaved ? "fill-amber-400 text-amber-400" : ""} />
-                  </button>
-                </div>
               </div>
-
-              {/* Comments Section */}
-              <section className="space-y-5 pt-4 border-t border-border">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold font-display text-foreground flex items-center gap-2">
-                    <MessageSquare size={16} className="text-primary" />
-                    <span>Feedback & Discussion ({comments.length})</span>
-                  </h3>
-                </div>
-
-                {/* Comment Input */}
-                <form onSubmit={handleAddComment} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={commentInput}
-                    onChange={(e) => setCommentInput(e.target.value)}
-                    placeholder="Share feedback on typography, 3D composition, or UX..."
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-card text-foreground text-xs focus:outline-none focus:border-primary/60"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!commentInput.trim()}
-                    className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold disabled:opacity-40 hover:opacity-90 transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Send size={13} />
-                    <span>Post</span>
-                  </button>
-                </form>
-
-                {/* Comments List */}
-                <div className="space-y-3">
-                  {comments.map((comment) => (
-                    <div
-                      key={comment.id}
-                      className="p-4 rounded-xl border border-border bg-card/60 space-y-2"
-                    >
-                      <div className="flex items-center justify-between">
-                        <Link
-                          to={`/@${comment.user.username}`}
-                          className="flex items-center gap-2 text-xs font-bold text-foreground hover:text-primary transition-colors"
-                        >
-                          <img
-                            src={comment.user.avatarUrl}
-                            alt={comment.user.fullName}
-                            className="w-6 h-6 rounded-full object-cover border border-border"
-                          />
-                          <span>{comment.user.fullName}</span>
-                          <span className="text-[10px] font-mono text-muted-foreground font-normal">
-                            @{comment.user.username}
-                          </span>
-                        </Link>
-                        <span className="text-[10px] font-mono text-muted-foreground">
-                          {new Date(comment.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed pl-8">
-                        {comment.content}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
-
-            {/* Right Column: Sticky Specification Sidebar (4 cols) */}
-            <div className="lg:col-span-4 space-y-5">
-              <div className="sticky top-28 space-y-5">
-                {/* Project Creator Box */}
-                <div className="p-5 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
-                    Project Creator
-                  </span>
-
-                  <div className="flex items-center gap-3">
-                    <Link to={`/@${creator.username}`}>
-                      <img
-                        src={creator.avatarUrl}
-                        alt={creator.fullName}
-                        className="w-12 h-12 rounded-2xl object-cover border-2 border-border hover:border-primary transition-all shadow-sm"
-                      />
-                    </Link>
-                    <div className="min-w-0">
-                      <Link
-                        to={`/@${creator.username}`}
-                        className="font-bold text-xs text-foreground hover:text-primary transition-colors truncate block"
-                      >
-                        {creator.fullName}
-                      </Link>
-                      <span className="text-[10px] font-mono text-muted-foreground block truncate">
-                        @{creator.username}
-                      </span>
-                      {creator.availableForWork && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 font-semibold mt-0.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          Available for freelance
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <button
-                      onClick={() => toggleFollow(creator.id)}
-                      className={`flex-1 py-2 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                        isFollowing
-                          ? "border border-border bg-muted text-muted-foreground"
-                          : "bg-primary text-primary-foreground shadow-sm hover:opacity-90"
-                      }`}
-                    >
-                      {isFollowing ? (
-                        <>
-                          <UserCheck size={13} /> Following
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus size={13} /> Follow
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      onClick={() => setHireModalOpen(true)}
-                      className="px-4 py-2 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                    >
-                      <Mail size={13} className="text-primary" /> Hire
-                    </button>
-                  </div>
-                </div>
-
-                {/* Project Metrics & Stats */}
-                <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
-                    Case Study Metrics
-                  </span>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="p-3 rounded-xl bg-muted/20 border border-border">
-                      <span className="text-[10px] font-mono text-muted-foreground block uppercase">
-                        Appreciations
-                      </span>
-                      <strong className="text-foreground font-mono text-sm">
-                        {(project.appreciationsCount || 0).toLocaleString()}
-                      </strong>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-muted/20 border border-border">
-                      <span className="text-[10px] font-mono text-muted-foreground block uppercase">
-                        Views
-                      </span>
-                      <strong className="text-foreground font-mono text-sm">
-                        {(project.viewsCount || 0).toLocaleString()}
-                      </strong>
-                    </div>
-                  </div>
-
-                  {/* Tools Badges */}
-                  {project.tools && project.tools.length > 0 && (
-                    <div className="pt-2 border-t border-border space-y-2">
-                      <span className="text-[10px] font-mono text-muted-foreground block uppercase font-bold">
-                        Software & Tools Used
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {project.tools.map((tool) => (
-                          <span
-                            key={tool}
-                            className="px-2 py-0.5 rounded-md bg-muted/50 border border-border text-foreground text-[11px] font-medium"
-                          >
-                            {tool}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Tags */}
-                  {project.tags && project.tags.length > 0 && (
-                    <div className="pt-2 border-t border-border space-y-2">
-                      <span className="text-[10px] font-mono text-muted-foreground block uppercase font-bold">
-                        Creative Keywords
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {project.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-mono"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Similar Recommendations */}
-                {similarProjects.length > 0 && (
-                  <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
-                      Similar Masterworks
-                    </span>
-                    <div className="space-y-2.5">
-                      {similarProjects.map((rel) => (
-                        <Link
-                          key={rel.id}
-                          to={`/project/${rel.slug || rel.id}`}
-                          className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/40 transition-colors group"
-                        >
-                          <img
-                            src={rel.coverImage}
-                            alt={rel.title}
-                            className="w-12 h-9 rounded-lg object-cover border border-border shrink-0"
-                          />
-                          <div className="min-w-0 flex-1">
-                            <div className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                              {rel.title}
-                            </div>
-                            <div className="text-[10px] text-muted-foreground font-mono truncate">
-                              by {rel.creator.fullName}
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+            ))
+          ) : (
+            <p className="text-xs text-muted-foreground text-center py-4">
+              Be the first to leave a comment on this project!
+            </p>
+          )}
         </div>
-      </motion.main>
-
-      {/* Lightbox Dialog */}
-      <Lightbox
-        isOpen={lightboxOpen}
-        onClose={() => setLightboxOpen(false)}
-        images={allImages}
-        initialIndex={lightboxIndex}
-        projectTitle={project.title}
-      />
-
-      {/* Share Dialog */}
-      <ShareModal
-        isOpen={shareOpen}
-        onClose={() => setShareOpen(false)}
-        projectTitle={project.title}
-        projectSlug={project.slug || project.id}
-      />
-
-      {/* Hire Modal */}
-      <HireModal
-        isOpen={hireModalOpen}
-        onClose={() => setHireModalOpen(false)}
-        creator={creator}
-      />
-
-      {/* Save to Collection Modal */}
-      <SaveToCollectionModal
-        isOpen={saveModalOpen}
-        onClose={() => setSaveModalOpen(false)}
-        project={project}
-      />
-
-      {/* Report Modal */}
-      <ReportModal
-        isOpen={reportModalOpen}
-        onClose={() => setReportModalOpen(false)}
-        targetType="project"
-        targetId={project.id}
-        targetTitle={project.title}
-      />
-    </>
+      </div>
+    </motion.main>
   );
 }

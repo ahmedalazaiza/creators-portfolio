@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -82,10 +82,9 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-[90vh] flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
-      {/* Soft Ambient Pastel Glows in Background */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 right-1/3 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Soft Ambient Brand Glow in Background */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#CDF22B]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#1E45FB]/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main Glass Card Container */}
       <motion.div
@@ -96,7 +95,7 @@ export default function AuthPage() {
       >
         {/* Logo & Headline */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white mx-auto shadow-md shadow-indigo-500/20">
+          <div className="w-12 h-12 rounded-2xl bg-[#CDF22B] text-slate-900 flex items-center justify-center mx-auto shadow-md shadow-[#CDF22B]/30 font-bold">
             <Sparkles size={22} />
           </div>
 
@@ -105,7 +104,7 @@ export default function AuthPage() {
           </h1>
           <p className="text-xs text-muted-foreground">
             {isSignUp
-              ? "Join a calm, creative community to showcase your work"
+              ? "Join a calm, creative community to publish and explore work"
               : "Sign in to access your portfolio studio and projects"}
           </p>
         </div>
@@ -118,10 +117,11 @@ export default function AuthPage() {
               setIsSignUp(false);
               setErrorMessage("");
             }}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${!isSignUp
+            className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              !isSignUp
                 ? "bg-white dark:bg-slate-900 text-foreground shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
-              }`}
+            }`}
           >
             Log In
           </button>
@@ -131,10 +131,11 @@ export default function AuthPage() {
               setIsSignUp(true);
               setErrorMessage("");
             }}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isSignUp
+            className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              isSignUp
                 ? "bg-white dark:bg-slate-900 text-foreground shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
-              }`}
+            }`}
           >
             Sign Up
           </button>
@@ -159,9 +160,9 @@ export default function AuthPage() {
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
-              className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs flex items-start gap-2"
+              className="p-3 rounded-2xl bg-[#CDF22B]/20 border border-[#CDF22B]/50 text-slate-900 dark:text-[#CDF22B] text-xs flex items-start gap-2 font-medium"
             >
-              <CheckCircle2 size={15} className="shrink-0 mt-0.5" />
+              <CheckCircle2 size={15} className="shrink-0 mt-0.5 text-emerald-600 dark:text-[#CDF22B]" />
               <span>{successMessage}</span>
             </motion.div>
           )}
@@ -188,7 +189,7 @@ export default function AuthPage() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Ahmed Al-Azaiza"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all"
                   />
                 </div>
               </div>
@@ -205,7 +206,7 @@ export default function AuthPage() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="ahmed_azaiza"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-mono"
                   />
                 </div>
               </div>
@@ -224,7 +225,7 @@ export default function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all"
               />
             </div>
           </div>
@@ -242,7 +243,7 @@ export default function AuthPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all"
               />
             </div>
           </div>
@@ -250,10 +251,10 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-semibold text-xs shadow-md shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full mt-2 py-3 rounded-full btn-primary font-bold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {loading ? (
-              <Loader2 size={16} className="animate-spin" />
+              <Loader2 size={16} className="animate-spin text-slate-900" />
             ) : (
               <>
                 <span>{isSignUp ? "Create Free Account" : "Sign In to Portfolios"}</span>
@@ -272,7 +273,7 @@ export default function AuthPage() {
                 <button
                   type="button"
                   onClick={() => setIsSignUp(false)}
-                  className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
+                  className="text-slate-900 dark:text-[#CDF22B] font-bold hover:underline cursor-pointer"
                 >
                   Log In
                 </button>
@@ -283,7 +284,7 @@ export default function AuthPage() {
                 <button
                   type="button"
                   onClick={() => setIsSignUp(true)}
-                  className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
+                  className="text-slate-900 dark:text-[#CDF22B] font-bold hover:underline cursor-pointer"
                 >
                   Create one for free
                 </button>

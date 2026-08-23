@@ -1,153 +1,134 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { Eye, Heart, Bookmark, ThumbsUp } from "lucide-react";
+import { motion } from "motion/react";
+import { Heart, Eye, Bookmark, Sparkles, User } from "lucide-react";
 import { Project } from "../types";
 import { useProjects } from "../hooks/useProjects";
-import SaveToCollectionModal from "./SaveToCollectionModal";
+import { useAuth } from "../context/AuthContext";
 
 interface ProjectCardProps {
   project: Project;
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const [hovered, setHovered] = useState(false);
-  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const { toggleAppreciation, toggleSave } = useProjects();
+  const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
-  const { toggleAppreciation } = useProjects();
+
+  const [isLiked, setIsLiked] = useState(Boolean(project.isAppreciated));
+  const [likesCount, setLikesCount] = useState(project.appreciationsCount || 0);
+
+  const handleAppreciate = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
+    const nextState = !isLiked;
+    setIsLiked(nextState);
+    setLikesCount((prev) => Math.max(0, prev + (nextState ? 1 : -1)));
+    toggleAppreciation(project.id, user?.id);
+  };
 
   const projectUrl = `/project/${project.slug || project.id}`;
-  const creator = project.creator;
-
-  const handleLike = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleAppreciation(project.id);
-  };
-
-  const handleSave = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setSaveModalOpen(true);
-  };
-
-  const handleCreatorClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(`/@${creator.username}`);
-  };
+  const creatorUsername = project.creator?.username || "creator";
+  const creatorName = project.creator?.fullName || "Creator";
+  const creatorAvatar =
+    project.creator?.avatarUrl ||
+    `https://api.dicebear.com/7.x/shapes/svg?seed=${creatorUsername}`;
 
   return (
-    <>
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        className="group flex flex-col space-y-2 transition-all duration-200"
-      >
-        {/* Behance Project Card Thumbnail Canvas */}
-        <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted/40 border border-border/60 group-hover:border-[#0057ff]/40 group-hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-all">
-          <Link to={projectUrl} className="block w-full h-full">
-            <img
-              src={project.coverImage}
-              alt={project.title}
-              loading="lazy"
-              className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-            />
-          </Link>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.25 }}
+      className="group flex flex-col rounded-3xl overflow-hidden glass-card border border-slate-200/80 dark:border-slate-800/80 hover:border-[#CDF22B]/80 shadow-xs hover:shadow-xl hover:shadow-[#CDF22B]/10 transition-all"
+    >
+      {/* Cover Image Container */}
+      <Link to={projectUrl} className="relative aspect-4/3 overflow-hidden bg-slate-100 dark:bg-slate-900 block">
+        <img
+          src={project.coverImage}
+          alt={project.title}
+          loading="lazy"
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+        />
 
-          {/* Behance Hover Overlay with Quick Action Buttons */}
-          <div
-            className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 p-3 flex flex-col justify-between transition-opacity duration-200 pointer-events-none ${
-              hovered ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {/* Top Row: Save Button */}
-            <div className="flex items-center justify-end pointer-events-auto">
-              <button
-                onClick={handleSave}
-                aria-label="Save to Moodboard"
-                className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer shadow-md ${
-                  project.isSaved
-                    ? "bg-[#0057ff] text-white"
-                    : "bg-black/60 hover:bg-black/80 text-white"
-                }`}
-              >
-                <Bookmark
-                  size={14}
-                  className={project.isSaved ? "fill-white" : ""}
-                />
-              </button>
-            </div>
-
-            {/* Bottom Row: Quick Appreciate Action */}
-            <div className="flex items-center justify-between pointer-events-auto">
-              <span className="text-white text-xs font-bold truncate max-w-[70%] drop-shadow-sm">
-                {project.title}
-              </span>
-              <button
-                onClick={handleLike}
-                aria-label="Appreciate"
-                className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer shadow-md ${
-                  project.isAppreciated
-                    ? "bg-rose-500 text-white"
-                    : "bg-black/60 hover:bg-black/80 text-white hover:text-rose-400"
-                }`}
-              >
-                <Heart
-                  size={14}
-                  className={project.isAppreciated ? "fill-white" : ""}
-                />
-              </button>
-            </div>
-          </div>
+        {/* Floating Category Badge */}
+        <div className="absolute top-3 left-3 z-10">
+          <span className="px-2.5 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-[11px] font-semibold text-foreground border border-white/40 shadow-xs">
+            {project.category}
+          </span>
         </div>
 
-        {/* Behance Exact Project Card Footer Meta */}
-        <div className="space-y-0.5 pt-0.5">
-          {/* Row 1: Title (left) & Appreciations / Views (right) */}
-          <div className="flex items-center justify-between gap-2">
-            <Link
-              to={projectUrl}
-              className="text-[13px] font-bold text-foreground hover:text-[#0057ff] transition-colors truncate font-sans block flex-1"
-              title={project.title}
-            >
-              {project.title}
-            </Link>
+        {/* Hover Quick Appreciate & Save Overlay */}
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={handleAppreciate}
+            aria-label="Appreciate project"
+            className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
+              isLiked
+                ? "bg-[#CDF22B] text-slate-900 shadow-md shadow-[#CDF22B]/40"
+                : "bg-white/90 dark:bg-slate-900/90 text-foreground hover:bg-[#CDF22B] hover:text-slate-900"
+            }`}
+          >
+            <Heart size={14} className={isLiked ? "fill-current" : ""} />
+          </button>
+        </div>
+      </Link>
 
-            <div className="flex items-center gap-2 text-muted-foreground text-[11px] font-mono shrink-0 font-medium">
-              <span className="flex items-center gap-1 hover:text-foreground transition-colors">
-                <ThumbsUp size={11} className={project.isAppreciated ? "text-[#0057ff] fill-[#0057ff]" : ""} />
-                <span>{project.appreciationsCount || 0}</span>
-              </span>
-              <span className="flex items-center gap-1 hover:text-foreground transition-colors">
-                <Eye size={11} />
-                <span>{project.viewsCount || 0}</span>
-              </span>
-            </div>
-          </div>
+      {/* Card Content & Metadata */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-3">
+        {/* Title */}
+        <Link to={projectUrl} className="block group-hover:text-slate-900 dark:group-hover:text-[#CDF22B] transition-colors">
+          <h3 className="text-sm font-bold font-display text-foreground line-clamp-1 leading-snug">
+            {project.title}
+          </h3>
+          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+            {project.description}
+          </p>
+        </Link>
 
-          {/* Row 2: Creator Name & PRO Badge */}
-          <div className="flex items-center justify-between">
+        {/* Creator & Metrics Footer */}
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+          {/* Creator Profile Link */}
+          <Link
+            to={`/@${creatorUsername}`}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity min-w-0"
+          >
+            <img
+              src={creatorAvatar}
+              alt={creatorName}
+              className="w-5 h-5 rounded-full object-cover bg-slate-100 shrink-0 border border-white dark:border-slate-700"
+            />
+            <span className="font-semibold text-foreground truncate text-[11px]">
+              {creatorName}
+            </span>
+          </Link>
+
+          {/* Appreciations & Views Metrics */}
+          <div className="flex items-center gap-3 text-muted-foreground text-[11px] shrink-0 font-medium">
             <button
-              onClick={handleCreatorClick}
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-xs truncate text-left cursor-pointer group/creator"
+              onClick={handleAppreciate}
+              className={`flex items-center gap-1 hover:text-slate-900 dark:hover:text-[#CDF22B] transition-colors cursor-pointer ${
+                isLiked ? "text-slate-900 dark:text-[#CDF22B] font-bold" : ""
+              }`}
             >
-              <span className="truncate group-hover/creator:underline">
-                {creator.fullName}
-              </span>
-              <span className="px-1.5 py-0.2 rounded-xs bg-[#0057ff] text-white text-[9px] font-mono font-bold uppercase tracking-wider shrink-0">
-                PRO
-              </span>
+              <Heart size={13} className={isLiked ? "fill-current text-[#CDF22B]" : ""} />
+              <span>{likesCount}</span>
             </button>
+
+            <div className="flex items-center gap-1">
+              <Eye size={13} />
+              <span>{project.viewsCount || 0}</span>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Save to Collection Modal */}
-      <SaveToCollectionModal
-        isOpen={saveModalOpen}
-        onClose={() => setSaveModalOpen(false)}
-        project={project}
-      />
-    </>
+    </motion.div>
   );
 }

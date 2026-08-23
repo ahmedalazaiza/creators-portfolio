@@ -13,8 +13,6 @@ import {
   Users,
   Sun,
   Moon,
-  FolderPlus,
-  ArrowRight,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -52,7 +50,6 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
   const navLinks = [
     { label: "Explore", path: "/" },
     { label: "Creators", path: "/creators" },
-    { label: "Inspiration", path: "/inspiration" },
   ];
 
   return (
@@ -61,11 +58,11 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
         {/* Left: Brand Identity */}
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-[#CDF22B] text-slate-900 flex items-center justify-center shadow-md shadow-[#CDF22B]/20 group-hover:scale-105 transition-transform font-bold">
               <Sparkles size={16} />
             </div>
             <span className="text-lg font-bold tracking-tight text-foreground">
-              Portfolios<span className="text-indigo-600 dark:text-indigo-400">.</span>
+              Portfolios<span className="text-[#CDF22B]">.</span>
             </span>
           </Link>
 
@@ -98,7 +95,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             aria-label="Toggle color theme"
             className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            {isDark ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} />}
+            {isDark ? <Sun size={16} className="text-[#CDF22B]" /> : <Moon size={16} />}
           </button>
 
           {/* Logged In vs Logged Out State */}
@@ -107,7 +104,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               {/* "+ New Project" Button */}
               <Link
                 to="/create"
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 hover:opacity-95 active:scale-95 transition-all cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full btn-primary text-xs font-bold active:scale-95 transition-all cursor-pointer"
               >
                 <Plus size={14} />
                 <span>New Project</span>
@@ -117,7 +114,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 p-1 rounded-full border border-slate-200 dark:border-slate-800 hover:border-indigo-400 transition-colors cursor-pointer"
+                  className="flex items-center gap-2 p-1 rounded-full border border-slate-200 dark:border-slate-800 hover:border-[#CDF22B] transition-colors cursor-pointer"
                 >
                   <img
                     src={
@@ -139,7 +136,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                     >
                       {/* Identity Header */}
                       <div className="p-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
-                        <p className="font-semibold text-foreground truncate">
+                        <p className="font-bold text-foreground truncate">
                           {user?.fullName || "Creative Member"}
                         </p>
                         <p className="text-[11px] text-muted-foreground font-mono truncate">
@@ -152,7 +149,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
                       >
-                        <User size={14} className="text-indigo-500" />
+                        <User size={14} className="text-[#1E45FB]" />
                         <span>My Profile</span>
                       </Link>
 
@@ -161,8 +158,8 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
                       >
-                        <LayoutDashboard size={14} className="text-purple-500" />
-                        <span>Dashboard</span>
+                        <LayoutDashboard size={14} className="text-[#CDF22B]" />
+                        <span>Creator Dashboard</span>
                       </Link>
 
                       <Link
@@ -170,8 +167,8 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
                       >
-                        <Plus size={14} className="text-pink-500" />
-                        <span>New Project</span>
+                        <Plus size={14} className="text-[#CDF22B]" />
+                        <span>Upload Project</span>
                       </Link>
 
                       <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
@@ -199,14 +196,14 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               </Link>
               <Link
                 to="/signup"
-                className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white text-xs font-semibold shadow-sm shadow-indigo-500/20 active:scale-95 transition-all"
+                className="px-4 py-2 rounded-full btn-primary text-xs font-bold active:scale-95 transition-all"
               >
                 Sign Up
               </Link>
             </div>
           )}
 
-          {/* Mobile Hamburger Menu Toggle */}
+          {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-full text-muted-foreground hover:text-foreground"
