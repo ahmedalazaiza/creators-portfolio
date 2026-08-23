@@ -8,8 +8,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  BarChart,
-  Bar,
 } from "recharts";
 import {
   Plus,
@@ -37,10 +35,14 @@ import {
   Pin,
   Check,
   CheckCheck,
+  ShieldAlert,
+  X,
 } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../context/AuthContext";
 import { useInquiries } from "../hooks/useInquiries";
+import { useModeration } from "../hooks/useModeration";
+import { useLanguage } from "../context/LanguageContext";
 import { Project } from "../types";
 
 // Analytics Sample Data
@@ -61,12 +63,14 @@ const ANALYTICS_30D = [
   { day: "Week 4", views: 9200, appreciations: 810 },
 ];
 
-type StudioTab = "projects" | "analytics" | "inquiries";
+type StudioTab = "projects" | "analytics" | "inquiries" | "moderation";
 
 export default function DashboardPage() {
   const { allProjects, saveProject, deleteProject } = useProjects();
   const { user } = useAuth();
   const { inquiries, markInquiryStatus, deleteInquiry } = useInquiries();
+  const { reports, pendingCount, dismissReport, resolveReport } = useModeration();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<StudioTab>("projects");
@@ -149,14 +153,14 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[11px] font-mono uppercase tracking-widest text-primary font-bold">
-                Creator Studio Benchmark
+                {t("studio.subtitle", "Creator Studio Benchmark")}
               </span>
               <span className="text-xs text-muted-foreground font-mono">
                 · @{user?.username || "ahmed_azaiza"}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-foreground tracking-tight">
-              Studio Command Center
+              {t("studio.title", "Studio Command Center")}
             </h1>
           </div>
 
@@ -175,7 +179,7 @@ export default function DashboardPage() {
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_15px_rgba(205,242,43,0.3)] hover:opacity-90 active:scale-95 transition-all cursor-pointer"
             >
               <Plus size={14} />
-              <span>Create New Project</span>
+              <span>{t("studio.createBtn", "Create New Project")}</span>
             </Link>
           </div>
         </div>
@@ -184,7 +188,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-1">
             <span className="text-[11px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 font-bold">
-              <Grid size={12} className="text-primary" /> Total Works
+              <Grid size={12} className="text-primary" /> {t("studio.totalWorks", "Total Works")}
             </span>
             <div className="text-xl sm:text-2xl font-bold font-mono text-foreground">
               {displayedProjects.length}
@@ -196,7 +200,7 @@ export default function DashboardPage() {
 
           <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-1">
             <span className="text-[11px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 font-bold">
-              <Heart size={12} className="text-rose-500" /> Appreciations
+              <Heart size={12} className="text-rose-500" /> {t("studio.totalAppreciations", "Appreciations")}
             </span>
             <div className="text-xl sm:text-2xl font-bold font-mono text-foreground">
               {totalAppreciations.toLocaleString()}
@@ -208,7 +212,7 @@ export default function DashboardPage() {
 
           <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-1">
             <span className="text-[11px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 font-bold">
-              <Eye size={12} className="text-primary" /> Total Impressions
+              <Eye size={12} className="text-primary" /> {t("studio.totalImpressions", "Total Impressions")}
             </span>
             <div className="text-xl sm:text-2xl font-bold font-mono text-foreground">
               {totalViews.toLocaleString()}
@@ -220,7 +224,7 @@ export default function DashboardPage() {
 
           <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-1">
             <span className="text-[11px] font-mono uppercase text-muted-foreground flex items-center gap-1.5 font-bold">
-              <Mail size={12} className="text-primary" /> Client Inquiries
+              <Mail size={12} className="text-primary" /> {t("studio.clientInquiries", "Client Inquiries")}
             </span>
             <div className="text-xl sm:text-2xl font-bold font-mono text-foreground">
               {inquiries.length}
@@ -231,18 +235,18 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Studio Primary Navigation Tabs */}
-        <div className="flex items-center gap-6 border-b border-border pb-2">
+        {/* Studio Navigation Tabs */}
+        <div className="flex items-center gap-6 border-b border-border pb-2 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab("projects")}
-            className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer ${
+            className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
               activeTab === "projects"
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Grid size={14} />
-            <span>Case Studies ({displayedProjects.length})</span>
+            <span>{t("studio.tabWorks", "Case Studies")} ({displayedProjects.length})</span>
             {activeTab === "projects" && (
               <motion.span
                 layoutId="studioTabLine"
@@ -253,14 +257,14 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("analytics")}
-            className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer ${
+            className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
               activeTab === "analytics"
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <BarChart2 size={14} />
-            <span>Growth & Analytics</span>
+            <span>{t("studio.tabAnalytics", "Growth & Analytics")}</span>
             {activeTab === "analytics" && (
               <motion.span
                 layoutId="studioTabLine"
@@ -271,18 +275,41 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("inquiries")}
-            className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer ${
+            className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
               activeTab === "inquiries"
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Mail size={14} />
-            <span>Client Inquiries ({inquiries.length})</span>
+            <span>{t("studio.tabInquiries", "Client Inquiries")} ({inquiries.length})</span>
             {unreadInquiries > 0 && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
             {activeTab === "inquiries" && (
+              <motion.span
+                layoutId="studioTabLine"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+              />
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab("moderation")}
+            className={`flex items-center gap-2 pb-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
+              activeTab === "moderation"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <ShieldAlert size={14} />
+            <span>{t("studio.tabModeration", "Content Moderation")} ({reports.length})</span>
+            {pendingCount > 0 && (
+              <span className="text-[10px] px-1.5 py-0.2 bg-destructive text-white rounded-full font-mono">
+                {pendingCount}
+              </span>
+            )}
+            {activeTab === "moderation" && (
               <motion.span
                 layoutId="studioTabLine"
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
@@ -294,7 +321,6 @@ export default function DashboardPage() {
         {/* TAB 1: PROJECTS */}
         {activeTab === "projects" && (
           <div className="space-y-6">
-            {/* Filter & Search Bar */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-2xl border border-border bg-card/60">
               <div className="flex items-center gap-1.5 p-1 bg-muted/40 rounded-xl border border-border">
                 <button
@@ -341,7 +367,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Grid */}
             {filtered.length === 0 ? (
               <div className="py-20 text-center rounded-2xl border border-dashed border-border bg-muted/10 space-y-4 max-w-md mx-auto">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
@@ -473,7 +498,6 @@ export default function DashboardPage() {
         {/* TAB 2: ANALYTICS */}
         {activeTab === "analytics" && (
           <div className="space-y-6">
-            {/* Time Filter Controls */}
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold font-display text-foreground">
                 Traffic & Engagement Overview
@@ -503,7 +527,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Recharts Area Chart */}
             <div className="p-5 sm:p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
               <div className="h-64 sm:h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -563,7 +586,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Top Performing Projects Leaderboard */}
             <div className="p-5 sm:p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
               <h3 className="text-sm font-bold font-display text-foreground">
                 Top Performing Masterworks
@@ -611,22 +633,17 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* TAB 3: INQUIRIES & HIRE LEADS */}
+        {/* TAB 3: INQUIRIES */}
         {activeTab === "inquiries" && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold font-display text-foreground">
-                Commission Leads & Freelance Inquiries ({inquiries.length})
-              </h3>
-            </div>
+            <h3 className="text-sm font-bold font-display text-foreground">
+              Commission Leads & Freelance Inquiries ({inquiries.length})
+            </h3>
 
             {inquiries.length === 0 ? (
               <div className="py-20 text-center rounded-2xl border border-dashed border-border bg-muted/10 space-y-2 max-w-md mx-auto">
                 <Mail size={24} className="text-muted-foreground mx-auto" />
                 <h4 className="text-sm font-bold text-foreground">No inquiries yet</h4>
-                <p className="text-xs text-muted-foreground">
-                  Ensure your profile is set to "Available for Work" so potential clients can reach out.
-                </p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -639,7 +656,6 @@ export default function DashboardPage() {
                         : "border-border bg-card"
                     }`}
                   >
-                    {/* Top Meta */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border">
                       <div>
                         <div className="flex items-center gap-2">
@@ -665,7 +681,6 @@ export default function DashboardPage() {
                         </a>
                       </div>
 
-                      {/* Badges */}
                       <div className="flex items-center gap-2 text-xs font-mono">
                         <span className="px-2.5 py-1 rounded-lg border border-border bg-muted/40 text-foreground flex items-center gap-1 font-semibold">
                           <DollarSign size={12} className="text-primary" /> {inq.budgetRange}
@@ -676,12 +691,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    {/* Brief Body */}
                     <p className="text-xs text-foreground leading-relaxed whitespace-pre-line bg-muted/20 p-3 rounded-xl border border-border/50">
                       {inq.projectBrief}
                     </p>
 
-                    {/* Action Row */}
                     <div className="flex items-center justify-between pt-1">
                       <span className="text-[10px] font-mono text-muted-foreground">
                         Received {new Date(inq.createdAt).toLocaleDateString()}
@@ -702,7 +715,7 @@ export default function DashboardPage() {
                         )}
 
                         <a
-                          href={`mailto:${inq.clientEmail}?subject=Re: Commission Project Inquiry - @${user?.username || "creator"}&body=Hi ${inq.clientName},%0D%0A%0D%0AThank you for reaching out regarding your project...`}
+                          href={`mailto:${inq.clientEmail}?subject=Re: Commission Project Inquiry&body=Hi ${inq.clientName},%0D%0A%0D%0AThank you for reaching out...`}
                           className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:opacity-90 flex items-center gap-1.5"
                         >
                           <Mail size={13} /> Reply via Email
@@ -711,11 +724,86 @@ export default function DashboardPage() {
                         <button
                           onClick={() => deleteInquiry(inq.id)}
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                          title="Delete inquiry"
                         >
                           <Trash2 size={13} />
                         </button>
                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 4: CONTENT MODERATION */}
+        {activeTab === "moderation" && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold font-display text-foreground">
+              Community Reports & Moderation Queue ({reports.length})
+            </h3>
+
+            {reports.length === 0 ? (
+              <div className="py-20 text-center rounded-2xl border border-dashed border-border bg-muted/10 space-y-2 max-w-md mx-auto">
+                <ShieldAlert size={24} className="text-muted-foreground mx-auto" />
+                <h4 className="text-sm font-bold text-foreground">Moderation queue clean</h4>
+                <p className="text-xs text-muted-foreground">No pending reports flagged by the community.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {reports.map((rep) => (
+                  <div
+                    key={rep.id}
+                    className={`p-5 rounded-2xl border transition-all space-y-3 ${
+                      rep.status === "pending"
+                        ? "border-destructive/40 bg-destructive/5"
+                        : "border-border bg-card opacity-70"
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-md bg-destructive text-white font-mono text-[10px] font-bold uppercase">
+                            {rep.reason}
+                          </span>
+                          <span className="text-xs font-bold text-foreground">
+                            Target: {rep.targetTitle || rep.targetId}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span className="text-xs font-mono text-muted-foreground">
+                        Reported {new Date(rep.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    {rep.details && (
+                      <p className="text-xs text-foreground bg-muted/30 p-3 rounded-xl">
+                        {rep.details}
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[11px] font-mono text-muted-foreground">
+                        Status: <strong className="text-foreground uppercase">{rep.status}</strong>
+                      </span>
+
+                      {rep.status === "pending" && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => dismissReport(rep.id)}
+                            className="px-3.5 py-1.5 rounded-lg border border-border text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
+                          >
+                            Dismiss Report
+                          </button>
+                          <button
+                            onClick={() => resolveReport(rep.id)}
+                            className="px-4 py-1.5 rounded-full bg-destructive text-white text-xs font-bold hover:opacity-90 cursor-pointer"
+                          >
+                            Resolve & Hide Item
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

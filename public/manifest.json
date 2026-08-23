@@ -1,0 +1,16 @@
+{
+  "short_name": "Azaiza Gallery",
+  "name": "Azaiza Gallery — Curated Creators Portfolios",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#070a14",
+  "theme_color": "#CDF22B",
+  "display": "standalone",
+  "orientation": "portrait"
+}

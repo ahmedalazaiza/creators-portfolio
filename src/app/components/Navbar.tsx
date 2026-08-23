@@ -25,10 +25,12 @@ import {
   Heart,
   UserPlus,
   Mail,
+  Globe,
 } from "lucide-react";
 import { useScrolled } from "../hooks/useScrolled";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../hooks/useNotifications";
+import { useLanguage } from "../context/LanguageContext";
 import SearchModal from "./SearchModal";
 
 interface NavbarProps {
@@ -47,13 +49,14 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { language, toggleLanguage, t } = useLanguage();
 
   const isHome = location.pathname === "/";
 
   const mainNavItems = [
-    { label: "Explore", path: "/" },
-    { label: "Search", path: "/search" },
-    { label: "Creators", path: "/creators" },
+    { label: t("nav.explore", "Explore"), path: "/" },
+    { label: t("nav.search", "Search"), path: "/search" },
+    { label: t("nav.creators", "Creators"), path: "/creators" },
     { label: "UI/UX", path: "/?category=ui-ux" },
     { label: "3D & Motion", path: "/?category=3d-motion" },
     { label: "Branding", path: "/?category=branding" },
@@ -145,8 +148,19 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             </button>
           </div>
 
-          {/* Right: Actions, Share Work Button, Notifications, Avatar */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Right: Language Switcher, Actions, Share Work Button, Notifications, Avatar */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            {/* Language Switcher (EN / AR) */}
+            <button
+              onClick={toggleLanguage}
+              aria-label="Toggle language"
+              className="px-2.5 py-1.5 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+              title={language === "en" ? "التبديل إلى العربية" : "Switch to English"}
+            >
+              <Globe size={13} className="text-primary" />
+              <span>{language === "en" ? "عربي" : "EN"}</span>
+            </button>
+
             {/* Mobile Search Icon */}
             <button
               onClick={() => setSearchOpen(true)}
@@ -253,7 +267,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_15px_rgba(205,242,43,0.3)] hover:opacity-90 active:scale-95 transition-all cursor-pointer"
             >
               <Plus size={14} />
-              <span className="hidden sm:inline">Share Work</span>
+              <span className="hidden sm:inline">{t("nav.shareWork", "Share Work")}</span>
             </Link>
 
             {/* User Profile Avatar / Sign In */}
@@ -297,7 +311,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                       className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
                     >
                       <User size={14} className="text-primary" />
-                      <span>My Behance Profile</span>
+                      <span>{t("nav.profile", "My Profile")}</span>
                     </Link>
 
                     <Link
@@ -306,7 +320,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                       className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
                     >
                       <LayoutDashboard size={14} className="text-primary" />
-                      <span>Creator Studio & Insights</span>
+                      <span>{t("nav.studio", "Creator Studio")}</span>
                     </Link>
 
                     <Link
@@ -315,7 +329,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                       className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
                     >
                       <Users size={14} className="text-primary" />
-                      <span>Discover Creators</span>
+                      <span>{t("nav.creators", "Creators")}</span>
                     </Link>
 
                     <Link
@@ -324,7 +338,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                       className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
                     >
                       <Plus size={14} className="text-primary" />
-                      <span>Publish Project</span>
+                      <span>{t("nav.shareWork", "Share Work")}</span>
                     </Link>
 
                     <Link
@@ -333,7 +347,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                       className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-foreground transition-colors font-medium"
                     >
                       <Settings size={14} className="text-muted-foreground" />
-                      <span>Account Settings</span>
+                      <span>{t("nav.settings", "Settings")}</span>
                     </Link>
 
                     <div className="pt-1 border-t border-border">
@@ -343,7 +357,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                           className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-destructive/10 text-destructive transition-colors font-semibold text-left cursor-pointer"
                         >
                           <LogOut size={14} />
-                          <span>Sign Out</span>
+                          <span>{t("nav.signOut", "Sign Out")}</span>
                         </button>
                       ) : (
                         <Link
@@ -352,7 +366,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                           className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted text-primary transition-colors font-semibold text-left"
                         >
                           <User size={14} />
-                          <span>Sign In / Register</span>
+                          <span>{t("nav.signIn", "Sign In")}</span>
                         </Link>
                       )}
                     </div>

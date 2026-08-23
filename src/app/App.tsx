@@ -5,7 +5,9 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import ErrorBoundary from "./components/ErrorBoundary";
+import OnboardingModal from "./components/OnboardingModal";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 
 // Pages
 import HomePage from "./pages/HomePage";
@@ -30,31 +32,40 @@ function ProfileRedirect() {
 
 function PageTitleHandler() {
   const location = useLocation();
+  const { language } = useLanguage();
 
   useEffect(() => {
     const path = location.pathname;
+    const isAr = language === "ar";
+
     if (path === "/") {
-      document.title = "Azaiza Gallery — Curated Portfolios & Creative Directory";
+      document.title = isAr
+        ? "معرض العزايزة — منصة استعراض أعمال المبدعين والمصممين"
+        : "Azaiza Gallery — Curated Portfolios & Creative Directory";
     } else if (path === "/search") {
-      document.title = "Search Masterworks & Creators — Azaiza Gallery";
+      document.title = isAr
+        ? "البحث عن الأعمال والمبدعين — معرض العزايزة"
+        : "Search Masterworks & Creators — Azaiza Gallery";
     } else if (path === "/creators") {
-      document.title = "Discover Leading Creators & Designers — Azaiza Gallery";
+      document.title = isAr
+        ? "دليل نخبة المصممين والمبدعين — معرض العزايزة"
+        : "Discover Leading Creators & Designers — Azaiza Gallery";
     } else if (path.startsWith("/project/")) {
-      document.title = "Case Study — Azaiza Gallery";
+      document.title = isAr ? "دراسة حالة — معرض العزايزة" : "Case Study — Azaiza Gallery";
     } else if (path.startsWith("/@") || path.startsWith("/profile")) {
-      document.title = "Creator Portfolio — Azaiza Gallery";
+      document.title = isAr ? "ملف المبدع — معرض العزايزة" : "Creator Portfolio — Azaiza Gallery";
     } else if (path === "/dashboard") {
-      document.title = "Creator Studio & Analytics — Azaiza Gallery";
+      document.title = isAr ? "استوديو المبدع والتحليلات — معرض العزايزة" : "Creator Studio & Analytics — Azaiza Gallery";
     } else if (path === "/dashboard/new") {
-      document.title = "Create New Case Study — Azaiza Gallery";
+      document.title = isAr ? "إنشاء دراسة حالة جديدة — معرض العزايزة" : "Create New Case Study — Azaiza Gallery";
     } else if (path.startsWith("/dashboard/edit/")) {
-      document.title = "Edit Case Study — Azaiza Gallery";
+      document.title = isAr ? "تعديل دراسة الحالة — معرض العزايزة" : "Edit Case Study — Azaiza Gallery";
     } else if (path === "/dashboard/settings") {
-      document.title = "Account & Profile Settings — Azaiza Gallery";
+      document.title = isAr ? "إعدادات الحساب والملف — معرض العزايزة" : "Account & Profile Settings — Azaiza Gallery";
     } else {
-      document.title = "Azaiza Gallery";
+      document.title = isAr ? "معرض العزايزة" : "Azaiza Gallery";
     }
-  }, [location.pathname]);
+  }, [location.pathname, language]);
 
   return null;
 }
@@ -120,6 +131,7 @@ function AppContent({
 
       {!isAuthPage && <Footer />}
       {!isAuthPage && <ScrollToTopButton />}
+      <OnboardingModal />
     </div>
   );
 }
@@ -143,9 +155,11 @@ export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <AuthProvider>
-          <AppContent isDark={isDark} onToggleTheme={toggleTheme} />
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <AppContent isDark={isDark} onToggleTheme={toggleTheme} />
+          </AuthProvider>
+        </LanguageProvider>
       </BrowserRouter>
     </ErrorBoundary>
   );

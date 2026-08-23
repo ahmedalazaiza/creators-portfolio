@@ -24,15 +24,19 @@ import {
   Mail,
   Palette,
   FolderPlus,
+  ShieldAlert,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useProjects } from "../hooks/useProjects";
 import { useCreator } from "../hooks/useCreator";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
+import { useRecommendations } from "../hooks/useRecommendations";
 import Lightbox from "../components/Lightbox";
 import ShareModal from "../components/ShareModal";
 import HireModal from "../components/HireModal";
 import SaveToCollectionModal from "../components/SaveToCollectionModal";
+import ReportModal from "../components/ReportModal";
 import ProjectCard from "../components/ProjectCard";
 
 export default function ProjectDetailPage() {
@@ -46,10 +50,12 @@ export default function ProjectDetailPage() {
     getProjectComments,
     addComment,
     deleteComment,
-    projects: allProjects,
   } = useProjects();
 
   const { user } = useAuth();
+  const { t } = useLanguage();
+  const { getSimilarProjects } = useRecommendations();
+
   const project = slug ? getProjectBySlug(slug) : null;
   const { isFollowing, toggleFollow } = useCreator(project?.creator.username);
 
@@ -59,6 +65,7 @@ export default function ProjectDetailPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [hireModalOpen, setHireModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
 
   useEffect(() => {
     if (project) {
@@ -91,6 +98,7 @@ export default function ProjectDetailPage() {
   const creator = project.creator;
   const comments = getProjectComments(project.id);
   const allImages = [project.coverImage, ...(project.images || [])];
+  const similarProjects = getSimilarProjects(project, 3);
 
   const handleLike = () => {
     toggleAppreciation(project.id, user?.id);
@@ -124,11 +132,6 @@ export default function ProjectDetailPage() {
     setCommentInput("");
   };
 
-  // Related projects from same category
-  const relatedProjects = allProjects
-    .filter((p) => p.id !== project.id && (p.category === project.category || p.categoryId === project.categoryId))
-    .slice(0, 3);
-
   return (
     <>
       <motion.main
@@ -150,6 +153,14 @@ export default function ProjectDetailPage() {
             </Link>
 
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setReportModalOpen(true)}
+                className="p-1.5 rounded-full border border-border bg-card hover:bg-destructive/10 text-muted-foreground hover:text-destructive text-xs transition-colors cursor-pointer"
+                title="Report content"
+              >
+                <ShieldAlert size={14} />
+              </button>
+
               <button
                 onClick={() => setShareOpen(true)}
                 className="p-1.5 rounded-full border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground text-xs transition-colors cursor-pointer"
@@ -507,14 +518,14 @@ export default function ProjectDetailPage() {
                   )}
                 </div>
 
-                {/* Related Projects */}
-                {relatedProjects.length > 0 && (
+                {/* Similar Recommendations */}
+                {similarProjects.length > 0 && (
                   <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
                     <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
-                      More in {project.category}
+                      Similar Masterworks
                     </span>
                     <div className="space-y-2.5">
-                      {relatedProjects.map((rel) => (
+                      {similarProjects.map((rel) => (
                         <Link
                           key={rel.id}
                           to={`/project/${rel.slug || rel.id}`}
@@ -573,6 +584,15 @@ export default function ProjectDetailPage() {
         isOpen={saveModalOpen}
         onClose={() => setSaveModalOpen(false)}
         project={project}
+      />
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        targetType="project"
+        targetId={project.id}
+        targetTitle={project.title}
       />
     </>
   );
