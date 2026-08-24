@@ -1,9 +1,132 @@
 -- ==============================================================================
--- Portfolios - Comprehensive High-Quality Seed Data
--- Run this directly in Supabase SQL Editor
+-- Portfolios - Comprehensive High-Quality Seed Data & Auto-Migration
+-- (Run this directly in Supabase SQL Editor - Safe & Self-Healing)
 -- ==============================================================================
 
--- 1. Ensure Auth Users exist so foreign keys to auth.users are valid
+-- 1. Enable Required Extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- 2. Auto-Migrate: Ensure all columns exist on profiles table if it was created earlier
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  full_name TEXT NOT NULL
+);
+
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS headline TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS bio TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT DEFAULT 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS banner_url TEXT DEFAULT 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS location TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS website TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS available_for_work BOOLEAN DEFAULT true;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS skills TEXT[] DEFAULT '{}';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS social_links JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS followers_count INT DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS following_count INT DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS total_appreciations INT DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS total_views INT DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_email_verified BOOLEAN DEFAULT false;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+
+-- 3. Auto-Migrate: Ensure categories table exists & is populated
+CREATE TABLE IF NOT EXISTS public.categories (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  description TEXT,
+  icon TEXT,
+  display_order INT DEFAULT 0
+);
+
+INSERT INTO public.categories (id, name, slug, description, icon, display_order)
+VALUES
+  ('ui-ux', 'UI/UX & Product Design', 'ui-ux', 'Digital product experiences, SaaS platforms, design systems, and mobile interfaces.', 'Layout', 1),
+  ('branding', 'Branding & Visual Identity', 'branding', 'Brand strategy, identity systems, typography, logomarks, and visual guidelines.', 'Layers', 2),
+  ('3d-motion', '3D & Motion Graphics', '3d-motion', 'Three-dimensional artwork, CGI rendering, spatial reality, and motion design.', 'Box', 3),
+  ('photography', 'Photography & Art Direction', 'photography', 'Editorial photography, architectural capture, portraits, and visual narratives.', 'Camera', 4),
+  ('illustration', 'Illustration & Concept Art', 'illustration', 'Digital painting, character design, editorial illustration, and concept art.', 'PenTool', 5),
+  ('architecture', 'Architecture & Spatial Design', 'architecture', 'Interior architecture, spatial installations, structural design, and environments.', 'Building', 6),
+  ('ai-art', 'AI & Generative Art', 'ai-art', 'Generative adversarial designs, algorithmic art, prompt-crafted visual syntheses.', 'Cpu', 7)
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  slug = EXCLUDED.slug,
+  description = EXCLUDED.description,
+  icon = EXCLUDED.icon,
+  display_order = EXCLUDED.display_order;
+
+-- 4. Auto-Migrate: Ensure projects table & all columns exist
+CREATE TABLE IF NOT EXISTS public.projects (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  description TEXT NOT NULL
+);
+
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS full_description TEXT;
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS category_id TEXT REFERENCES public.categories(id) ON DELETE SET NULL;
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'UI/UX & Product Design';
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS cover_image TEXT;
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS accent_color TEXT DEFAULT '#CDF22B';
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS year TEXT DEFAULT '2025';
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS tools TEXT[] DEFAULT '{}';
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS content_blocks JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'published';
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS views_count INT DEFAULT 0;
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS appreciations_count INT DEFAULT 0;
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+
+-- 5. Auto-Migrate: Ensure auxiliary tables exist
+CREATE TABLE IF NOT EXISTS public.project_images (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE NOT NULL,
+  image_url TEXT NOT NULL,
+  caption TEXT,
+  display_order INT DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.appreciations (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE(user_id, project_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.comments (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.follows (
+  follower_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  following_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  PRIMARY KEY(follower_id, following_id),
+  CHECK (follower_id <> following_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.favorites (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE(user_id, project_id)
+);
+
+-- ==============================================================================
+-- 6. Insert Auth Users (Satisfies Foreign Keys to auth.users)
+-- ==============================================================================
 INSERT INTO auth.users (
   id,
   instance_id,
@@ -27,7 +150,9 @@ INSERT INTO auth.users (
   ('a8888888-8888-8888-8888-888888888888', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'chloe@portfolios.design', '$2a$10$abcdefghijklmnopqrstuvwxyzABCDEF1234567890abcdefghijkl', now(), '{"provider":"email","providers":["email"]}', '{"username":"chloe_art","full_name":"Chloe Dubois"}', now(), now())
 ON CONFLICT (id) DO NOTHING;
 
--- 2. Insert Profiles
+-- ==============================================================================
+-- 7. Insert/Update Real Creator Profiles
+-- ==============================================================================
 INSERT INTO public.profiles (
   id,
   username,
@@ -213,7 +338,7 @@ ON CONFLICT (id) DO UPDATE SET
   social_links = EXCLUDED.social_links;
 
 -- ==============================================================================
--- 3. Insert Realistic Projects (18 Case Studies Across All Categories)
+-- 8. Insert 16 Curated Case Studies Across All Categories
 -- ==============================================================================
 INSERT INTO public.projects (
   id,
@@ -669,7 +794,7 @@ ON CONFLICT (id) DO UPDATE SET
   is_featured = EXCLUDED.is_featured;
 
 -- ==============================================================================
--- 4. Insert Project Images (Detailed Multi-Media Galleries)
+-- 9. Insert Project Images (Detailed Multi-Media Galleries)
 -- ==============================================================================
 INSERT INTO public.project_images (id, project_id, image_url, caption, display_order)
 VALUES
@@ -685,7 +810,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================================================
--- 5. Insert Appreciations (Likes)
+-- 10. Insert Appreciations (Likes)
 -- ==============================================================================
 INSERT INTO public.appreciations (id, user_id, project_id, created_at)
 VALUES
@@ -700,7 +825,7 @@ VALUES
 ON CONFLICT (user_id, project_id) DO NOTHING;
 
 -- ==============================================================================
--- 6. Insert Genuine Creator Comments
+-- 11. Insert Creator Comments
 -- ==============================================================================
 INSERT INTO public.comments (id, project_id, user_id, content, created_at)
 VALUES
@@ -735,7 +860,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================================================
--- 7. Insert Social Follow Connections
+-- 12. Insert Follows (Social Connections)
 -- ==============================================================================
 INSERT INTO public.follows (follower_id, following_id, created_at)
 VALUES
