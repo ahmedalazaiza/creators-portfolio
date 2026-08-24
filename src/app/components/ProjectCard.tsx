@@ -88,19 +88,19 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
 
         {/* Hover Quick Appreciate & Save Overlay */}
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           {/* Favorite / Bookmark Button */}
           <button
             onClick={handleToggleFavorite}
             aria-label="Save to favorites"
             title={isLoggedIn ? (isSaved ? "Saved to Favorites" : "Save to Favorites") : "Sign in to save"}
-            className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
+            className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-md ${
               isSaved
-                ? "bg-[#CDF22B] text-slate-950 font-bold"
-                : "bg-black/75 dark:bg-black/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 border border-white/20"
+                ? "bg-[#CDF22B] text-slate-950 border border-[#CDF22B] font-bold"
+                : "bg-slate-900/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 border border-white/25 hover:border-[#CDF22B]"
             }`}
           >
-            <Bookmark size={14} className={isSaved ? "fill-current text-slate-950" : ""} />
+            <Bookmark size={14} className={isSaved ? "fill-slate-950 text-slate-950" : "text-white"} />
           </button>
 
           {/* Like / Appreciate Button */}
@@ -108,13 +108,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             onClick={handleAppreciate}
             aria-label="Appreciate project"
             title={isLoggedIn ? "Appreciate project" : "Sign in to appreciate"}
-            className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
+            className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-md ${
               isLiked
-                ? "bg-[#CDF22B] text-slate-950 font-bold"
-                : "bg-black/75 dark:bg-black/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 border border-white/20"
+                ? "bg-[#CDF22B] text-slate-950 border border-[#CDF22B] font-bold"
+                : "bg-slate-900/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 border border-white/25 hover:border-[#CDF22B]"
             }`}
           >
-            <Heart size={14} className={isLiked ? "fill-current text-slate-950" : ""} />
+            <Heart size={14} className={isLiked ? "fill-slate-950 text-slate-950" : "text-white"} />
           </button>
         </div>
       </Link>
