@@ -8,6 +8,9 @@ import {
   Twitter,
   Linkedin,
   MessageCircle,
+  Link2,
+  CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 
 interface ShareModalProps {
@@ -38,7 +41,7 @@ export default function ShareModal({
   const shareUrl = url || window.location.href;
   const shareText =
     type === "profile"
-      ? `Check out @${title}'s portfolio on Portfolios`
+      ? `Check out @${title}'s creative portfolio on Portfolios`
       : `Check out "${title}" on Portfolios`;
 
   const handleCopy = () => {
@@ -50,30 +53,33 @@ export default function ShareModal({
   const shareLinks = [
     {
       name: "WhatsApp",
+      sub: "Send message",
       icon: MessageCircle,
       url: `https://api.whatsapp.com/send?text=${encodeURIComponent(
         `${shareText}\n${shareUrl}`
       )}`,
-      color: "hover:text-emerald-500 hover:border-emerald-500/30 hover:bg-emerald-500/10",
-      iconColor: "text-emerald-500",
+      badgeBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+      hoverBorder: "hover:border-emerald-500/40 hover:bg-emerald-500/5",
     },
     {
       name: "Twitter / X",
+      sub: "Post to feed",
       icon: Twitter,
       url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
         shareText
       )}&url=${encodeURIComponent(shareUrl)}`,
-      color: "hover:text-sky-500 hover:border-sky-500/30 hover:bg-sky-500/10",
-      iconColor: "text-sky-500",
+      badgeBg: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+      hoverBorder: "hover:border-sky-500/40 hover:bg-sky-500/5",
     },
     {
       name: "LinkedIn",
+      sub: "Share network",
       icon: Linkedin,
       url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
         shareUrl
       )}`,
-      color: "hover:text-blue-500 hover:border-blue-500/30 hover:bg-blue-500/10",
-      iconColor: "text-blue-500",
+      badgeBg: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+      hoverBorder: "hover:border-blue-500/40 hover:bg-blue-500/5",
     },
   ];
 
@@ -89,33 +95,33 @@ export default function ShareModal({
           className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity"
         />
 
-        {/* Modal Box */}
+        {/* Modal Window */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 12 }}
+          initial={{ opacity: 0, scale: 0.95, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: 12 }}
+          exit={{ opacity: 0, scale: 0.95, y: 12 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-md bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 rounded-[32px] overflow-hidden z-10 flex flex-col p-6 sm:p-7 space-y-6 my-auto"
+          className="relative w-full max-w-md bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 rounded-[32px] overflow-hidden z-10 flex flex-col p-5 sm:p-7 space-y-5 my-auto"
         >
           {/* Header */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center font-bold shrink-0">
-                <Share2 size={18} />
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-full bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 flex items-center justify-center font-bold shrink-0">
+                <Share2 size={16} />
               </div>
               <div>
-                <h3 className="font-bold text-base text-foreground leading-snug">
+                <h3 className="font-bold text-sm sm:text-base text-foreground leading-tight">
                   {type === "profile" ? "Share Creator Profile" : "Share Case Study"}
                 </h3>
-                <p className="text-xs text-muted-foreground">
-                  Spread creative inspiration
+                <p className="text-[11px] text-muted-foreground">
+                  Spread creative benchmark & craft
                 </p>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Close share modal"
             >
               <X size={16} />
@@ -124,13 +130,18 @@ export default function ShareModal({
 
           {/* Preview Card */}
           {(avatarUrl || coverImage || subtitle) && (
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10">
+            <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10">
               {avatarUrl && (
-                <img
-                  src={avatarUrl}
-                  alt={title}
-                  className="w-11 h-11 rounded-full object-cover border border-slate-200 dark:border-white/20 shrink-0"
-                />
+                <div className="relative shrink-0">
+                  <img
+                    src={avatarUrl}
+                    alt={title}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-slate-300 dark:border-white/20"
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#CDF22B] text-slate-950 flex items-center justify-center border border-white dark:border-slate-950">
+                    <Sparkles size={9} />
+                  </div>
+                </div>
               )}
               {coverImage && (
                 <img
@@ -140,11 +151,11 @@ export default function ShareModal({
                 />
               )}
               <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-foreground truncate">
-                  {title}
+                <div className="text-xs font-bold text-foreground truncate flex items-center gap-1">
+                  <span>{type === "profile" && !title.startsWith("@") ? `@${title}` : title}</span>
                 </div>
                 {subtitle && (
-                  <div className="text-[11px] text-muted-foreground truncate">
+                  <div className="text-[11px] text-muted-foreground truncate leading-relaxed">
                     {subtitle}
                   </div>
                 )}
@@ -152,12 +163,12 @@ export default function ShareModal({
             </div>
           )}
 
-          {/* 1-Click Social Sharing Links */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-foreground uppercase tracking-wider">
-              Share to Social Channels
-            </label>
-            <div className="grid grid-cols-3 gap-3">
+          {/* 1-Click Social Channels */}
+          <div className="space-y-2.5">
+            <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+              Share to Channels
+            </div>
+            <div className="grid grid-cols-3 gap-2.5">
               {shareLinks.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -166,31 +177,44 @@ export default function ShareModal({
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 transition-all text-xs font-medium text-foreground cursor-pointer ${item.color}`}
+                    className={`flex flex-col items-center justify-center gap-2 p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 transition-all cursor-pointer group ${item.hoverBorder} hover:scale-[1.02] active:scale-95`}
                   >
-                    <Icon size={18} className={item.iconColor} />
-                    <span className="text-[11px] font-semibold truncate">{item.name}</span>
+                    <div className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-transform group-hover:scale-110 ${item.badgeBg}`}>
+                      <Icon size={18} />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs font-bold text-foreground">
+                        {item.name}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {item.sub}
+                      </div>
+                    </div>
                   </a>
                 );
               })}
             </div>
           </div>
 
-          {/* Copy Link Section */}
-          <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-white/10">
-            <label className="block text-xs font-bold text-foreground uppercase tracking-wider">
-              Copy Direct Link
-            </label>
+          {/* Copy Direct Link Section */}
+          <div className="space-y-2 pt-1 border-t border-slate-200 dark:border-white/10">
+            <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+              Direct Link
+            </div>
             <div className="flex items-center gap-2 p-1.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#11130e]">
+              <div className="pl-2.5 text-muted-foreground shrink-0">
+                <Link2 size={15} />
+              </div>
               <input
                 type="text"
                 readOnly
                 value={shareUrl}
-                className="w-full bg-transparent px-3 text-xs text-foreground font-mono focus:outline-none truncate"
+                className="w-full bg-transparent px-1.5 text-xs text-foreground font-mono focus:outline-none truncate"
               />
               <button
+                type="button"
                 onClick={handleCopy}
-                className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
                   copied
                     ? "bg-emerald-500 text-white"
                     : "btn-primary text-slate-950"
@@ -198,7 +222,7 @@ export default function ShareModal({
               >
                 {copied ? (
                   <>
-                    <Check size={13} />
+                    <Check size={13} strokeWidth={2.5} />
                     <span>Copied!</span>
                   </>
                 ) : (
@@ -215,4 +239,5 @@ export default function ShareModal({
     </AnimatePresence>
   );
 }
+
 
