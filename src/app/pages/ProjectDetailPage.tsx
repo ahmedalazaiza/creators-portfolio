@@ -439,7 +439,7 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Comments & Community Discussion Section */}
-      <div className="glass-card rounded-3xl p-6 sm:p-10 border border-slate-200/80 dark:border-white/10 shadow-sm space-y-6">
+      <div id="comments-section" className="glass-card rounded-3xl p-6 sm:p-10 border border-slate-200/80 dark:border-white/10 shadow-sm space-y-6 scroll-mt-20">
         <div className="flex items-center gap-2">
           <MessageSquare size={16} className="text-slate-800 dark:text-[#CDF22B]" />
           <h3 className="text-base font-bold font-display text-foreground">
@@ -458,65 +458,62 @@ export default function ProjectDetailPage() {
               alt={user?.fullName}
               className="w-8 h-8 rounded-full object-cover bg-slate-100 shrink-0"
             />
-            <div className="flex-1 flex gap-2">
+            <div className="flex-1 flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Share thoughtful feedback or ask a question..."
-                className="flex-1 px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
+                className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground text-xs focus:outline-none focus:border-[#CDF22B] transition-colors"
               />
               <button
                 type="submit"
-                disabled={!commentText.trim()}
-                className="px-5 py-2.5 rounded-2xl btn-primary text-xs font-bold active:scale-95 disabled:opacity-40 cursor-pointer"
+                disabled={!commentText.trim() || isSubmittingComment}
+                className="px-5 py-2.5 rounded-2xl btn-primary text-slate-950 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40 shadow-xs active:scale-95 transition-transform shrink-0"
               >
-                <Send size={14} />
+                <Send size={13} />
+                <span>Post Comment</span>
               </button>
             </div>
           </form>
         ) : (
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-center space-y-2">
-            <p className="text-xs text-muted-foreground">
-              Sign in to join the conversation and leave feedback for this project.
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#171915] border border-slate-200 dark:border-white/10 flex items-center justify-between gap-4 text-xs">
+            <p className="text-muted-foreground">
+              Sign in to join the discussion, ask questions, and support this creator.
             </p>
             <Link
               to="/login"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full btn-primary text-xs font-bold"
+              className="px-4 py-1.5 rounded-full btn-primary text-slate-950 text-xs font-bold shrink-0"
             >
-              Sign In to Comment
+              Sign In
             </Link>
           </div>
         )}
 
-        {/* Comments List */}
-        <div className="space-y-3 pt-2">
+        {/* Comments Feed */}
+        <div className="space-y-4 pt-2">
           {comments.length > 0 ? (
             comments.map((c) => {
-              const canDelete =
-                user &&
-                (user.id === c.user?.id ||
-                  user.username === c.user?.username ||
-                  user.id === project.userId);
-
+              const canDelete = isOwner || (user && user.id === c.userId);
               return (
                 <div
                   key={c.id}
-                  className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50/70 dark:bg-[#171915]/80 border border-slate-200/60 dark:border-white/10 group"
+                  className="flex gap-3.5 p-4 rounded-2xl bg-slate-50/70 dark:bg-[#171915]/60 border border-slate-200/60 dark:border-white/5 group"
                 >
                   <Link to={`/@${c.user?.username || "creator"}`}>
                     <img
                       src={
                         c.user?.avatarUrl ||
-                        `https://api.dicebear.com/7.x/shapes/svg?seed=${c.user?.username || "anon"}`
+                        `https://api.dicebear.com/7.x/shapes/svg?seed=${c.user?.username || "user"}`
                       }
-                      alt={c.user?.fullName}
-                      className="w-8 h-8 rounded-full object-cover bg-slate-100 shrink-0 border border-white dark:border-white/10"
+                      alt={c.user?.fullName || "Commenter"}
+                      className="w-8 h-8 rounded-full object-cover bg-slate-100 shrink-0"
                     />
                   </Link>
-                  <div className="space-y-1 flex-1 min-w-0">
+
+                  <div className="flex-1 space-y-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
                         <Link
                           to={`/@${c.user?.username || "creator"}`}
                           className="text-xs font-bold text-foreground hover:text-[#CDF22B] transition-colors truncate"
@@ -562,6 +559,106 @@ export default function ProjectDetailPage() {
               Be the first to share feedback and start the conversation on this project!
             </p>
           )}
+        </div>
+      </div>
+
+      {/* Mobile Sticky Bottom Action Bar (Fixed, Touch-Friendly) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 dark:bg-[#11140e]/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-white/10 px-3.5 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom,0.65rem))] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.7)]">
+        <div className="flex items-center justify-between gap-2 max-w-lg mx-auto">
+          {/* Creator Mini Identity */}
+          <Link
+            to={`/@${project.creator?.username || "creator"}`}
+            className="flex items-center gap-2 min-w-0 pr-1 hover:opacity-80 transition-opacity"
+          >
+            <img
+              src={
+                project.creator?.avatarUrl ||
+                `https://api.dicebear.com/7.x/shapes/svg?seed=${project.creator?.username}`
+              }
+              alt={project.creator?.fullName || "Creator"}
+              className="w-8 h-8 rounded-full object-cover bg-slate-100 border border-slate-200 dark:border-white/10 shrink-0"
+            />
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold text-foreground truncate">
+                {project.creator?.fullName || "Creator"}
+              </p>
+              <p className="text-[10px] text-muted-foreground font-mono truncate">
+                @{project.creator?.username || "creator"}
+              </p>
+            </div>
+          </Link>
+
+          {/* Action Buttons Group */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Share Button */}
+            <button
+              onClick={handleShare}
+              aria-label="Share case study"
+              className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#181b15] text-foreground transition-all cursor-pointer active:scale-95 shadow-2xs"
+            >
+              <Share2 size={16} />
+            </button>
+
+            {/* Comment Jump Button */}
+            <button
+              onClick={() => {
+                const commentEl = document.getElementById("comments-section");
+                if (commentEl) {
+                  commentEl.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              aria-label="Jump to comments"
+              className="relative w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#181b15] text-foreground transition-all cursor-pointer active:scale-95 shadow-2xs"
+            >
+              <MessageSquare size={16} />
+              {comments.length > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
+                  {comments.length}
+                </span>
+              )}
+            </button>
+
+            {/* Bookmark / Save Button */}
+            <button
+              onClick={handleToggleFavorite}
+              aria-label="Save to favorites"
+              className={`w-10 h-10 flex items-center justify-center rounded-full transition-all cursor-pointer active:scale-95 shadow-2xs ${
+                isSaved
+                  ? "bg-slate-900 text-white dark:bg-[#CDF22B] dark:text-slate-950 font-bold"
+                  : "border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#181b15] text-foreground"
+              }`}
+            >
+              <Bookmark
+                size={16}
+                className={
+                  isSaved
+                    ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                    : ""
+                }
+              />
+            </button>
+
+            {/* Hero Appreciate Button */}
+            <button
+              onClick={handleAppreciate}
+              aria-label="Appreciate project"
+              className={`min-h-[40px] px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer ${
+                isLiked
+                  ? "bg-rose-500 text-white shadow-rose-500/25 dark:bg-[#CDF22B] dark:text-slate-950 dark:border-[#CDF22B]"
+                  : "btn-primary text-slate-950"
+              }`}
+            >
+              <Heart
+                size={15}
+                className={
+                  isLiked
+                    ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                    : "text-slate-950"
+                }
+              />
+              <span>{likesCount}</span>
+            </button>
+          </div>
         </div>
       </div>
 

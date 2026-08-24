@@ -12,6 +12,11 @@ export default function MobileBottomNav() {
 
   const pathname = location.pathname;
 
+  // On Project Detail case study pages, yield to the dedicated ProjectStickyActionBar
+  if (pathname.startsWith("/project/") || pathname.startsWith("/p/")) {
+    return null;
+  }
+
   const isExplore = pathname === "/" || pathname === "/explore" || pathname === "/inspiration";
   const isSearch = pathname === "/search";
   const isSaved = pathname === "/saved";

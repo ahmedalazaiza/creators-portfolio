@@ -127,25 +127,20 @@ export default function CategorySectionSlider({
         </div>
       </div>
 
-      {/* Free Full-Bleed Horizontal Slider Track (Up to 10 projects) */}
+      {/* Smooth Full-Bleed Horizontal Slider Track with CSS Scroll Snap */}
       <div
         ref={scrollContainerRef}
-        onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeaveOrUp}
-        onMouseUp={handleMouseLeaveOrUp}
-        onMouseMove={handleMouseMove}
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
+          WebkitOverflowScrolling: "touch",
         }}
-        className={`flex items-stretch gap-4 sm:gap-5 overflow-x-auto overflow-y-hidden no-scrollbar py-3 px-3 sm:px-6 lg:px-10 -mx-3 sm:-mx-6 lg:-mx-10 select-none ${
-          isDragging ? "cursor-grabbing scroll-auto" : "cursor-grab scroll-smooth"
-        }`}
+        className="flex items-stretch gap-4 sm:gap-5 overflow-x-auto overflow-y-hidden no-scrollbar py-3 px-3 sm:px-6 lg:px-10 -mx-3 sm:-mx-6 lg:-mx-10 snap-x snap-mandatory scroll-smooth"
       >
         {displayProjects.map((project) => (
           <div
             key={project.id}
-            className="w-[260px] sm:w-[320px] md:w-[360px] lg:w-[380px] shrink-0 flex flex-col pointer-events-auto"
+            className="w-[270px] sm:w-[320px] md:w-[360px] lg:w-[380px] shrink-0 flex flex-col snap-start scroll-ml-3 sm:scroll-ml-6 lg:scroll-ml-10"
           >
             <ProjectCard project={project} />
           </div>

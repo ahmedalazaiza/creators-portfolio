@@ -5,6 +5,7 @@ import { Heart, Eye, Bookmark, Sparkles, User } from "lucide-react";
 import { Project } from "../types";
 import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../context/AuthContext";
+import confetti from "canvas-confetti";
 
 interface ProjectCardProps {
   project: Project;
@@ -39,6 +40,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     setIsLiked(nextState);
     setLikesCount((prev) => Math.max(0, prev + (nextState ? 1 : -1)));
     toggleAppreciation(project.id, user?.id);
+
+    if (nextState && typeof window !== "undefined") {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+      confetti({
+        particleCount: 22,
+        spread: 40,
+        origin: { x: Math.max(0.1, Math.min(0.9, x)), y: Math.max(0.1, Math.min(0.9, y)) },
+        colors: ["#CDF22B", "#f43f5e", "#0F172A", "#ffffff"],
+        ticks: 150,
+        scalar: 0.65,
+      });
+    }
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {

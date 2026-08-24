@@ -33,6 +33,7 @@ import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../hooks/useProjects";
 import { useSocial } from "../hooks/useSocial";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import confetti from "canvas-confetti";
 import { Profile, Project } from "../types";
 import ProjectCard from "../components/ProjectCard";
 import EditProfileModal from "../components/EditProfileModal";
@@ -363,6 +364,7 @@ export default function CreatorProfilePage() {
 
     if (isOwnProfile) return;
 
+    const willFollow = !following;
     setFollowLoading(true);
     await toggleFollow(
       {
@@ -373,6 +375,15 @@ export default function CreatorProfilePage() {
       user?.id
     );
     setFollowLoading(false);
+
+    if (willFollow) {
+      confetti({
+        particleCount: 35,
+        spread: 55,
+        origin: { y: 0.75 },
+        colors: ["#CDF22B", "#0F172A", "#FFFFFF"],
+      });
+    }
   };
 
   const handleShareProfile = () => {
