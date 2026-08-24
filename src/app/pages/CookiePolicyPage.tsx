@@ -30,7 +30,7 @@ export default function CookiePolicyPage() {
 
       {/* Header */}
       <div className="space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-slate-800 text-[#CDF22B] text-xs font-bold border border-slate-800 dark:border-slate-700 shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-[#171915] text-[#CDF22B] text-xs font-bold border border-slate-800 dark:border-white/10 shadow-2xs">
           <Cookie size={14} />
           <span>Transparency & Tracking</span>
         </div>
@@ -45,7 +45,7 @@ export default function CookiePolicyPage() {
       {/* Preferences Cards */}
       <div className="space-y-6 text-xs sm:text-sm leading-relaxed text-muted-foreground">
         {/* Essential Storage */}
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
               <ShieldCheck size={18} className="text-slate-900 dark:text-[#CDF22B]" />
@@ -61,7 +61,7 @@ export default function CookiePolicyPage() {
         </div>
 
         {/* Analytics Toggle */}
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
               <Sliders size={18} className="text-slate-900 dark:text-[#CDF22B]" />
@@ -70,22 +70,22 @@ export default function CookiePolicyPage() {
             <button
               onClick={() => setAnalyticsEnabled(!analyticsEnabled)}
               className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
-                analyticsEnabled ? "bg-[#CDF22B]" : "bg-slate-300 dark:bg-slate-700"
+                analyticsEnabled ? "bg-[#CDF22B]" : "bg-slate-300 dark:bg-[#1e231b]"
               }`}
             >
               <div
-                className={`w-5 h-5 rounded-full bg-white dark:bg-slate-900 absolute top-0.5 transition-transform ${
+                className={`w-5 h-5 rounded-full bg-white dark:bg-[#171915] absolute top-0.5 transition-transform ${
                   analyticsEnabled ? "left-6.5" : "left-0.5"
                 }`}
               />
             </button>
           </div>
           <p>
-            Helps us monitor 60 FPS scrolling performance, aggregate project view counts, and detect broken image URLs without identifying individual persons.
+            Anonymized metrics to help us detect slow network speeds, image load times, and platform uptime. No personal identity is ever tracked or sold.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-4">
           <button
             onClick={handleSavePreferences}
             className="px-6 py-2.5 rounded-full btn-primary text-xs font-bold shadow-md cursor-pointer active:scale-95 transition-transform"

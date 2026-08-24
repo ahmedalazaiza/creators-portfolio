@@ -54,7 +54,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-950/70 transition-colors pt-16 pb-10 text-xs text-muted-foreground relative overflow-hidden backdrop-blur-2xl">
+    <footer className="border-t border-slate-200/80 dark:border-white/10 bg-slate-50/80 dark:bg-[#11140e] transition-colors pt-16 pb-10 text-xs text-muted-foreground relative overflow-hidden backdrop-blur-2xl">
       {/* Background Soft Glow */}
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#CDF22B]/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
@@ -77,7 +77,7 @@ export default function Footer() {
             </p>
 
             {/* Platform Status Indicator */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-foreground shadow-2xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-[11px] font-mono text-foreground shadow-2xs">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#CDF22B] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#CDF22B]"></span>
@@ -161,7 +161,7 @@ export default function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-foreground placeholder:text-muted-foreground text-xs focus:outline-none focus:border-[#CDF22B] transition-colors pr-10"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground text-xs focus:outline-none focus:border-[#CDF22B] transition-colors pr-10"
                 />
                 <button
                   type="submit"
@@ -197,7 +197,7 @@ export default function Footer() {
                   rel="noreferrer"
                   title={platform.name}
                   aria-label={platform.name}
-                  className="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:bg-[#CDF22B] hover:text-slate-950 dark:hover:bg-[#CDF22B] dark:hover:text-slate-950 flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
+                  className="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-[#171915] border border-transparent dark:border-white/10 text-slate-800 dark:text-slate-200 hover:bg-[#CDF22B] hover:text-slate-950 dark:hover:bg-[#CDF22B] dark:hover:text-slate-950 flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
                 >
                   {platform.icon}
                 </a>
@@ -207,7 +207,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar: Copyright & Connected Legal Links */}
-        <div className="pt-8 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div className="pt-8 border-t border-slate-200/80 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-1.5">
             <span>© {new Date().getFullYear()} Portfolios Inc.</span>
             <span>•</span>

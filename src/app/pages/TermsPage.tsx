@@ -22,7 +22,7 @@ export default function TermsPage() {
 
       {/* Header */}
       <div className="space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-slate-800 text-[#CDF22B] text-xs font-bold border border-slate-800 dark:border-slate-700 shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-[#171915] text-[#CDF22B] text-xs font-bold border border-slate-800 dark:border-white/10 shadow-2xs">
           <Scale size={14} />
           <span>Legal Agreement</span>
         </div>
@@ -36,7 +36,7 @@ export default function TermsPage() {
 
       {/* Content Glass Cards */}
       <div className="space-y-6 text-xs sm:text-sm leading-relaxed text-muted-foreground">
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <Copyright size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>1. Creator Intellectual Property</h2>
@@ -46,7 +46,7 @@ export default function TermsPage() {
           </p>
         </div>
 
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <Users size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>2. Community Conduct & Authenticity</h2>
@@ -56,7 +56,7 @@ export default function TermsPage() {
           </p>
         </div>
 
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <Award size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>3. Client Inquiries & Commercial Dealings</h2>

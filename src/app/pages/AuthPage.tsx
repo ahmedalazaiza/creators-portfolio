@@ -214,7 +214,7 @@ export default function AuthPage() {
                 to="/login"
                 className={`flex-1 py-2 text-center rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   !isSignUp
-                    ? "bg-white dark:bg-slate-900 text-foreground shadow-xs"
+                    ? "bg-white dark:bg-[#171915] text-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -224,7 +224,7 @@ export default function AuthPage() {
                 to="/signup"
                 className={`flex-1 py-2 text-center rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   isSignUp
-                    ? "bg-white dark:bg-slate-900 text-foreground shadow-xs"
+                    ? "bg-white dark:bg-[#171915] text-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -279,7 +279,7 @@ export default function AuthPage() {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Ahmed Al-Azaiza"
-                      className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
+                      className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
                     />
                   </div>
                 </motion.div>
@@ -297,7 +297,7 @@ export default function AuthPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
+                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
                   />
                 </div>
               </div>
@@ -315,7 +315,7 @@ export default function AuthPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-11 pr-11 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
+                    className="w-full pl-11 pr-11 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
                   />
                   <button
                     type="button"

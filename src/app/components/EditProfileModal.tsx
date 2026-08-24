@@ -168,7 +168,7 @@ export default function EditProfileModal({
         {/* Modal Form Scrollable Body */}
         <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-6 overflow-y-auto flex-1">
           {/* Avatar Section */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 rounded-2xl bg-slate-50 dark:bg-[#1e231b]/70 border border-slate-200/80 dark:border-white/10">
             <div className="relative group">
               <img
                 src={
@@ -176,7 +176,7 @@ export default function EditProfileModal({
                   `https://api.dicebear.com/7.x/shapes/svg?seed=${user.username || "creator"}`
                 }
                 alt="Avatar Preview"
-                className="w-20 h-20 rounded-2xl object-cover bg-slate-200 dark:bg-slate-800 border-2 border-white dark:border-slate-700 shadow-md"
+                className="w-20 h-20 rounded-2xl object-cover bg-slate-200 dark:bg-[#171915] border-2 border-white dark:border-white/10 shadow-md"
               />
             </div>
 
@@ -190,12 +190,12 @@ export default function EditProfileModal({
                   value={avatarUrl}
                   onChange={(e) => setAvatarUrl(e.target.value)}
                   placeholder="https://... image URL"
-                  className="flex-1 min-w-[200px] px-3.5 py-2 rounded-xl bg-background border border-slate-200 dark:border-slate-700 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
+                  className="flex-1 min-w-[200px] px-3.5 py-2 rounded-xl bg-background border border-slate-200 dark:border-white/10 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
                 />
                 <button
                   type="button"
                   onClick={handleGenerateRandomAvatar}
-                  className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-[#CDF22B] hover:text-slate-950 text-foreground text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-[#CDF22B] hover:text-slate-950 text-foreground text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <RefreshCw size={12} />
                   <span>Randomize</span>
@@ -272,7 +272,7 @@ export default function EditProfileModal({
           </div>
 
           {/* Available for Work Toggle */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80">
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-[#1e231b]/70 border border-slate-200/80 dark:border-white/10">
             <div className="space-y-0.5">
               <p className="text-xs font-bold text-foreground flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -287,7 +287,7 @@ export default function EditProfileModal({
               type="button"
               onClick={() => setAvailableForWork(!availableForWork)}
               className={`w-12 h-6.5 rounded-full p-1 transition-colors cursor-pointer ${
-                availableForWork ? "bg-[#CDF22B]" : "bg-slate-300 dark:bg-slate-700"
+                availableForWork ? "bg-[#CDF22B]" : "bg-slate-300 dark:bg-[#2E3823]"
               }`}
             >
               <div

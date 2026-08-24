@@ -74,7 +74,7 @@ export default function FavoritesPage() {
           </div>
 
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-[#CDF22B] text-xs font-bold border border-slate-200 dark:border-slate-700">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-[#171915] text-slate-900 dark:text-[#CDF22B] text-xs font-bold border border-slate-200 dark:border-white/10">
               <Lock size={12} />
               <span>Registered Members Only</span>
             </div>
@@ -87,7 +87,7 @@ export default function FavoritesPage() {
           </div>
 
           {/* Value Props */}
-          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 text-left text-xs space-y-2.5">
+          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-left text-xs space-y-2.5">
             <div className="flex items-center gap-2 text-foreground font-medium">
               <div className="w-1.5 h-1.5 rounded-full bg-[#CDF22B]" />
               <span>Bookmark unlimited UI/UX & 3D projects</span>
@@ -130,7 +130,7 @@ export default function FavoritesPage() {
   return (
     <main className="min-h-screen pt-6 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-white/10">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center shrink-0 shadow-md shadow-[#CDF22B]/25 font-bold">
@@ -141,7 +141,7 @@ export default function FavoritesPage() {
                 <h1 className="text-2xl sm:text-3xl font-bold font-display text-foreground tracking-tight">
                   Saved Favorites
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-slate-900 dark:bg-slate-800 text-[#CDF22B] text-xs font-mono font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-900 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-[#CDF22B] text-xs font-mono font-bold">
                   {favoriteProjects.length}
                 </span>
               </div>
@@ -155,7 +155,7 @@ export default function FavoritesPage() {
         {/* Explore More CTA */}
         <Link
           to="/"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-[#CDF22B] hover:text-slate-900 text-xs font-bold text-foreground transition-all cursor-pointer shadow-2xs self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-[#CDF22B] hover:text-slate-900 text-xs font-bold text-foreground transition-all cursor-pointer shadow-2xs self-start sm:self-auto"
         >
           <Compass size={14} />
           <span>Discover More Works</span>
@@ -172,7 +172,7 @@ export default function FavoritesPage() {
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 ${
                 selectedCategory === "all"
                   ? "bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 shadow-xs"
-                  : "bg-slate-100 dark:bg-slate-800/80 text-muted-foreground hover:text-foreground"
+                  : "bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-muted-foreground hover:text-foreground"
               }`}
             >
               All ({favoriteProjects.length})
@@ -187,7 +187,7 @@ export default function FavoritesPage() {
                   className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
                     selectedCategory === cat.slug
                       ? "bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 shadow-xs"
-                      : "bg-slate-100 dark:bg-slate-800/80 text-muted-foreground hover:text-foreground"
+                      : "bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <span>{cat.name.split(" ")[0]}</span>
@@ -198,14 +198,14 @@ export default function FavoritesPage() {
           </div>
 
           {/* Quick Search Input */}
-          <div className="relative w-full md:w-64 shrink-0">
-            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative w-full md:w-64">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search in favorites..."
-              className="w-full pl-9 pr-8 py-2 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
+              placeholder="Search in saved..."
+              className="w-full pl-9 pr-8 py-2 rounded-full bg-slate-100 dark:bg-[#171915] border border-slate-200/80 dark:border-white/10 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
             />
             {searchQuery && (
               <button

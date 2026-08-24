@@ -324,7 +324,7 @@ export default function SearchModal({
                       className={`p-2.5 rounded-2xl border text-left font-medium transition-all flex items-center justify-between cursor-pointer ${
                         isSelected
                           ? "bg-[#CDF22B]/20 border-slate-900 dark:border-[#CDF22B] text-foreground font-bold shadow-xs"
-                          : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-muted-foreground hover:text-foreground hover:border-slate-300"
+                          : "border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e231b]/60 text-muted-foreground hover:text-foreground hover:border-slate-300"
                       }`}
                     >
                       <span className="truncate">{opt.label}</span>
@@ -369,14 +369,14 @@ export default function SearchModal({
                       className={`p-3 rounded-2xl border text-left transition-all flex items-start gap-2.5 cursor-pointer ${
                         isSelected
                           ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-md"
-                          : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-foreground hover:border-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          : "border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e231b]/50 text-foreground hover:border-slate-400 hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                       }`}
                     >
                       <div
                         className={`p-2 rounded-xl shrink-0 transition-colors ${
                           isSelected
                             ? "bg-[#CDF22B] text-slate-950"
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
+                            : "bg-slate-100 dark:bg-[#171915] text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-white/10"
                         }`}
                       >
                         {icon}
@@ -402,7 +402,7 @@ export default function SearchModal({
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                className="space-y-2.5 p-4 rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80"
+                className="space-y-2.5 p-4 rounded-2xl bg-slate-100/70 dark:bg-[#1e231b]/80 border border-slate-200/80 dark:border-white/10"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 font-bold text-foreground text-xs">
@@ -425,7 +425,7 @@ export default function SearchModal({
                     className={`px-3 py-1.5 rounded-xl font-medium transition-all cursor-pointer ${
                       selectedSubCategory === "all"
                         ? "bg-[#CDF22B] text-slate-950 font-bold shadow-xs"
-                        : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-muted-foreground hover:text-foreground"
+                        : "bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     All Sub-fields
@@ -439,7 +439,7 @@ export default function SearchModal({
                         className={`px-3 py-1.5 rounded-xl font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                           isSubSelected
                             ? "bg-[#CDF22B] text-slate-950 font-bold shadow-xs"
-                            : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-muted-foreground hover:text-foreground hover:border-slate-400"
+                            : "bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-muted-foreground hover:text-foreground hover:border-slate-400"
                         }`}
                       >
                         <span>{sub.name}</span>
@@ -478,7 +478,7 @@ export default function SearchModal({
                       className={`px-3.5 py-1.5 rounded-full border text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                         isToolActive
                           ? "bg-[#CDF22B] text-slate-950 border-slate-900 dark:border-[#CDF22B] shadow-xs"
-                          : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-muted-foreground hover:text-foreground hover:border-slate-300"
+                          : "border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e231b]/60 text-muted-foreground hover:text-foreground hover:border-slate-300"
                       }`}
                     >
                       <span>{tool}</span>
@@ -505,7 +505,7 @@ export default function SearchModal({
                       className={`px-4 py-2 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                         isTfSelected
                           ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent font-bold"
-                          : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-muted-foreground hover:text-foreground"
+                          : "border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e231b]/60 text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       <span>{tf.label}</span>
@@ -518,11 +518,11 @@ export default function SearchModal({
           </div>
 
           {/* Modal Footer Controls */}
-          <div className="p-4 sm:p-5 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-900/60 flex flex-wrap items-center justify-between gap-3">
+          <div className="p-4 sm:p-5 border-t border-slate-200/80 dark:border-white/10 bg-slate-50/80 dark:bg-[#070905] flex flex-wrap items-center justify-between gap-3">
             <button
               onClick={handleResetFilters}
               disabled={activeFiltersCount === 0}
-              className="px-4 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <RotateCcw size={13} />
               <span>Reset All ({activeFiltersCount})</span>

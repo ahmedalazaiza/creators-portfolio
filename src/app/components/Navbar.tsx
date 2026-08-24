@@ -395,7 +395,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
 
                       {/* Subcategories list */}
                       {isExpanded && cat.subCategories && (
-                        <div className="bg-slate-50/70 dark:bg-slate-900/50 pl-6 pr-3 py-1.5 space-y-1 text-[11px]">
+                        <div className="bg-slate-50/70 dark:bg-[#070905]/70 pl-6 pr-3 py-1.5 space-y-1 text-[11px]">
                           {cat.subCategories.map((sub) => (
                             <Link
                               key={sub.id}

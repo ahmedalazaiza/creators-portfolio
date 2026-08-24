@@ -362,7 +362,7 @@ export default function ProjectEditorPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Aura — Kinetic Spatial Design System"
-                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
               />
             </div>
 
@@ -374,7 +374,7 @@ export default function ProjectEditorPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-foreground text-xs sm:text-sm focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all cursor-pointer font-medium"
+                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-foreground text-xs sm:text-sm focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all cursor-pointer font-medium"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
@@ -391,7 +391,7 @@ export default function ProjectEditorPage() {
                 <input
                   type="text"
                   defaultValue={new Date().getFullYear().toString()}
-                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-foreground text-xs sm:text-sm focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all"
+                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-foreground text-xs sm:text-sm focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all"
                 />
               </div>
             </div>
@@ -406,13 +406,13 @@ export default function ProjectEditorPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe the background, creative challenges, aesthetic decisions, and deliverables..."
-                className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all resize-none leading-relaxed"
+                className="w-full p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all resize-none leading-relaxed"
               />
             </div>
           </div>
 
           {/* Section 2: Cover Image (Required) */}
-          <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/10">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-foreground">
                 Cover Image <span className="text-rose-500">* (Main Showcase)</span>
@@ -437,7 +437,7 @@ export default function ProjectEditorPage() {
             />
 
             {coverImage ? (
-              <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 group aspect-video sm:aspect-21/9 bg-slate-100 dark:bg-slate-900">
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 group aspect-video sm:aspect-21/9 bg-slate-100 dark:bg-[#171915]">
                 <img
                   src={coverImage}
                   alt="Project cover preview"
@@ -456,7 +456,7 @@ export default function ProjectEditorPage() {
             ) : (
               <div
                 onClick={() => coverInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-[#CDF22B] rounded-3xl p-8 sm:p-12 text-center space-y-3 bg-slate-50/50 dark:bg-slate-900/30 cursor-pointer transition-colors group"
+                className="border-2 border-dashed border-slate-200 dark:border-white/15 hover:border-[#CDF22B] rounded-3xl p-8 sm:p-12 text-center space-y-3 bg-slate-50/50 dark:bg-[#171915]/60 cursor-pointer transition-colors group"
               >
                 <div className="w-14 h-14 rounded-2xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto group-hover:scale-105 transition-transform">
                   {uploadingCover ? (
@@ -494,7 +494,7 @@ export default function ProjectEditorPage() {
                       const val = e.target.value.trim();
                       if (val) setCoverImage(val);
                     }}
-                    className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
+                    className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#171915] text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
                   />
                 </div>
               </div>
@@ -502,7 +502,7 @@ export default function ProjectEditorPage() {
           </div>
 
           {/* Section 3: Multi-image Gallery */}
-          <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/10">
             <div className="flex items-center justify-between">
               <div>
                 <label className="block text-xs font-semibold text-foreground">
@@ -516,7 +516,7 @@ export default function ProjectEditorPage() {
               <button
                 type="button"
                 onClick={() => galleryInputRef.current?.click()}
-                className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-foreground text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-foreground text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Plus size={13} />
                 <span>Add Images</span>
@@ -538,7 +538,7 @@ export default function ProjectEditorPage() {
                 {galleryImages.map((imgUrl, index) => (
                   <div
                     key={index}
-                    className="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 group bg-slate-100 dark:bg-slate-900"
+                    className="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 group bg-slate-100 dark:bg-[#171915]"
                   >
                     <img
                       src={imgUrl}
@@ -665,12 +665,12 @@ export default function ProjectEditorPage() {
                     }
                   }}
                   placeholder="Type a tag and press Add..."
-                  className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
+                  className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#171915] text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B]"
                 />
                 <button
                   type="button"
                   onClick={handleAddTag}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-semibold text-foreground cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-xs font-semibold text-foreground cursor-pointer"
                 >
                   Add
                 </button>

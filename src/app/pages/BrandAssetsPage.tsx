@@ -22,7 +22,7 @@ export default function BrandAssetsPage() {
 
       {/* Header */}
       <div className="space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-slate-800 text-[#CDF22B] text-xs font-bold border border-slate-800 dark:border-slate-700 shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-[#171915] text-[#CDF22B] text-xs font-bold border border-slate-800 dark:border-white/10 shadow-2xs">
           <Sparkles size={14} />
           <span>Brand Identity Kit</span>
         </div>
@@ -37,7 +37,7 @@ export default function BrandAssetsPage() {
       {/* Brand Kit Cards */}
       <div className="space-y-6 text-xs sm:text-sm leading-relaxed text-muted-foreground">
         {/* Logo Section */}
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-5">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
               <Layers size={18} className="text-slate-900 dark:text-[#CDF22B]" />
@@ -58,7 +58,7 @@ export default function BrandAssetsPage() {
             </div>
 
             {/* Dark Preview */}
-            <div className="p-8 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center gap-2">
+            <div className="p-8 rounded-2xl bg-[#070905] border border-white/10 flex items-center justify-center gap-2">
               <div className="w-8 h-8 rounded-xl bg-[#CDF22B] text-slate-900 flex items-center justify-center font-bold">
                 <Sparkles size={16} />
               </div>
@@ -70,14 +70,14 @@ export default function BrandAssetsPage() {
         </div>
 
         {/* Color Palette */}
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <Palette size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>Color Tokens</h2>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
+            <div className="p-3 rounded-2xl border border-slate-200 dark:border-white/10 space-y-2">
               <div className="h-16 rounded-xl bg-[#CDF22B] shadow-sm" />
               <div>
                 <div className="font-bold text-foreground text-xs">Volt Lime</div>
@@ -85,23 +85,23 @@ export default function BrandAssetsPage() {
               </div>
             </div>
 
-            <div className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="h-16 rounded-xl bg-slate-950 border border-slate-800" />
+            <div className="p-3 rounded-2xl border border-slate-200 dark:border-white/10 space-y-2">
+              <div className="h-16 rounded-xl bg-[#070905] border border-white/10" />
               <div>
-                <div className="font-bold text-foreground text-xs">Obsidian Navy</div>
-                <div className="text-[11px] font-mono text-muted-foreground">#090D16</div>
+                <div className="font-bold text-foreground text-xs">Obsidian Black</div>
+                <div className="text-[11px] font-mono text-muted-foreground">#070905</div>
               </div>
             </div>
 
-            <div className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="h-16 rounded-xl bg-slate-100 border border-slate-200 dark:border-slate-700" />
+            <div className="p-3 rounded-2xl border border-slate-200 dark:border-white/10 space-y-2">
+              <div className="h-16 rounded-xl bg-[#171915] border border-white/10" />
               <div>
-                <div className="font-bold text-foreground text-xs">Soft Slate</div>
-                <div className="text-[11px] font-mono text-muted-foreground">#F8FAFC</div>
+                <div className="font-bold text-foreground text-xs">Elevated Surface</div>
+                <div className="text-[11px] font-mono text-muted-foreground">#171915</div>
               </div>
             </div>
 
-            <div className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
+            <div className="p-3 rounded-2xl border border-slate-200 dark:border-white/10 space-y-2">
               <div className="h-16 rounded-xl bg-gradient-to-r from-[#CDF22B] to-emerald-400" />
               <div>
                 <div className="font-bold text-foreground text-xs">Atmospheric Glow</div>

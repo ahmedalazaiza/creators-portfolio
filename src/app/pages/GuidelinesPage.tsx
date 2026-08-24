@@ -22,7 +22,7 @@ export default function GuidelinesPage() {
 
       {/* Header */}
       <div className="space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-slate-800 text-[#CDF22B] text-xs font-bold border border-slate-800 dark:border-slate-700 shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 dark:bg-[#171915] text-[#CDF22B] text-xs font-bold border border-slate-800 dark:border-white/10 shadow-2xs">
           <Sparkles size={14} />
           <span>Curatorial Standards</span>
         </div>
@@ -36,7 +36,7 @@ export default function GuidelinesPage() {
 
       {/* Guidelines Grid */}
       <div className="space-y-6 text-xs sm:text-sm leading-relaxed text-muted-foreground">
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <Image size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>1. Image Resolution & Visual Craft</h2>
@@ -48,7 +48,7 @@ export default function GuidelinesPage() {
           </ul>
         </div>
 
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <CheckCircle size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>2. Curatorial Curation Criteria</h2>
@@ -58,7 +58,7 @@ export default function GuidelinesPage() {
           </p>
         </div>
 
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <Lightbulb size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>3. Multi-Disciplinary Tags & Tools</h2>

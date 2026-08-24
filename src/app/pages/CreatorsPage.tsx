@@ -206,7 +206,7 @@ export default function CreatorsPage() {
                       <img
                         src={creator.avatarUrl}
                         alt={creator.fullName}
-                        className="w-18 h-18 rounded-2xl object-cover bg-slate-100 dark:bg-slate-800 border-2 border-background shadow-lg"
+                        className="w-18 h-18 rounded-2xl object-cover bg-slate-100 dark:bg-[#171915] border-2 border-background shadow-lg"
                       />
                       {creator.availableForWork && (
                         <span
@@ -223,7 +223,7 @@ export default function CreatorsPage() {
                         onClick={(e) => handleFollow(e, creator)}
                         className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5 ${
                           following
-                            ? "bg-slate-200 dark:bg-slate-800 text-foreground hover:bg-rose-500 hover:text-white"
+                            ? "bg-slate-200 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground hover:bg-rose-500 hover:text-white"
                             : "btn-primary text-slate-950"
                         }`}
                       >
@@ -270,7 +270,7 @@ export default function CreatorsPage() {
                         {creator.skills.slice(0, 3).map((s) => (
                           <span
                             key={s}
-                            className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-foreground border border-slate-200 dark:border-slate-700"
+                            className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-[#1e231b] text-[10px] font-semibold text-foreground border border-slate-200 dark:border-white/10"
                           >
                             {s}
                           </span>
@@ -281,7 +281,7 @@ export default function CreatorsPage() {
                 </div>
 
                 {/* Footer Metrics */}
-                <div className="px-6 py-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex items-center justify-between text-[11px] text-muted-foreground font-medium">
+                <div className="px-6 py-3 border-t border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-[#070905]/40 flex items-center justify-between text-[11px] text-muted-foreground font-medium">
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1">
                       <Grid size={12} /> {creatorProjectsCount} Works
@@ -293,10 +293,10 @@ export default function CreatorsPage() {
 
                   <Link
                     to={`/@${creator.username}`}
-                    className="text-xs font-bold text-slate-900 dark:text-[#CDF22B] hover:underline flex items-center gap-1"
+                    className="font-bold text-foreground hover:text-slate-900 dark:hover:text-[#CDF22B] flex items-center gap-1 transition-colors"
                   >
                     <span>View Profile</span>
-                    <ArrowRight size={11} />
+                    <ArrowRight size={12} />
                   </Link>
                 </div>
               </motion.div>
@@ -305,8 +305,8 @@ export default function CreatorsPage() {
         </div>
       ) : (
         /* Empty State */
-        <div className="glass-card rounded-3xl p-12 sm:p-16 text-center space-y-4 max-w-md mx-auto border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-muted-foreground flex items-center justify-center mx-auto">
+        <div className="glass-card rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 sm:p-16 text-center space-y-4 max-w-md mx-auto shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-[#171915] text-muted-foreground flex items-center justify-center mx-auto">
             <Users size={28} />
           </div>
           <div className="space-y-1">

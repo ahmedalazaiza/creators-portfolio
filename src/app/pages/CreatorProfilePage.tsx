@@ -563,15 +563,15 @@ export default function CreatorProfilePage() {
           </div>
 
           {/* ─── 4 Statistics Metrics Bar ──────────────────────────────── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-200/80 dark:border-white/10">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-center">
               <p className="text-lg sm:text-2xl font-bold font-display text-foreground">
                 {creatorProjects.length}
               </p>
               <p className="text-[11px] text-muted-foreground font-medium">Projects</p>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-center">
               <p className="text-lg sm:text-2xl font-bold font-display text-foreground flex items-center justify-center gap-1.5">
                 <Heart size={16} className="text-slate-900 dark:text-[#CDF22B] fill-current" />
                 <span>{totalAppreciations}</span>
@@ -579,14 +579,14 @@ export default function CreatorProfilePage() {
               <p className="text-[11px] text-muted-foreground font-medium">Appreciations</p>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-center">
               <p className="text-lg sm:text-2xl font-bold font-display text-foreground">
                 {liveFollowersCount}
               </p>
               <p className="text-[11px] text-muted-foreground font-medium">Followers</p>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-center">
               <p className="text-lg sm:text-2xl font-bold font-display text-foreground">
                 {profile.followingCount}
               </p>
@@ -596,14 +596,14 @@ export default function CreatorProfilePage() {
         </div>
       </div>
 
-      {/* ─── 2. Profile Tabs Navigation ───────────────────────────────── */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-1">
+      {/* ─── 2. Tab Navigation Bar ───────────────────────────────────── */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-white/10 pb-1">
         <button
           onClick={() => setActiveTab("projects")}
           className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
             activeTab === "projects"
               ? "bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 shadow-xs"
-              : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+              : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
           }`}
         >
           <Grid size={14} />
@@ -615,7 +615,7 @@ export default function CreatorProfilePage() {
           className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
             activeTab === "about"
               ? "bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 shadow-xs"
-              : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+              : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
           }`}
         >
           <User size={14} />
@@ -628,7 +628,7 @@ export default function CreatorProfilePage() {
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
               activeTab === "saved"
                 ? "bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+                : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
             }`}
           >
             <Bookmark size={14} />

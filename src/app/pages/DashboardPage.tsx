@@ -90,10 +90,10 @@ export default function DashboardPage() {
 
       {/* 3 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-        <div className="glass-card p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-2">
+        <div className="glass-card p-6 rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs font-semibold">Total Project Views</span>
-            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-foreground">
+            <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1e231b] text-foreground">
               <Eye size={16} />
             </div>
           </div>
@@ -105,10 +105,10 @@ export default function DashboardPage() {
           </span>
         </div>
 
-        <div className="glass-card p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-2">
+        <div className="glass-card p-6 rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs font-semibold">Appreciations & Likes</span>
-            <div className="p-2 rounded-xl bg-slate-900 dark:bg-slate-800 text-[#CDF22B]">
+            <div className="p-2 rounded-xl bg-slate-900 dark:bg-[#1e231b] text-[#CDF22B]">
               <Heart size={16} />
             </div>
           </div>
@@ -120,10 +120,10 @@ export default function DashboardPage() {
           </span>
         </div>
 
-        <div className="glass-card p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-2">
+        <div className="glass-card p-6 rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs font-semibold">Published Projects</span>
-            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-foreground">
+            <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#1e231b] text-foreground">
               <Grid size={16} />
             </div>
           </div>
@@ -149,9 +149,9 @@ export default function DashboardPage() {
             {userProjects.map((p) => (
               <div
                 key={p.id}
-                className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800/80 shadow-xs flex flex-col justify-between"
+                className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-xs flex flex-col justify-between"
               >
-                <div className="relative aspect-video bg-slate-100 dark:bg-slate-900">
+                <div className="relative aspect-video bg-slate-100 dark:bg-[#171915]">
                   <img
                     src={p.coverImage}
                     alt={p.title}
