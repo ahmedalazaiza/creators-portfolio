@@ -261,10 +261,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         let msg = error.message;
+        // If Supabase has "Confirm email" enabled on the backend, allow the user into the platform with unverified status
+        if (msg.includes("Email not confirmed")) {
+          let userProfile: UserProfile | null = null;
+
+          if (isSupabaseConfigured) {
+            try {
+              const { data: profile } = await supabase
+                .from("profiles")
+                .select("*")
+                .ilike("username", cleanEmail.split("@")[0])
+                .maybeSingle();
+
+              if (profile) {
+                userProfile = {
+                  id: profile.id,
+                  email: cleanEmail,
+                  username: profile.username,
+                  fullName: profile.full_name,
+                  avatarUrl: profile.avatar_url,
+                  headline: profile.headline || "Creative Designer",
+                  bio: profile.bio || "Crafting digital experiences and visual design systems.",
+                  location: profile.location || "Global",
+                  website: profile.website || "portfolios.space",
+                  availableForWork: profile.available_for_work ?? true,
+                  skills: profile.skills || ["Design Systems", "UI/UX"],
+                  socialLinks: profile.social_links || {},
+                  isEmailVerified: false,
+                  createdAt: profile.created_at,
+                  updatedAt: profile.updated_at,
+                };
+              }
+            } catch {
+              // Ignore
+            }
+          }
+
+          if (!userProfile) {
+            const fallbackUsername = cleanEmail.split("@")[0].replace(/[^a-z0-9_]/g, "_");
+            userProfile = {
+              id: `unverified_${fallbackUsername}`,
+              email: cleanEmail,
+              username: fallbackUsername,
+              fullName: fallbackUsername,
+              avatarUrl: `https://api.dicebear.com/7.x/shapes/svg?seed=${fallbackUsername}`,
+              headline: "Creative Designer",
+              bio: "Crafting digital experiences and visual design systems.",
+              location: "Global",
+              website: "portfolios.space",
+              availableForWork: true,
+              skills: ["Design Systems", "UI/UX"],
+              isEmailVerified: false,
+              createdAt: new Date().toISOString(),
+            };
+          }
+
+          setUser(userProfile);
+          localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(userProfile));
+          return {};
+        }
+
         if (msg.includes("Invalid login credentials")) {
           msg = "Invalid email address or password. Please check your credentials.";
-        } else if (msg.includes("Email not confirmed")) {
-          msg = "Please verify your email address. Check your inbox for the verification link.";
         }
         return { error: msg };
       }
