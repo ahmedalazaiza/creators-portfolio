@@ -187,29 +187,32 @@ export default function SearchModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-hidden">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity"
           />
 
-          {/* Modal Box */}
+          {/* Modal / Bottom Sheet Box */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 12 }}
-            transition={{ duration: 0.2 }}
-            className="relative w-full max-w-2xl bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 rounded-[32px] overflow-hidden z-10 flex flex-col max-h-[88vh]"
+            initial={{ opacity: 0, y: 50, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.98 }}
+            transition={{ type: "spring", damping: 26, stiffness: 320 }}
+            className="relative w-full sm:max-w-2xl bg-white dark:bg-[#151813] border-t sm:border border-slate-300 dark:border-white/15 rounded-t-[32px] sm:rounded-[32px] overflow-hidden z-10 flex flex-col max-h-[92vh] sm:max-h-[88vh] shadow-2xl pb-[max(0.75rem,env(safe-area-inset-bottom,0.75rem))] sm:pb-0"
           >
+            {/* Mobile Drag Indicator Bar */}
+            <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-white/20 mx-auto mt-3 mb-1 sm:hidden shrink-0" />
+
             {/* Header: Clean Search Input Bar */}
             <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#11130e]">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center shrink-0 font-bold">
-                  <Search size={16} />
+                <div className="w-10 h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center shrink-0 font-bold shadow-xs">
+                  <Search size={17} />
                 </div>
 
                 <input
@@ -219,24 +222,25 @@ export default function SearchModal({
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleApply()}
                   placeholder="Search projects, creators, tools..."
-                  className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-sm sm:text-base font-medium focus:outline-none"
+                  className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-sm sm:text-base font-medium focus:outline-none min-h-[44px]"
                 />
 
                 {query && (
                   <button
                     onClick={() => setQuery("")}
-                    className="p-1.5 text-muted-foreground hover:text-foreground rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                    className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                    aria-label="Clear search"
                   >
-                    <X size={14} />
+                    <X size={15} />
                   </button>
                 )}
 
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                  className="w-10 h-10 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
                   aria-label="Close search"
                 >
-                  <X size={16} />
+                  <X size={18} />
                 </button>
               </div>
             </div>
@@ -379,27 +383,27 @@ export default function SearchModal({
             </div>
 
             {/* Footer Actions */}
-            <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#11130e] flex items-center justify-between gap-3">
+            <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#11130e] flex items-center justify-between gap-2 sm:gap-3">
               <button
                 onClick={handleResetFilters}
                 disabled={activeFiltersCount === 0}
-                className="px-3.5 py-2 rounded-full text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="min-h-[44px] px-3.5 py-2 rounded-full text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed transition-colors active:scale-95"
               >
-                <RotateCcw size={12} />
-                <span>Reset all</span>
+                <RotateCcw size={13} />
+                <span>Reset</span>
               </button>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-xs font-semibold text-foreground transition-colors cursor-pointer"
+                  className="min-h-[44px] px-4 py-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-xs font-semibold text-foreground transition-colors cursor-pointer active:scale-95"
                 >
                   Cancel
                 </button>
 
                 <button
                   onClick={() => handleApply()}
-                  className="px-5 py-2 rounded-full btn-primary text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
+                  className="min-h-[44px] px-5 py-2 rounded-full btn-primary text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
                 >
                   <span>Show {matchingProjects.length} Projects</span>
                   <ArrowRight size={13} />

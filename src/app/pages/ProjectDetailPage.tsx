@@ -236,9 +236,9 @@ export default function ProjectDetailPage() {
               navigate("/");
             }
           }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="min-h-[40px] px-3.5 py-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer active:scale-95"
         >
-          <ArrowLeft size={14} />
+          <ArrowLeft size={15} />
           <span>Back</span>
         </button>
 
@@ -246,20 +246,20 @@ export default function ProjectDetailPage() {
           {isOwner && (
             <Link
               to={`/project/edit/${project.id}`}
-              className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-foreground text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="min-h-[40px] px-4 py-2 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-foreground text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer active:scale-95"
             >
-              <Edit3 size={13} />
+              <Edit3 size={14} />
               <span>Edit Project</span>
             </Link>
           )}
 
           <button
             onClick={handleShare}
-            className="p-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors cursor-pointer active:scale-95"
             title="Share Project"
             aria-label="Share project"
           >
-            <Share2 size={15} />
+            <Share2 size={16} />
           </button>
         </div>
       </div>
@@ -311,24 +311,38 @@ export default function ProjectDetailPage() {
               onClick={handleToggleFavorite}
               aria-label="Save to favorites"
               title={isLoggedIn ? (isSaved ? "Saved to Favorites" : "Save to Favorites") : "Sign in to save"}
-              className={`p-2.5 rounded-full text-xs font-bold flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95 ${
+              className={`w-10 h-10 min-w-[40px] min-h-[40px] rounded-full text-xs font-bold flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95 ${
                 isSaved
-                  ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/30 font-bold"
-                  : "glass-card hover:bg-[#CDF22B] hover:text-slate-950 text-foreground border border-slate-200 dark:border-white/10"
+                  ? "bg-slate-900 text-white dark:bg-[#CDF22B] dark:text-slate-950 shadow-md font-bold"
+                  : "glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground border border-slate-200 dark:border-white/10"
               }`}
             >
-              <Bookmark size={15} className={isSaved ? "fill-current text-slate-950" : ""} />
+              <Bookmark
+                size={16}
+                className={
+                  isSaved
+                    ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                    : ""
+                }
+              />
             </button>
 
             <button
               onClick={handleAppreciate}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
+              className={`min-h-[40px] px-5 py-2 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
                 isLiked
-                  ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/35 border border-[#CDF22B]"
+                  ? "bg-rose-500 text-white border border-rose-500 shadow-md shadow-rose-500/25 dark:bg-[#CDF22B] dark:text-slate-950 dark:border-[#CDF22B]"
                   : "glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground border border-slate-200 dark:border-white/10 hover:border-[#CDF22B]/60"
               }`}
             >
-              <Heart size={15} className={isLiked ? "fill-slate-950 text-slate-950" : "text-foreground"} />
+              <Heart
+                size={15}
+                className={
+                  isLiked
+                    ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                    : "text-foreground"
+                }
+              />
               <span>{isLiked ? "Appreciated" : "Appreciate"}</span>
               <span className="opacity-80 font-mono">({likesCount})</span>
             </button>

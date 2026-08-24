@@ -55,7 +55,7 @@ export default function FilterBar({
             <button
               key={cat.id}
               onClick={() => onSelectCategory(cat.slug)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+              className={`min-h-[38px] px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 active:scale-95 ${
                 isSelected
                   ? "bg-primary text-primary-foreground shadow-[0_0_12px_rgba(205,242,43,0.25)]"
                   : "bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/60"
@@ -78,13 +78,13 @@ export default function FilterBar({
                 setToolDropdownOpen(!toolDropdownOpen);
                 setSortDropdownOpen(false);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
+              className={`min-h-[38px] flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer active:scale-95 ${
                 activeTool
                   ? "border-[#CDF22B]/50 bg-[#CDF22B]/15 text-slate-900 dark:text-[#CDF22B]"
                   : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
-              <Wrench size={12} className={activeTool ? "text-slate-900 dark:text-[#CDF22B]" : ""} />
+              <Wrench size={13} className={activeTool ? "text-slate-900 dark:text-[#CDF22B]" : ""} />
               <span>{activeTool ? `Tool: ${activeTool}` : "Tools Used"}</span>
               <ChevronDown size={13} />
             </button>
@@ -130,9 +130,9 @@ export default function FilterBar({
           {activeFilterCount > 0 && (
             <button
               onClick={onClearFilters}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-xs font-semibold hover:bg-destructive/20 transition-colors cursor-pointer"
+              className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-xs font-semibold hover:bg-destructive/20 transition-colors cursor-pointer active:scale-95"
             >
-              <X size={12} />
+              <X size={13} />
               <span>Reset Filters ({activeFilterCount})</span>
             </button>
           )}
@@ -145,9 +145,9 @@ export default function FilterBar({
               setSortDropdownOpen(!sortDropdownOpen);
               setToolDropdownOpen(false);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold transition-all cursor-pointer"
+            className="min-h-[38px] flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold transition-all cursor-pointer active:scale-95"
           >
-            <ArrowUpDown size={12} className="text-slate-900 dark:text-[#CDF22B]" />
+            <ArrowUpDown size={13} className="text-slate-900 dark:text-[#CDF22B]" />
             <span>Sort: {SORT_LABELS[sortBy]}</span>
             <ChevronDown size={13} />
           </button>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
 import { AnimatePresence } from "motion/react";
 import Navbar from "./components/Navbar";
+import MobileBottomNav from "./components/MobileBottomNav";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
@@ -107,7 +108,7 @@ function AppContent({
       {!isAuthPage && <Navbar isDark={isDark} onToggleTheme={onToggleTheme} />}
       {!isAuthPage && <EmailVerificationBanner />}
 
-      <div className="flex-1">
+      <div className="flex-1 pb-16 md:pb-0">
         <Routes>
           {/* 1. Public Discovery & Feeds */}
           <Route path="/" element={<HomePage />} />
@@ -214,6 +215,7 @@ function AppContent({
       </div>
 
       {!isAuthPage && <Footer />}
+      {!isAuthPage && <MobileBottomNav />}
     </div>
   );
 }

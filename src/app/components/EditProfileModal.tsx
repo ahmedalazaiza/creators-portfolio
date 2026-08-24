@@ -133,17 +133,21 @@ export default function EditProfileModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/75 backdrop-blur-md overflow-y-auto">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 16 }}
-        className="glass-card w-full max-w-2xl rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col"
+        initial={{ opacity: 0, y: 50, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 50, scale: 0.98 }}
+        transition={{ type: "spring", damping: 26, stiffness: 320 }}
+        className="glass-card w-full sm:max-w-2xl rounded-t-[32px] sm:rounded-3xl border-t sm:border border-slate-200/80 dark:border-white/10 shadow-2xl overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col sm:my-auto pb-[max(1rem,env(safe-area-inset-bottom,1rem))] sm:pb-0"
       >
+        {/* Mobile Drag Indicator Bar */}
+        <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-white/20 mx-auto mt-3 mb-1 sm:hidden shrink-0" />
+
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-200/80 dark:border-white/10 flex items-center justify-between bg-card/60">
+        <div className="p-4 sm:p-6 border-b border-slate-200/80 dark:border-white/10 flex items-center justify-between bg-card/60">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center font-bold shadow-md shadow-[#CDF22B]/20">
+            <div className="w-10 h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center font-bold shadow-md shadow-[#CDF22B]/20 shrink-0">
               <User size={18} />
             </div>
             <div>
@@ -159,7 +163,7 @@ export default function EditProfileModal({
           <button
             onClick={onClose}
             aria-label="Close modal"
-            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
           >
             <X size={18} />
           </button>
@@ -390,7 +394,7 @@ export default function EditProfileModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-full btn-secondary text-xs font-semibold cursor-pointer"
+              className="min-h-[44px] px-5 py-2.5 rounded-full btn-secondary text-xs font-semibold cursor-pointer active:scale-95"
             >
               Cancel
             </button>
@@ -398,11 +402,11 @@ export default function EditProfileModal({
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2.5 rounded-full btn-primary text-xs font-bold shadow-md flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
+              className="min-h-[44px] px-6 py-2.5 rounded-full btn-primary text-slate-950 text-xs font-bold shadow-md flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
             >
               {savedSuccess ? (
                 <>
-                  <Check size={14} />
+                  <Check size={14} strokeWidth={2.5} />
                   <span>Profile Updated!</span>
                 </>
               ) : (

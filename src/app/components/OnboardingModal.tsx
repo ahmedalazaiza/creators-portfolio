@@ -50,7 +50,7 @@ export default function OnboardingModal() {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div className="fixed inset-0 z-[99999] flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -60,14 +60,17 @@ export default function OnboardingModal() {
           className="fixed inset-0 bg-black/80 backdrop-blur-xs transition-opacity"
         />
 
-        {/* Modal Window */}
+        {/* Modal / Bottom Sheet Window */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: 15 }}
-          transition={{ duration: 0.2 }}
-          className="relative w-full max-w-lg bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 rounded-[32px] overflow-hidden z-10 flex flex-col p-6 sm:p-8 space-y-6 my-auto"
+          initial={{ opacity: 0, y: 50, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 50, scale: 0.98 }}
+          transition={{ type: "spring", damping: 26, stiffness: 320 }}
+          className="relative w-full sm:max-w-lg bg-white dark:bg-[#151813] border-t sm:border border-slate-300 dark:border-white/15 rounded-t-[32px] sm:rounded-[32px] overflow-hidden z-10 flex flex-col p-6 sm:p-8 space-y-6 pb-[max(1.25rem,env(safe-area-inset-bottom,1.25rem))] sm:pb-8 sm:my-auto shadow-2xl"
         >
+          {/* Mobile Drag Indicator Bar */}
+          <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-white/20 mx-auto -mt-3 mb-1 sm:hidden shrink-0" />
+
           {/* Header Pill */}
           <div className="flex items-center justify-between">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 text-[11px] font-mono font-bold">
@@ -77,10 +80,10 @@ export default function OnboardingModal() {
 
             <button
               onClick={handleFinish}
-              className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Close welcome modal"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
           </div>
 

@@ -93,7 +93,7 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -103,16 +103,19 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
           className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity"
         />
 
-        {/* Modal Container */}
+        {/* Modal / Bottom Sheet Container */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 12 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: 12 }}
-          transition={{ duration: 0.2 }}
-          className="relative w-full max-w-lg bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 rounded-[32px] overflow-hidden z-10 flex flex-col my-auto"
+          initial={{ opacity: 0, y: 50, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 50, scale: 0.98 }}
+          transition={{ type: "spring", damping: 26, stiffness: 320 }}
+          className="relative w-full sm:max-w-lg bg-white dark:bg-[#151813] border-t sm:border border-slate-300 dark:border-white/15 rounded-t-[32px] sm:rounded-[32px] overflow-hidden z-10 flex flex-col max-h-[92vh] sm:max-h-[90vh] shadow-2xl pb-[max(1rem,env(safe-area-inset-bottom,1rem))] sm:pb-0 sm:my-auto"
         >
+          {/* Mobile Drag Indicator Bar */}
+          <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-white/20 mx-auto mt-3 mb-1 sm:hidden shrink-0" />
+
           {/* Header */}
-          <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#11130e] flex items-center justify-between gap-3">
+          <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#11130e] flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <img
                 src={creator.avatarUrl}
@@ -133,10 +136,10 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
 
             <button
               onClick={handleResetAndClose}
-              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+              className="w-10 h-10 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
               aria-label="Close modal"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
           </div>
 
@@ -276,7 +279,7 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="px-4 py-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-xs font-semibold text-foreground transition-colors cursor-pointer"
+                  className="min-h-[44px] px-4 py-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-xs font-semibold text-foreground transition-colors cursor-pointer active:scale-95"
                 >
                   Cancel
                 </button>
@@ -284,16 +287,16 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2 rounded-full btn-primary text-xs font-bold flex items-center gap-2 cursor-pointer active:scale-95 transition-transform disabled:opacity-50"
+                  className="min-h-[44px] px-6 py-2 rounded-full btn-primary text-xs font-bold flex items-center gap-2 cursor-pointer active:scale-95 transition-transform disabled:opacity-50"
                 >
                   {submitting ? (
                     <>
-                      <Loader2 size={13} className="animate-spin" />
+                      <Loader2 size={14} className="animate-spin" />
                       <span>Sending Inquiry...</span>
                     </>
                   ) : (
                     <>
-                      <Send size={13} />
+                      <Send size={14} />
                       <span>Send Project Request</span>
                     </>
                   )}

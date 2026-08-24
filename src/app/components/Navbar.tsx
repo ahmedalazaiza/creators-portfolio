@@ -161,9 +161,9 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               onClick={() => setSearchModalOpen(true)}
               aria-label="Open search and filter modal (⌘K)"
               title="Search & Filter (⌘K)"
-              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer group shadow-2xs"
+              className="w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer group shadow-2xs"
             >
-              <Search size={16} className="text-foreground group-hover:scale-105 transition-transform" />
+              <Search size={17} className="text-foreground group-hover:scale-105 transition-transform" />
             </button>
 
             {/* 2. Favorites / Liked Projects (Heart Icon - Brand Colored) */}
@@ -171,14 +171,14 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               to="/favorites"
               aria-label="My Favorites"
               title={favoritesCount > 0 ? `My Favorites (${favoritesCount})` : "My Favorites"}
-              className={`relative p-2 rounded-full transition-all cursor-pointer border ${
+              className={`relative w-10 h-10 flex items-center justify-center rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/favorites"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-[#0F172A] dark:text-[#CDF22B] font-bold shadow-2xs"
                   : "text-muted-foreground hover:text-foreground dark:hover:text-[#CDF22B] hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
               }`}
             >
               <Heart
-                size={16}
+                size={17}
                 className={
                   location.pathname === "/favorites"
                     ? "fill-current text-[#0F172A] dark:text-[#CDF22B]"
@@ -186,7 +186,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 }
               />
               {favoritesCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
+                <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
                   {favoritesCount > 99 ? "99+" : favoritesCount}
                 </span>
               )}
@@ -197,18 +197,18 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               to="/saved"
               aria-label="Saved Collections"
               title={savedCount > 0 ? `Saved Collections (${savedCount})` : "Saved Collections"}
-              className={`relative p-2 rounded-full transition-all cursor-pointer border ${
+              className={`relative w-10 h-10 flex items-center justify-center rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/saved"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-foreground font-bold shadow-2xs"
                   : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
               }`}
             >
               <Bookmark
-                size={16}
+                size={17}
                 className={location.pathname === "/saved" ? "fill-current text-foreground" : ""}
               />
               {savedCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
+                <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
                   {savedCount > 99 ? "99+" : savedCount}
                 </span>
               )}
@@ -218,9 +218,9 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             <button
               onClick={onToggleTheme}
               aria-label="Toggle color theme"
-              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
             >
-              {isDark ? <Sun size={16} className="text-[#CDF22B]" /> : <Moon size={16} />}
+              {isDark ? <Sun size={17} className="text-[#CDF22B]" /> : <Moon size={17} />}
             </button>
 
             {/* Logged In vs Logged Out State */}
@@ -239,7 +239,8 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center gap-2 p-1 rounded-full border border-slate-200 dark:border-white/10 hover:border-[#CDF22B] transition-colors cursor-pointer"
+                    aria-label="User menu"
+                    className="w-10 h-10 flex items-center justify-center p-1 rounded-full border border-slate-200 dark:border-white/10 hover:border-[#CDF22B] transition-colors cursor-pointer"
                   >
                     <img
                       src={
@@ -363,9 +364,10 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-full text-muted-foreground hover:text-foreground"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              className="md:hidden w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
             >
-              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
