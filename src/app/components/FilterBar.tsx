@@ -80,11 +80,11 @@ export default function FilterBar({
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
                 activeTool
-                  ? "border-primary/50 bg-primary/10 text-primary"
+                  ? "border-[#CDF22B]/50 bg-[#CDF22B]/15 text-slate-900 dark:text-[#CDF22B]"
                   : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
-              <Wrench size={12} className={activeTool ? "text-primary" : ""} />
+              <Wrench size={12} className={activeTool ? "text-slate-900 dark:text-[#CDF22B]" : ""} />
               <span>{activeTool ? `Tool: ${activeTool}` : "Tools Used"}</span>
               <ChevronDown size={13} />
             </button>
@@ -98,7 +98,7 @@ export default function FilterBar({
                   }}
                   className={`w-full text-left px-3 py-1.5 rounded-xl transition-colors flex items-center justify-between ${
                     !activeTool
-                      ? "bg-primary/10 text-primary font-bold"
+                      ? "bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] font-bold"
                       : "text-foreground hover:bg-muted"
                   }`}
                 >
@@ -114,7 +114,7 @@ export default function FilterBar({
                     }}
                     className={`w-full text-left px-3 py-1.5 rounded-xl transition-colors flex items-center justify-between ${
                       activeTool === tool
-                        ? "bg-primary/10 text-primary font-bold"
+                        ? "bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] font-bold"
                         : "text-foreground hover:bg-muted"
                     }`}
                   >
@@ -147,7 +147,7 @@ export default function FilterBar({
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold transition-all cursor-pointer"
           >
-            <ArrowUpDown size={12} className="text-primary" />
+            <ArrowUpDown size={12} className="text-slate-900 dark:text-[#CDF22B]" />
             <span>Sort: {SORT_LABELS[sortBy]}</span>
             <ChevronDown size={13} />
           </button>

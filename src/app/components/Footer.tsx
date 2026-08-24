@@ -252,7 +252,7 @@ export default function Footer() {
             <span>© {new Date().getFullYear()} Portfolios Inc.</span>
             <span>•</span>
             <span className="inline-flex items-center gap-1">
-              Crafted with calm energy for creators <Sparkles size={11} className="text-[#CDF22B]" />
+              Crafted with calm energy for creators <Sparkles size={11} className="text-slate-900 dark:text-[#CDF22B]" />
             </span>
           </div>
 

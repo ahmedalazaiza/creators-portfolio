@@ -87,20 +87,27 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           </span>
         </div>
 
-        {/* Hover Quick Appreciate & Save Overlay */}
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Quick Appreciate & Save Overlay (Always visible on mobile, hover on desktop) */}
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           {/* Favorite / Bookmark Button */}
           <button
             onClick={handleToggleFavorite}
             aria-label="Save to favorites"
             title={isLoggedIn ? (isSaved ? "Saved to Favorites" : "Save to Favorites") : "Sign in to save"}
-            className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-md ${
+            className={`w-9 h-9 sm:w-8 sm:h-8 min-w-[36px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] rounded-full backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95 ${
               isSaved
-                ? "bg-[#CDF22B] text-slate-950 border border-[#CDF22B] font-bold"
-                : "bg-slate-900/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 border border-white/25 hover:border-[#CDF22B]"
+                ? "bg-slate-900 text-white border border-slate-900 dark:bg-[#CDF22B] dark:text-slate-950 dark:border-[#CDF22B] font-bold"
+                : "bg-slate-900/85 text-white hover:bg-slate-900 hover:text-white dark:hover:bg-[#CDF22B] dark:hover:text-slate-950 border border-white/25 hover:border-white/40"
             }`}
           >
-            <Bookmark size={14} className={isSaved ? "fill-slate-950 text-slate-950" : "text-white"} />
+            <Bookmark
+              size={14}
+              className={
+                isSaved
+                  ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                  : "text-white"
+              }
+            />
           </button>
 
           {/* Like / Appreciate Button */}
@@ -108,13 +115,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             onClick={handleAppreciate}
             aria-label="Appreciate project"
             title={isLoggedIn ? "Appreciate project" : "Sign in to appreciate"}
-            className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-md ${
+            className={`w-9 h-9 sm:w-8 sm:h-8 min-w-[36px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] rounded-full backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95 ${
               isLiked
-                ? "bg-[#CDF22B] text-slate-950 border border-[#CDF22B] font-bold"
-                : "bg-slate-900/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 border border-white/25 hover:border-[#CDF22B]"
+                ? "bg-rose-500 text-white border border-rose-500 dark:bg-[#CDF22B] dark:text-slate-950 dark:border-[#CDF22B] font-bold"
+                : "bg-slate-900/85 text-white hover:bg-rose-500 hover:text-white dark:hover:bg-[#CDF22B] dark:hover:text-slate-950 border border-white/25 hover:border-transparent"
             }`}
           >
-            <Heart size={14} className={isLiked ? "fill-slate-950 text-slate-950" : "text-white"} />
+            <Heart
+              size={14}
+              className={
+                isLiked
+                  ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                  : "text-white"
+              }
+            />
           </button>
         </div>
       </Link>
@@ -148,19 +162,51 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </span>
           </Link>
 
-          {/* Appreciations & Views Metrics */}
-          <div className="flex items-center gap-3 text-muted-foreground text-[11px] shrink-0 font-medium">
+          {/* Appreciations, Save & Views Metrics */}
+          <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground text-[11px] shrink-0 font-medium">
+            {/* Appreciate Button */}
             <button
               onClick={handleAppreciate}
-              className={`flex items-center gap-1 hover:text-slate-900 dark:hover:text-[#CDF22B] transition-colors cursor-pointer ${
-                isLiked ? "text-slate-900 dark:text-[#CDF22B] font-bold" : ""
+              aria-label={isLiked ? "Unlike project" : "Appreciate project"}
+              className={`flex items-center gap-1 min-h-[36px] px-1.5 sm:px-2 py-1 -my-1 rounded-lg transition-colors cursor-pointer active:scale-95 ${
+                isLiked
+                  ? "text-rose-600 dark:text-[#CDF22B] font-bold"
+                  : "hover:text-slate-900 dark:hover:text-[#CDF22B]"
               }`}
             >
-              <Heart size={13} className={isLiked ? "fill-current text-[#CDF22B]" : ""} />
+              <Heart
+                size={13}
+                className={
+                  isLiked
+                    ? "fill-rose-500 text-rose-500 dark:fill-[#CDF22B] dark:text-[#CDF22B]"
+                    : "text-muted-foreground"
+                }
+              />
               <span>{likesCount}</span>
             </button>
 
-            <div className="flex items-center gap-1">
+            {/* Mobile Save Shortcut Button */}
+            <button
+              onClick={handleToggleFavorite}
+              aria-label={isSaved ? "Saved to favorites" : "Save to favorites"}
+              className={`flex md:hidden items-center gap-1 min-h-[36px] px-1.5 py-1 -my-1 rounded-lg transition-colors cursor-pointer active:scale-95 ${
+                isSaved
+                  ? "text-slate-900 dark:text-[#CDF22B] font-bold"
+                  : "hover:text-slate-900 dark:hover:text-[#CDF22B]"
+              }`}
+            >
+              <Bookmark
+                size={13}
+                className={
+                  isSaved
+                    ? "fill-slate-900 text-slate-900 dark:fill-[#CDF22B] dark:text-[#CDF22B]"
+                    : "text-muted-foreground"
+                }
+              />
+            </button>
+
+            {/* Views Count */}
+            <div className="flex items-center gap-1 min-h-[36px] px-1">
               <Eye size={13} />
               <span>{project.viewsCount || 0}</span>
             </div>
