@@ -118,9 +118,9 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
             </div>
 
             {/* 2-Column Split Layout */}
-            <div className="grid grid-cols-12 divide-x divide-slate-200 dark:divide-white/10 min-h-[310px]">
+            <div className="grid grid-cols-12 divide-x divide-slate-200 dark:divide-white/10 min-h-[320px]">
               {/* Left Column: Categories List */}
-              <div className="col-span-5 p-2.5 space-y-1 max-h-[350px] overflow-y-auto bg-slate-50/50 dark:bg-[#171915]">
+              <div className="col-span-5 p-2.5 space-y-1 max-h-[380px] overflow-y-auto custom-scrollbar bg-slate-50/50 dark:bg-[#171915]">
                 {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => {
                   const isHovered = (activeCategory?.slug || "ui-ux") === cat.slug;
                   const icon = CATEGORY_ICONS[cat.icon || "Sparkles"] || <Sparkles size={14} />;
@@ -180,7 +180,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
                   </div>
 
                   {/* Sub-categories List */}
-                  <div className="space-y-1">
+                  <div className="space-y-1 max-h-[290px] overflow-y-auto custom-scrollbar pr-1">
                     {activeCategory.subCategories?.map((sub) => (
                       <button
                         key={sub.id}

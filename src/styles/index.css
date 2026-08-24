@@ -1,89 +1,78 @@
-@import './fonts.css';
-@import './tailwind.css';
-@import './theme.css';
+@import "tailwindcss";
+@import "./theme.css";
 
 @layer utilities {
-  /* Completely hide scrollbars while preserving full touch/drag/wheel scrolling */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none !important; /* IE and Edge */
-    scrollbar-width: none !important; /* Firefox */
-  }
-
-  .glass-card {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.85);
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.02);
-  }
-
-  .dark .glass-card {
-    background: rgba(23, 25, 21, 0.9);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
-  }
-
   .glass-nav {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
   }
 
   .dark .glass-nav {
-    background: rgba(7, 9, 5, 0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: rgba(7, 9, 5, 0.85);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .glass-card {
+    background-color: var(--card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .dark .glass-card {
+    background-color: var(--card);
+  }
+
+  .project-card-hover {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .project-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .project-card-hover:hover {
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.7), 0 0 20px -5px rgba(205, 242, 43, 0.15);
   }
 
   .btn-primary {
     background-color: #CDF22B;
-    color: #0f172a;
+    color: #0F172A;
     font-weight: 700;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 10px rgba(205, 242, 43, 0.28);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dark .btn-primary {
+    background-color: #CDF22B;
+    color: #070905;
   }
 
   .btn-primary:hover {
-    background-color: #bfe61e;
-    box-shadow: 0 4px 16px rgba(205, 242, 43, 0.45);
+    filter: brightness(1.06);
     transform: translateY(-1px);
+    box-shadow: 0 4px 14px 0 rgba(205, 242, 43, 0.35);
   }
 
-  .btn-primary:active {
-    transform: translateY(0);
-  }
-
+  /* Secondary Button: #0F172A deep navy border & text in light mode, clean white/glass in dark mode */
   .btn-secondary {
     background-color: transparent;
-    color: #0f172a;
+    color: #0F172A;
     border: 1px solid rgba(15, 23, 42, 0.16);
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .btn-secondary:hover {
     background-color: rgba(15, 23, 42, 0.05);
-    border-color: #0f172a;
+    border-color: rgba(15, 23, 42, 0.3);
     transform: translateY(-1px);
   }
 
-  .btn-secondary:active {
-    transform: translateY(0);
-  }
-
   .dark .btn-secondary {
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.16);
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
   .dark .btn-secondary:hover {
@@ -139,4 +128,75 @@ body {
 ::-moz-selection {
   background-color: #CDF22B !important;
   color: #070905 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Global Custom Scrollbar Styling (Clean, Thin & Brand Aligned)
+   ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.18);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #CDF22B;
+}
+
+/* Firefox scrollbar compatibility */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 23, 42, 0.18) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+/* Custom dedicated utility for inner scroll containers (e.g. dropdowns, modals) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.18);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #0F172A;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #CDF22B;
 }
