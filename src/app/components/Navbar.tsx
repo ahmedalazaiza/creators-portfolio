@@ -22,6 +22,7 @@ import {
   Heart,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useProjects } from "../hooks/useProjects";
 import CategoryNavMenu from "./CategoryNavMenu";
 import SearchModal from "./SearchModal";
 import { CATEGORIES } from "../data/categories";
@@ -40,6 +41,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, isLoggedIn, signOut } = useAuth();
+  const { favoritesCount, savedCount } = useProjects(undefined, user?.id);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -168,8 +170,8 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             <Link
               to="/favorites"
               aria-label="My Favorites"
-              title="My Favorites"
-              className={`p-2 rounded-full transition-all cursor-pointer border ${
+              title={favoritesCount > 0 ? `My Favorites (${favoritesCount})` : "My Favorites"}
+              className={`relative p-2 rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/favorites"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-[#0F172A] dark:text-[#CDF22B] font-bold shadow-2xs"
                   : "text-muted-foreground hover:text-foreground dark:hover:text-[#CDF22B] hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
@@ -183,14 +185,19 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                     : ""
                 }
               />
+              {favoritesCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#CDF22B] text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
+                  {favoritesCount > 99 ? "99+" : favoritesCount}
+                </span>
+              )}
             </Link>
 
             {/* 3. Saved Collections / Bookmarks (Bookmark Icon) */}
             <Link
               to="/saved"
               aria-label="Saved Collections"
-              title="Saved Collections"
-              className={`p-2 rounded-full transition-all cursor-pointer border ${
+              title={savedCount > 0 ? `Saved Collections (${savedCount})` : "Saved Collections"}
+              className={`relative p-2 rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/saved"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-foreground font-bold shadow-2xs"
                   : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
@@ -200,6 +207,11 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 size={16}
                 className={location.pathname === "/saved" ? "fill-current text-foreground" : ""}
               />
+              {savedCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
+                  {savedCount > 99 ? "99+" : savedCount}
+                </span>
+              )}
             </Link>
 
             {/* 4. Theme Toggle */}
@@ -269,19 +281,33 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         <Link
                           to="/favorites"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
+                          className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
                         >
-                          <Heart size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
-                          <span>My Favorites</span>
+                          <div className="flex items-center gap-2.5">
+                            <Heart size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
+                            <span>My Favorites</span>
+                          </div>
+                          {favoritesCount > 0 && (
+                            <span className="px-2 py-0.5 rounded-full bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-[10px] font-mono font-bold">
+                              {favoritesCount}
+                            </span>
+                          )}
                         </Link>
 
                         <Link
                           to="/saved"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
+                          className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
                         >
-                          <Bookmark size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
-                          <span>Saved Collections</span>
+                          <div className="flex items-center gap-2.5">
+                            <Bookmark size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
+                            <span>Saved Collections</span>
+                          </div>
+                          {savedCount > 0 && (
+                            <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-foreground text-[10px] font-mono font-bold">
+                              {savedCount}
+                            </span>
+                          )}
                         </Link>
 
                         <Link
@@ -380,18 +406,32 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 <Link
                   to="/favorites"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
+                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
-                  <Heart size={15} className="text-foreground dark:text-[#CDF22B]" />
-                  <span>My Favorites</span>
+                  <div className="flex items-center gap-2">
+                    <Heart size={15} className="text-foreground dark:text-[#CDF22B]" />
+                    <span>My Favorites</span>
+                  </div>
+                  {favoritesCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-[#CDF22B] text-slate-950 text-[10px] font-mono font-bold">
+                      {favoritesCount}
+                    </span>
+                  )}
                 </Link>
                 <Link
                   to="/saved"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
+                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
-                  <Bookmark size={15} className="text-slate-800 dark:text-slate-200" />
-                  <span>Saved Collections</span>
+                  <div className="flex items-center gap-2">
+                    <Bookmark size={15} className="text-slate-800 dark:text-slate-200" />
+                    <span>Saved Collections</span>
+                  </div>
+                  {savedCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-foreground text-[10px] font-mono font-bold">
+                      {savedCount}
+                    </span>
+                  )}
                 </Link>
                 <Link
                   to="/creators"

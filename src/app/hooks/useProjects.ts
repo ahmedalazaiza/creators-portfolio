@@ -572,9 +572,14 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
     }
   }, []);
 
+  const favoritesCount = sortedProjects.filter((p) => Boolean(p.isAppreciated)).length;
+  const savedCount = sortedProjects.filter((p) => Boolean(p.isSaved)).length;
+
   return {
     projects: sortedProjects,
     allProjects: projects,
+    favoritesCount,
+    savedCount,
     loading,
     refreshProjects,
     getProjectBySlug,
@@ -588,3 +593,4 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
     deleteProject,
   };
 }
+
