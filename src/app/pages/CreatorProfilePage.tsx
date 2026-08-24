@@ -670,7 +670,7 @@ export default function CreatorProfilePage() {
             {/* Appreciations */}
             <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
               <div className="w-9 h-9 rounded-xl bg-slate-200/60 dark:bg-white/10 text-slate-900 dark:text-white flex items-center justify-center shrink-0">
-                <Heart size={17} className="fill-current" />
+                <Heart size={17} strokeWidth={2} />
               </div>
               <div className="min-w-0">
                 <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
