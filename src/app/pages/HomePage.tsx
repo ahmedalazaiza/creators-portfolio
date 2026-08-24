@@ -356,45 +356,6 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* Sub-Category Pills Row - Wrapped nicely */}
-        <AnimatePresence>
-          {currentCategoryObj.subCategories && currentCategoryObj.subCategories.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -6, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: "auto" }}
-              exit={{ opacity: 0, y: -6, height: 0 }}
-              className="flex flex-wrap items-center justify-center gap-1.5 max-w-4xl mx-auto py-1"
-            >
-              <button
-                onClick={() => handleSubCategoryChange("all")}
-                className={`px-3 py-1.5 rounded-xl text-[11px] font-medium transition-all cursor-pointer ${
-                  activeSubCategory === "all"
-                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold shadow-xs"
-                    : "bg-slate-100 dark:bg-slate-800/80 text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                All Sub-fields
-              </button>
-              {currentCategoryObj.subCategories.map((sub) => {
-                const isSubActive = activeSubCategory === sub.slug;
-                return (
-                  <button
-                    key={sub.id}
-                    onClick={() => handleSubCategoryChange(sub.slug)}
-                    className={`px-3 py-1.5 rounded-xl text-[11px] font-medium transition-all cursor-pointer ${
-                      isSubActive
-                        ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold shadow-xs"
-                        : "bg-slate-100 dark:bg-slate-800/80 text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-slate-700"
-                    }`}
-                  >
-                    {sub.name}
-                  </button>
-                );
-              })}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Active Filters Summary Bar */}
         {activeFiltersCount > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 text-xs max-w-5xl mx-auto">
