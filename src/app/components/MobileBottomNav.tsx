@@ -103,7 +103,7 @@ export default function MobileBottomNav() {
         >
           <div className="relative">
             <Bookmark size={20} className={isSaved ? "fill-current stroke-[2]" : "stroke-[1.75]"} />
-            {savedCount > 0 && (
+            {isLoggedIn && savedCount > 0 && (
               <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[9px] font-mono font-bold flex items-center justify-center shadow-xs">
                 {savedCount > 99 ? "99+" : savedCount}
               </span>
@@ -114,7 +114,7 @@ export default function MobileBottomNav() {
 
         {/* 5. Creator Profile / Sign In */}
         <Link
-          to={isLoggedIn ? "/profile" : "/login"}
+          to={isLoggedIn ? (user?.username ? `/@${user.username}` : "/profile") : "/login"}
           aria-label={isLoggedIn ? "My Profile" : "Sign In"}
           className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] py-1 gap-1 transition-colors cursor-pointer ${
             isProfile

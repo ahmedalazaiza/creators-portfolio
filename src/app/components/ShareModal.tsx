@@ -12,7 +12,6 @@ import {
   Sparkles,
   QrCode,
   Smartphone,
-  Send,
   Code2,
   Download,
   ExternalLink,
@@ -114,7 +113,7 @@ export default function ShareModal({
       iconBg: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/25",
     },
     {
-      name: "X / Twitter",
+      name: "Twitter / X",
       desc: "Post to feed",
       icon: Twitter,
       url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
@@ -130,15 +129,6 @@ export default function ShareModal({
       brandColor: "#0A66C2",
       bgGradient: "hover:bg-blue-500/10 hover:border-blue-500/30 text-blue-600 dark:text-blue-400",
       iconBg: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/25",
-    },
-    {
-      name: "Telegram",
-      desc: "Send to chat",
-      icon: Send,
-      url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
-      brandColor: "#229ED9",
-      bgGradient: "hover:bg-cyan-500/10 hover:border-cyan-500/30 text-cyan-600 dark:text-cyan-400",
-      iconBg: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/25",
     },
   ];
 
@@ -318,8 +308,8 @@ export default function ShareModal({
                 </button>
               )}
 
-              {/* 4 Social Channels Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {/* 3 Social Channels Grid: WhatsApp, Twitter / X, LinkedIn */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {shareChannels.map((item) => {
                   const Icon = item.icon;
                   return (

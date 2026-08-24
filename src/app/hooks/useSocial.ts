@@ -24,16 +24,38 @@ export function useSocial(currentUserId?: string) {
 
   // Save to localStorage
   useEffect(() => {
-    setStorageItem(LOCAL_STORAGE_FOLLOWS_KEY, followingMap);
-  }, [followingMap]);
+    if (currentUserId && !currentUserId.startsWith("guest-")) {
+      setStorageItem(LOCAL_STORAGE_FOLLOWS_KEY, followingMap);
+    }
+  }, [followingMap, currentUserId]);
 
   useEffect(() => {
-    setStorageItem(LOCAL_STORAGE_FOLLOWERS_COUNT_KEY, followersCountMap);
-  }, [followersCountMap]);
+    if (currentUserId && !currentUserId.startsWith("guest-")) {
+      setStorageItem(LOCAL_STORAGE_FOLLOWERS_COUNT_KEY, followersCountMap);
+    }
+  }, [followersCountMap, currentUserId]);
 
   useEffect(() => {
-    setStorageItem(LOCAL_STORAGE_FOLLOWING_COUNT_KEY, followingCountMap);
-  }, [followingCountMap]);
+    if (currentUserId && !currentUserId.startsWith("guest-")) {
+      setStorageItem(LOCAL_STORAGE_FOLLOWING_COUNT_KEY, followingCountMap);
+    }
+  }, [followingCountMap, currentUserId]);
+
+  // Purge social maps on logout
+  useEffect(() => {
+    const resetSocialState = () => {
+      setFollowingMap({});
+      setFollowersCountMap({});
+      setFollowingCountMap({});
+    };
+
+    if (!currentUserId || currentUserId.startsWith("guest-")) {
+      resetSocialState();
+    }
+
+    window.addEventListener("app-auth-logout", resetSocialState);
+    return () => window.removeEventListener("app-auth-logout", resetSocialState);
+  }, [currentUserId]);
 
   // Load follows and own profile counts from Supabase if authenticated
   useEffect(() => {

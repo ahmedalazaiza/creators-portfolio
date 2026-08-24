@@ -66,12 +66,16 @@ export default function CreatorProfilePage() {
     !username ||
     (user && (user.username?.toLowerCase() === cleanUsername || user.id === username));
 
-  // If visiting /profile directly without a user session, redirect to login
+  // If visiting /profile directly, redirect to /@username or /login
   useEffect(() => {
-    if (!username && !authLoading && !isLoggedIn) {
-      navigate("/login", { replace: true, state: { from: "/profile" } });
+    if (!username && !authLoading) {
+      if (isLoggedIn && user?.username) {
+        navigate(`/@${user.username}`, { replace: true });
+      } else if (!isLoggedIn) {
+        navigate("/login", { replace: true, state: { from: "/profile" } });
+      }
     }
-  }, [username, authLoading, isLoggedIn, navigate]);
+  }, [username, authLoading, isLoggedIn, user?.username, navigate]);
 
   // Fetch real profile and projects from Supabase
   useEffect(() => {

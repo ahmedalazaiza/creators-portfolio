@@ -38,12 +38,38 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
   }, [comments]);
 
   useEffect(() => {
-    setStorageItem(LOCAL_STORAGE_APPRECIATIONS_KEY, appreciatedMap);
-  }, [appreciatedMap]);
+    if (currentUserId && !currentUserId.startsWith("guest-")) {
+      setStorageItem(LOCAL_STORAGE_APPRECIATIONS_KEY, appreciatedMap);
+    }
+  }, [appreciatedMap, currentUserId]);
 
   useEffect(() => {
-    setStorageItem(LOCAL_STORAGE_SAVES_KEY, savedMap);
-  }, [savedMap]);
+    if (currentUserId && !currentUserId.startsWith("guest-")) {
+      setStorageItem(LOCAL_STORAGE_SAVES_KEY, savedMap);
+    }
+  }, [savedMap, currentUserId]);
+
+  // Purge user-specific interaction maps on logout
+  useEffect(() => {
+    const resetUserState = () => {
+      setAppreciatedMap({});
+      setSavedMap({});
+      setProjects((prev) =>
+        prev.map((p) => ({
+          ...p,
+          isAppreciated: false,
+          isSaved: false,
+        }))
+      );
+    };
+
+    if (!currentUserId || currentUserId.startsWith("guest-")) {
+      resetUserState();
+    }
+
+    window.addEventListener("app-auth-logout", resetUserState);
+    return () => window.removeEventListener("app-auth-logout", resetUserState);
+  }, [currentUserId]);
 
   // Load live data from Supabase
   const refreshProjects = useCallback(async () => {
@@ -90,19 +116,23 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
       const favData = isAuthenticated ? results[3]?.data : null;
 
       const appMap: Record<string, boolean> = {};
-      if (appData) {
+      if (isAuthenticated && appData) {
         appData.forEach((a: any) => {
           appMap[a.project_id] = true;
         });
         setAppreciatedMap(appMap);
+      } else if (!isAuthenticated) {
+        setAppreciatedMap({});
       }
 
       const favMap: Record<string, boolean> = {};
-      if (favData) {
+      if (isAuthenticated && favData) {
         favData.forEach((f: any) => {
           favMap[f.project_id] = true;
         });
         setSavedMap(favMap);
+      } else if (!isAuthenticated) {
+        setSavedMap({});
       }
 
       if (!projectsError && projectsData) {
@@ -151,8 +181,8 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
           appreciationsCount: item.appreciations_count || 0,
           createdAt: item.created_at,
           updatedAt: item.updated_at,
-          isAppreciated: Boolean(appMap[item.id] ?? appreciatedMap[item.id]),
-          isSaved: Boolean(favMap[item.id] ?? savedMap[item.id]),
+          isAppreciated: isAuthenticated ? Boolean(appMap[item.id] ?? appreciatedMap[item.id]) : false,
+          isSaved: isAuthenticated ? Boolean(favMap[item.id] ?? savedMap[item.id]) : false,
         }));
 
         setProjects(mapped);
@@ -575,8 +605,13 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
     }
   }, []);
 
-  const favoritesCount = sortedProjects.filter((p) => Boolean(p.isAppreciated)).length;
-  const savedCount = sortedProjects.filter((p) => Boolean(p.isSaved)).length;
+  const isAuthenticated = Boolean(currentUserId && !currentUserId.startsWith("guest-"));
+  const favoritesCount = isAuthenticated
+    ? sortedProjects.filter((p) => Boolean(p.isAppreciated)).length
+    : 0;
+  const savedCount = isAuthenticated
+    ? sortedProjects.filter((p) => Boolean(p.isSaved)).length
+    : 0;
 
   return {
     projects: sortedProjects,

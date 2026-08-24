@@ -185,7 +185,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                     : ""
                 }
               />
-              {favoritesCount > 0 && (
+              {isLoggedIn && favoritesCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
                   {favoritesCount > 99 ? "99+" : favoritesCount}
                 </span>
@@ -196,7 +196,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             <Link
               to="/saved"
               aria-label="Saved Collections"
-              title={savedCount > 0 ? `Saved Collections (${savedCount})` : "Saved Collections"}
+              title={isLoggedIn && savedCount > 0 ? `Saved Collections (${savedCount})` : "Saved Collections"}
               className={`relative w-10 h-10 flex items-center justify-center rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/saved"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-foreground font-bold shadow-2xs"
@@ -207,7 +207,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 size={17}
                 className={location.pathname === "/saved" ? "fill-current text-foreground" : ""}
               />
-              {savedCount > 0 && (
+              {isLoggedIn && savedCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
                   {savedCount > 99 ? "99+" : savedCount}
                 </span>
@@ -271,7 +271,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         </div>
 
                         <Link
-                          to="/profile"
+                          to={user?.username ? `/@${user.username}` : "/profile"}
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
                         >
@@ -414,7 +414,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                     <Heart size={15} className="text-foreground dark:text-[#CDF22B]" />
                     <span>My Favorites</span>
                   </div>
-                  {favoritesCount > 0 && (
+                  {isLoggedIn && favoritesCount > 0 && (
                     <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-foreground text-[10px] font-mono font-bold">
                       {favoritesCount}
                     </span>
@@ -429,7 +429,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                     <Bookmark size={15} className="text-slate-800 dark:text-slate-200" />
                     <span>Saved Collections</span>
                   </div>
-                  {savedCount > 0 && (
+                  {isLoggedIn && savedCount > 0 && (
                     <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-foreground text-[10px] font-mono font-bold">
                       {savedCount}
                     </span>

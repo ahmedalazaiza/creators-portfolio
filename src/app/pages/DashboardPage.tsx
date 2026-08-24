@@ -72,7 +72,7 @@ export default function DashboardPage() {
 
         <div className="flex items-center gap-3">
           <Link
-            to="/profile"
+            to={user?.username ? `/@${user.username}` : "/profile"}
             className="px-4 py-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground text-xs font-semibold border border-slate-200 dark:border-white/10 shadow-xs flex items-center gap-1.5 transition-colors"
           >
             <User size={14} className="text-foreground" />

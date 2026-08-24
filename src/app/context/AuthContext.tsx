@@ -623,6 +623,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(null);
       try {
         localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+        localStorage.removeItem("portfolios_real_appreciations_v1");
+        localStorage.removeItem("portfolios_real_saves_v1");
+        localStorage.removeItem("portfolios_follows_v1");
+        localStorage.removeItem("portfolios_followers_count_v1");
+        localStorage.removeItem("portfolios_following_count_v1");
+        window.dispatchEvent(new CustomEvent("app-auth-logout"));
       } catch {}
     }
   }, []);
