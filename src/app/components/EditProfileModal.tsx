@@ -245,8 +245,8 @@ export default function EditProfileModal({
           {/* Location & Website */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-foreground flex items-center gap-1">
-                <MapPin size={12} className="text-[#CDF22B]" /> Location
+              <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <MapPin size={13} className="text-slate-800 dark:text-slate-200" /> Location
               </label>
               <input
                 type="text"
@@ -258,8 +258,8 @@ export default function EditProfileModal({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-foreground flex items-center gap-1">
-                <Globe size={12} className="text-[#CDF22B]" /> Website / Portfolio Link
+              <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <Globe size={13} className="text-slate-800 dark:text-slate-200" /> Website / Portfolio Link
               </label>
               <input
                 type="text"

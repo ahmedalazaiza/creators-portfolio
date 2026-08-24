@@ -311,7 +311,7 @@ export default function SearchModal({
             {/* 1. Sort By Section */}
             <div className="space-y-2.5">
               <div className="flex items-center gap-2 font-bold text-foreground text-xs uppercase tracking-wider">
-                <ArrowUpDown size={14} className="text-[#CDF22B]" />
+                <ArrowUpDown size={15} className="text-slate-900 dark:text-white" />
                 <span>Sort Projects (الترتيب)</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -323,12 +323,12 @@ export default function SearchModal({
                       onClick={() => setSelectedSort(opt.value)}
                       className={`p-2.5 rounded-2xl border text-left font-medium transition-all flex items-center justify-between cursor-pointer ${
                         isSelected
-                          ? "bg-[#CDF22B]/15 border-[#CDF22B] text-foreground font-bold shadow-xs"
+                          ? "bg-[#CDF22B]/20 border-slate-900 dark:border-[#CDF22B] text-foreground font-bold shadow-xs"
                           : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-muted-foreground hover:text-foreground hover:border-slate-300"
                       }`}
                     >
                       <span className="truncate">{opt.label}</span>
-                      {isSelected && <Check size={14} className="text-[#CDF22B] shrink-0 ml-1" />}
+                      {isSelected && <Check size={14} className="text-slate-950 dark:text-[#CDF22B] shrink-0 ml-1 font-bold" />}
                     </button>
                   );
                 })}
@@ -339,7 +339,7 @@ export default function SearchModal({
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-foreground text-xs uppercase tracking-wider">
-                  <Layers size={14} className="text-[#CDF22B]" />
+                  <Layers size={15} className="text-slate-900 dark:text-white" />
                   <span>Creative Discipline (التصنيف الرئيسي)</span>
                 </div>
                 {selectedCategory !== "all" && (
@@ -369,14 +369,14 @@ export default function SearchModal({
                       className={`p-3 rounded-2xl border text-left transition-all flex items-start gap-2.5 cursor-pointer ${
                         isSelected
                           ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-md"
-                          : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-foreground hover:border-[#CDF22B]/60 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-foreground hover:border-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                       }`}
                     >
                       <div
-                        className={`p-1.5 rounded-xl shrink-0 ${
+                        className={`p-2 rounded-xl shrink-0 transition-colors ${
                           isSelected
-                            ? "bg-[#CDF22B] text-slate-900"
-                            : "bg-slate-200/70 dark:bg-slate-800 text-muted-foreground"
+                            ? "bg-[#CDF22B] text-slate-950"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700"
                         }`}
                       >
                         {icon}
@@ -385,7 +385,7 @@ export default function SearchModal({
                         <div className="font-bold text-xs truncate">{cat.name}</div>
                         <div
                           className={`text-[10px] truncate ${
-                            isSelected ? "text-slate-300 dark:text-slate-600" : "text-muted-foreground"
+                            isSelected ? "text-slate-300 dark:text-slate-600 font-medium" : "text-muted-foreground"
                           }`}
                         >
                           {cat.subCategories?.length || 0} sub-fields
@@ -406,7 +406,7 @@ export default function SearchModal({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 font-bold text-foreground text-xs">
-                    <Compass size={14} className="text-[#CDF22B]" />
+                    <Compass size={15} className="text-slate-900 dark:text-white" />
                     <span>Specialized Sub-fields for {currentCategoryObj.name}</span>
                   </div>
                   {selectedSubCategory !== "all" && (
@@ -424,7 +424,7 @@ export default function SearchModal({
                     onClick={() => setSelectedSubCategory("all")}
                     className={`px-3 py-1.5 rounded-xl font-medium transition-all cursor-pointer ${
                       selectedSubCategory === "all"
-                        ? "bg-[#CDF22B] text-slate-900 font-bold shadow-xs"
+                        ? "bg-[#CDF22B] text-slate-950 font-bold shadow-xs"
                         : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -438,12 +438,12 @@ export default function SearchModal({
                         onClick={() => setSelectedSubCategory(sub.slug)}
                         className={`px-3 py-1.5 rounded-xl font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                           isSubSelected
-                            ? "bg-[#CDF22B] text-slate-900 font-bold shadow-xs"
-                            : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-muted-foreground hover:text-foreground hover:border-[#CDF22B]/60"
+                            ? "bg-[#CDF22B] text-slate-950 font-bold shadow-xs"
+                            : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-muted-foreground hover:text-foreground hover:border-slate-400"
                         }`}
                       >
                         <span>{sub.name}</span>
-                        {isSubSelected && <Check size={12} />}
+                        {isSubSelected && <Check size={12} className="text-slate-950" />}
                       </button>
                     );
                   })}
@@ -455,7 +455,7 @@ export default function SearchModal({
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-foreground text-xs uppercase tracking-wider">
-                  <Wrench size={14} className="text-[#CDF22B]" />
+                  <Wrench size={15} className="text-slate-900 dark:text-white" />
                   <span>Software & Creative Tools (البرامج المستخدمة)</span>
                 </div>
                 {selectedTool && (
@@ -477,12 +477,12 @@ export default function SearchModal({
                       onClick={() => setSelectedTool(isToolActive ? "" : tool)}
                       className={`px-3.5 py-1.5 rounded-full border text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                         isToolActive
-                          ? "bg-[#CDF22B] text-slate-900 border-[#CDF22B] shadow-xs"
+                          ? "bg-[#CDF22B] text-slate-950 border-slate-900 dark:border-[#CDF22B] shadow-xs"
                           : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-muted-foreground hover:text-foreground hover:border-slate-300"
                       }`}
                     >
                       <span>{tool}</span>
-                      {isToolActive && <Check size={12} />}
+                      {isToolActive && <Check size={12} className="text-slate-950" />}
                     </button>
                   );
                 })}
@@ -492,7 +492,7 @@ export default function SearchModal({
             {/* 5. Timeframe Filter */}
             <div className="space-y-2.5">
               <div className="flex items-center gap-2 font-bold text-foreground text-xs uppercase tracking-wider">
-                <Calendar size={14} className="text-[#CDF22B]" />
+                <Calendar size={15} className="text-slate-900 dark:text-white" />
                 <span>Time Period (الفترة الزمنية)</span>
               </div>
               <div className="flex items-center gap-2">
