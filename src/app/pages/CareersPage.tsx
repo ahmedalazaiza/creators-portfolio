@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
+import confetti from "canvas-confetti";
 import {
   Sparkles,
   ArrowLeft,
@@ -17,6 +18,10 @@ import {
   X,
   Send,
   Loader2,
+  User,
+  Mail,
+  Link2,
+  MessageSquare,
 } from "lucide-react";
 
 interface JobOpening {
@@ -95,19 +100,28 @@ export default function CareersPage() {
 
   const handleApply = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!applicantName.trim() || !applicantEmail.trim() || !portfolioLink.trim()) return;
+
     setSubmitting(true);
     setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setSelectedJob(null);
-        setApplicantName("");
-        setApplicantEmail("");
-        setPortfolioLink("");
-        setApplicantNote("");
-      }, 2000);
-    }, 900);
+      confetti({
+        particleCount: 70,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ["#CDF22B", "#0F172A", "#FFFFFF"],
+      });
+    }, 800);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedJob(null);
+    setSubmitted(false);
+    setApplicantName("");
+    setApplicantEmail("");
+    setPortfolioLink("");
+    setApplicantNote("");
   };
 
   return (
@@ -246,103 +260,139 @@ export default function CareersPage() {
       {/* Application Modal */}
       <AnimatePresence>
         {selectedJob && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-xs overflow-y-auto">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-card w-full max-w-xl rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-2xl p-6 sm:p-8 space-y-5 my-auto"
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 12 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-lg bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 rounded-[32px] overflow-hidden z-10 flex flex-col my-auto"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] font-bold font-mono text-[#CDF22B] uppercase">
-                    Application
-                  </span>
-                  <h3 className="text-base sm:text-lg font-bold font-display text-foreground">
+              {/* Header */}
+              <div className="p-6 sm:p-7 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#11130e] flex items-start justify-between gap-4">
+                <div className="space-y-1.5 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 uppercase">
+                      Application
+                    </span>
+                    <span className="text-[11px] font-medium text-muted-foreground">
+                      {selectedJob.department} • {selectedJob.location}
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold font-display text-foreground leading-snug">
                     {selectedJob.title}
                   </h3>
                 </div>
+
                 <button
-                  onClick={() => setSelectedJob(null)}
-                  className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+                  onClick={handleCloseModal}
+                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                  aria-label="Close modal"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               {submitted ? (
-                <div className="py-8 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto">
-                    <CheckCircle2 size={24} />
+                <div className="p-8 sm:p-10 text-center space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto border border-[#CDF22B]/30">
+                    <CheckCircle2 size={28} />
                   </div>
-                  <h4 className="text-base font-bold text-foreground">
-                    Application Submitted!
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Thank you! Our recruitment lead will review your submission and get in touch within 5 days.
-                  </p>
+                  <div className="space-y-1.5">
+                    <h4 className="text-lg font-bold text-foreground">
+                      Application Submitted!
+                    </h4>
+                    <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                      Thank you, <strong className="text-foreground">{applicantName}</strong>! Our recruitment lead will review your portfolio and reach out to <span className="text-foreground underline">{applicantEmail}</span> within 5 business days.
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <button
+                      onClick={handleCloseModal}
+                      className="px-6 py-2.5 rounded-full btn-primary text-xs font-bold cursor-pointer"
+                    >
+                      Done & Back to Careers
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <form onSubmit={handleApply} className="space-y-4 text-xs">
-                  <div className="space-y-1">
-                    <label className="font-semibold text-foreground">Your Full Name</label>
+                <form onSubmit={handleApply} className="p-6 sm:p-7 space-y-4 text-xs">
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-foreground flex items-center gap-1.5">
+                      <User size={13} className="text-muted-foreground" />
+                      <span>Your Full Name</span>
+                      <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       required
                       value={applicantName}
                       onChange={(e) => setApplicantName(e.target.value)}
                       placeholder="e.g. Leo DaVinci"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-foreground focus:outline-none focus:border-[#CDF22B]"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] transition-colors"
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="font-semibold text-foreground">Email Address</label>
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-foreground flex items-center gap-1.5">
+                      <Mail size={13} className="text-muted-foreground" />
+                      <span>Email Address</span>
+                      <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="email"
                       required
                       value={applicantEmail}
                       onChange={(e) => setApplicantEmail(e.target.value)}
                       placeholder="leo@design.studio"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-foreground focus:outline-none focus:border-[#CDF22B]"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] transition-colors"
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="font-semibold text-foreground">Portfolio / GitHub Link</label>
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-foreground flex items-center gap-1.5">
+                      <Link2 size={13} className="text-muted-foreground" />
+                      <span>Portfolio / GitHub Link</span>
+                      <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="url"
                       required
                       value={portfolioLink}
                       onChange={(e) => setPortfolioLink(e.target.value)}
                       placeholder="https://portfolios.design/@username"
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-foreground focus:outline-none focus:border-[#CDF22B]"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] transition-colors"
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="font-semibold text-foreground">Why Portfolios? (Short note)</label>
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-foreground flex items-center gap-1.5">
+                      <MessageSquare size={13} className="text-muted-foreground" />
+                      <span>Why Portfolios? (Short note)</span>
+                    </label>
                     <textarea
                       rows={3}
                       value={applicantNote}
                       onChange={(e) => setApplicantNote(e.target.value)}
                       placeholder="Tell us what excites you about this role..."
-                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#171915] border border-slate-200 dark:border-white/10 text-foreground focus:outline-none focus:border-[#CDF22B] resize-none"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] resize-none transition-colors"
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-3 rounded-full btn-primary font-bold shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                  >
-                    {submitting ? (
-                      <Loader2 size={15} className="animate-spin" />
-                    ) : (
-                      <Send size={14} />
-                    )}
-                    <span>{submitting ? "Sending Application..." : "Submit Application"}</span>
-                  </button>
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full py-3 rounded-full btn-primary text-xs font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform disabled:opacity-50"
+                    >
+                      {submitting ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Send size={14} />
+                      )}
+                      <span>{submitting ? "Sending Application..." : "Submit Application"}</span>
+                    </button>
+                  </div>
                 </form>
               )}
             </motion.div>
