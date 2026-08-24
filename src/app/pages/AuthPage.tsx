@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Sparkles,
   Mail,
+  MailCheck,
   Lock,
   User,
   Eye,
