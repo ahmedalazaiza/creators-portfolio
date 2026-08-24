@@ -16,6 +16,7 @@ import {
   Check,
   Flame,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../hooks/useProjects";
 import { useCreator } from "../hooks/useCreator";
 import ProjectCard from "../components/ProjectCard";
@@ -35,6 +36,7 @@ const SEARCH_SUGGESTIONS = [
 ];
 
 export default function SearchPage() {
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const initialCategory = searchParams.get("category") || "all";
@@ -45,12 +47,15 @@ export default function SearchPage() {
   const [activeTool, setActiveTool] = useState(initialTool);
   const [sortBy, setSortBy] = useState<SortOption>("featured");
 
-  const { projects, loading } = useProjects({
-    searchQuery: query,
-    category: activeCategory,
-    tool: activeTool,
-    sortBy,
-  });
+  const { projects, loading } = useProjects(
+    {
+      searchQuery: query,
+      category: activeCategory,
+      tool: activeTool,
+      sortBy,
+    },
+    user?.id
+  );
 
   const { creatorsList } = useCreator();
   const allCreators = creatorsList || [];

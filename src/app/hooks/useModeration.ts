@@ -13,38 +13,17 @@ export interface ReportItem {
   createdAt: string;
 }
 
-const LOCAL_STORAGE_REPORTS_KEY = "azaiza_gallery_reports_v3";
+import { getStorageItem, setStorageItem } from "../../lib/storage";
 
-const DEFAULT_REPORTS: ReportItem[] = [
-  {
-    id: "rep-1",
-    targetType: "project",
-    targetId: "proj-3",
-    targetTitle: "Cyberpunk 2099 — Kinetic Typography Specimen",
-    reporterName: "Anonymous Designer",
-    reason: "Suspected uncredited 3D asset usage",
-    details: "The background wireframe mesh appears to match an uncredited sketchfab model.",
-    status: "pending",
-    createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
-  },
-];
+const LOCAL_STORAGE_REPORTS_KEY = "portfolios_reports_v1";
 
 export function useModeration() {
-  const [reports, setReports] = useState<ReportItem[]>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_REPORTS_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch {
-        return DEFAULT_REPORTS;
-      }
-    }
-    return DEFAULT_REPORTS;
-  });
+  const [reports, setReports] = useState<ReportItem[]>(() =>
+    getStorageItem<ReportItem[]>(LOCAL_STORAGE_REPORTS_KEY, [])
+  );
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_REPORTS_KEY, JSON.stringify(reports));
+    setStorageItem(LOCAL_STORAGE_REPORTS_KEY, reports);
   }, [reports]);
 
   const submitReport = useCallback(

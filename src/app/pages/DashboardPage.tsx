@@ -20,15 +20,15 @@ import { ProjectGridSkeleton } from "../components/LoadingSkeletons";
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { projects, deleteProject, loading } = useProjects();
+  const { allProjects, deleteProject, loading } = useProjects(undefined, user?.id);
 
   // Filter projects belonging to current user
   const userProjects = useMemo(() => {
     if (!user) return [];
-    return projects.filter(
+    return allProjects.filter(
       (p) => p.userId === user.id || p.creator?.username === user.username
     );
-  }, [projects, user]);
+  }, [allProjects, user]);
 
   // Aggregate stats
   const totalViews = useMemo(

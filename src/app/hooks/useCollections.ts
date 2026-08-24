@@ -20,7 +20,6 @@ export function useCollections() {
   useEffect(() => {
     setStorageItem(LOCAL_STORAGE_COLLECTIONS_KEY, collections);
   }, [collections]);
-  }, [collections]);
 
   const createCollection = useCallback(
     (title: string, description?: string): Collection => {

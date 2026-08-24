@@ -14,10 +14,49 @@ export function useInquiries() {
   const [inquiries, setInquiries] = useState<Inquiry[]>(() =>
     getStorageItem<Inquiry[]>(LOCAL_STORAGE_INQUIRIES_KEY, DEFAULT_INQUIRIES)
   );
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setStorageItem(LOCAL_STORAGE_INQUIRIES_KEY, inquiries);
   }, [inquiries]);
+
+  // Fetch live inquiries for creator from Supabase
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user?.id || user.id.startsWith("guest-")) return;
+
+    const fetchInquiries = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("inquiries")
+          .select("*")
+          .eq("creator_id", user.id)
+          .order("created_at", { ascending: false });
+
+        if (!error && data) {
+          const mapped: Inquiry[] = data.map((d: any) => ({
+            id: d.id,
+            creatorId: d.creator_id,
+            clientName: d.client_name,
+            clientEmail: d.client_email,
+            companyName: d.company_name,
+            budgetRange: d.budget_range,
+            projectTimeline: d.project_timeline,
+            projectBrief: d.project_brief,
+            status: d.status || "unread",
+            createdAt: d.created_at,
+          }));
+          setInquiries(mapped);
+        }
+      } catch (err) {
+        console.warn("Supabase fetch inquiries error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInquiries();
+  }, [user?.id]);
 
   // Send Inquiry
   const sendInquiry = useCallback(
@@ -107,6 +146,7 @@ export function useInquiries() {
   return {
     inquiries,
     unreadCount,
+    loading,
     sendInquiry,
     markInquiryStatus,
     deleteInquiry,

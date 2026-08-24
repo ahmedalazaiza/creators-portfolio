@@ -5,7 +5,7 @@ import { useCreator } from "./useCreator";
 
 export function useRecommendations() {
   const { allProjects } = useProjects();
-  const { allCreators } = useCreator();
+  const { creatorsList } = useCreator();
 
   // Extract user taste profile from appreciated and saved projects
   const appreciated = allProjects.filter((p) => p.isAppreciated);
@@ -79,7 +79,7 @@ export function useRecommendations() {
 
   // Recommended Creators
   const recommendedCreators = useMemo(() => {
-    return allCreators
+    return (creatorsList || [])
       .filter((c) => !c.isFollowing)
       .map((c) => {
         let score = (c.followersCount || 0) + (c.totalAppreciations || 0) / 10;
@@ -89,7 +89,7 @@ export function useRecommendations() {
       .sort((a, b) => b.score - a.score)
       .slice(0, 4)
       .map((item) => item.creator);
-  }, [allCreators]);
+  }, [creatorsList]);
 
   return {
     recommendedProjects,

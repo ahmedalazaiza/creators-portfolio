@@ -40,7 +40,7 @@ import { ProfileHeaderSkeleton, ProjectGridSkeleton } from "../components/Loadin
 export default function CreatorProfilePage() {
   const { username } = useParams<{ username: string }>();
   const { user, isLoggedIn } = useAuth();
-  const { allProjects } = useProjects();
+  const { allProjects } = useProjects(undefined, user?.id);
   const { isFollowing, toggleFollow, getFollowersCount } = useSocial(user?.id);
   const navigate = useNavigate();
 

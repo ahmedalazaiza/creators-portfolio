@@ -39,7 +39,7 @@ export default function ProjectDetailPage() {
     addComment,
     deleteComment,
     loading: projectsLoading,
-  } = useProjects();
+  } = useProjects(undefined, user?.id);
 
   const projectFromHook = getProjectBySlug(slug || "");
   const [directProject, setDirectProject] = useState<any>(null);
