@@ -212,7 +212,7 @@ export default function HomePage() {
       className="min-h-screen pt-4 sm:pt-6 pb-24 relative overflow-hidden"
     >
       {/* Hero Section */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-8 sm:pb-10 text-center space-y-5">
+      <section className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-10 pt-8 sm:pt-14 pb-8 sm:pb-10 text-center space-y-5">
         {/* Soft Badge */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -280,7 +280,7 @@ export default function HomePage() {
       </section>
 
       {/* Discovery Search & Category Tags Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <section className="max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 space-y-6">
         {/* Advanced Search Bar with Filter Button */}
         <div className="max-w-3xl mx-auto">
           <div className="relative flex items-center rounded-full glass-card border border-slate-200/90 dark:border-white/10 shadow-lg shadow-slate-900/5 dark:shadow-black/20 focus-within:border-slate-400 dark:focus-within:border-[#CDF22B] focus-within:ring-4 focus-within:ring-slate-400/15 transition-all p-1.5 pl-4 gap-2 backdrop-blur-xl">
@@ -334,14 +334,14 @@ export default function HomePage() {
         </div>
 
         {/* Category Pills - Wrapped nicely without ugly horizontal scrollbars */}
-        <div className="flex flex-wrap items-center justify-center gap-2 max-w-5xl mx-auto py-1">
+        <div className="flex flex-wrap items-center justify-center gap-2 max-w-7xl mx-auto py-1">
           {CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat.slug;
             return (
               <button
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.slug)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   isActive
                     ? "bg-[#CDF22B] text-slate-900 font-bold shadow-sm shadow-[#CDF22B]/30 scale-105"
                     : "glass-card text-muted-foreground hover:text-foreground border border-slate-200/70 dark:border-white/10 hover:border-[#CDF22B]/70"
@@ -362,7 +362,7 @@ export default function HomePage() {
 
         {/* Active Filters Summary Bar */}
         {activeFiltersCount > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-100/60 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-xs max-w-5xl mx-auto">
+          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-100/60 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-xs max-w-7xl mx-auto">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-muted-foreground font-semibold">Active filters:</span>
 
@@ -506,7 +506,7 @@ export default function HomePage() {
             {loading && projects.length === 0 ? (
               <ProjectGridSkeleton count={8} />
             ) : projects.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
                 {projects.map((project) => (
                   <ProjectCard key={project.id} project={project} />
                 ))}

@@ -363,7 +363,7 @@ export default function CreatorProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-4 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="min-h-screen pt-4 pb-20 max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-10 space-y-8">
         <ProfileHeaderSkeleton />
         <div className="space-y-4 pt-2">
           <div className="h-5 w-40 bg-slate-200 dark:bg-[#1e231b] rounded-full animate-pulse" />
@@ -413,12 +413,12 @@ export default function CreatorProfilePage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="min-h-screen pt-4 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"
+      className="min-h-screen pt-4 pb-20 max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-10 space-y-8"
     >
       {/* ─── 1. Hero Cover Banner & Profile Card ──────────────────────── */}
       <div className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-md relative">
         {/* Cover Banner Image */}
-        <div className="relative h-44 sm:h-60 w-full overflow-hidden bg-slate-900">
+        <div className="relative h-48 sm:h-64 md:h-72 w-full overflow-hidden bg-slate-900">
           <img
             src={profile.bannerUrl}
             alt="Profile Banner"

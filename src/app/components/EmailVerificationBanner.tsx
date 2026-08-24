@@ -71,7 +71,7 @@ export default function EmailVerificationBanner() {
         transition={{ duration: 0.25 }}
         className="w-full bg-[#1e231b] border-b border-[#CDF22B]/30 text-foreground relative z-30 shadow-xs"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+        <div className="max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 py-2.5 sm:py-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
           {/* Text and Status Icon */}
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <div className="w-6 h-6 rounded-full bg-[#CDF22B]/20 text-[#CDF22B] flex items-center justify-center shrink-0">

@@ -224,7 +224,7 @@ export default function ProjectDetailPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen pt-8 sm:pt-10 pb-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10"
+      className="min-h-screen pt-6 sm:pt-10 pb-24 max-w-6xl xl:max-w-7xl mx-auto px-3 sm:px-6 lg:px-10 space-y-8 sm:space-y-10"
     >
       {/* Top Navigation & Actions Bar */}
       <div className="flex items-center justify-between">
@@ -270,12 +270,12 @@ export default function ProjectDetailPage() {
           )}
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-bold font-display text-foreground tracking-tight leading-tight">
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold font-display text-foreground tracking-tight leading-tight">
           {project.title}
         </h1>
 
         {/* Creator Info Snippet */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 dark:border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-slate-200/80 dark:border-white/10">
           <Link
             to={`/@${project.creator?.username || "creator"}`}
             className="flex items-center gap-3 group"
@@ -299,7 +299,7 @@ export default function ProjectDetailPage() {
           </Link>
 
           {/* Action Buttons: Favorite & Appreciate */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
               onClick={handleToggleFavorite}
               aria-label="Save to favorites"

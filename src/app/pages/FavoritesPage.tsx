@@ -130,7 +130,7 @@ export default function FavoritesPage() {
 
   // ─── 2. Authenticated User Favorites Screen ────────────────────────────
   return (
-    <main className="min-h-screen pt-6 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <main className="min-h-screen pt-6 pb-20 max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 space-y-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-white/10">
         <div className="space-y-2">
@@ -179,24 +179,19 @@ export default function FavoritesPage() {
             >
               All ({favoriteProjects.length})
             </button>
-            {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => {
-              const count = favoriteProjects.filter((p) => p.categoryId === cat.slug).length;
-              if (count === 0) return null;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.slug)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
-                    selectedCategory === cat.slug
-                      ? "bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 shadow-xs"
-                      : "bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <span>{cat.name.split(" ")[0]}</span>
-                  <span className="opacity-70 font-mono text-[10px]">({count})</span>
-                </button>
-              );
-            })}
+            {categoriesWithSavedCounts.map((cat) => (
+              <button
+                key={cat.slug}
+                onClick={() => setSelectedCategory(cat.slug)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                  selectedCategory === cat.slug
+                    ? "bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 shadow-xs"
+                    : "bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {cat.name} ({cat.count})
+              </button>
+            ))}
           </div>
 
           {/* Quick Search Input */}
@@ -223,7 +218,7 @@ export default function FavoritesPage() {
 
       {/* Projects Grid OR Empty State */}
       {filteredFavorites.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
           {filteredFavorites.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}

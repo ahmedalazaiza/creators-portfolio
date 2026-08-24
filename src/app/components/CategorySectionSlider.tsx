@@ -142,14 +142,14 @@ export default function CategorySectionSlider({
           scrollbarWidth: "none",
           msOverflowStyle: "none",
         }}
-        className={`flex items-stretch gap-5 overflow-x-auto overflow-y-hidden no-scrollbar py-3 px-4 sm:px-6 lg:px-8 -mx-4 sm:-mx-6 lg:-mx-8 select-none ${
+        className={`flex items-stretch gap-4 sm:gap-5 overflow-x-auto overflow-y-hidden no-scrollbar py-3 px-3 sm:px-6 lg:px-10 -mx-3 sm:-mx-6 lg:-mx-10 select-none ${
           isDragging ? "cursor-grabbing scroll-auto" : "cursor-grab scroll-smooth"
         }`}
       >
         {projects.map((project) => (
           <div
             key={project.id}
-            className="w-[280px] sm:w-[320px] md:w-[340px] shrink-0 flex flex-col pointer-events-auto"
+            className="w-[260px] sm:w-[320px] md:w-[360px] lg:w-[380px] shrink-0 flex flex-col pointer-events-auto"
           >
             <ProjectCard project={project} />
           </div>

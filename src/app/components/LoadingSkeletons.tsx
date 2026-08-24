@@ -35,7 +35,7 @@ export function ProjectCardSkeleton() {
 
 export function ProjectGridSkeleton({ count = 8 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
       {Array.from({ length: count }).map((_, i) => (
         <ProjectCardSkeleton key={i} />
       ))}
@@ -59,7 +59,7 @@ export function CategorySliderSkeleton() {
           <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-[#1e231b]" />
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
         {Array.from({ length: 4 }).map((_, i) => (
           <ProjectCardSkeleton key={i} />
         ))}
@@ -71,7 +71,7 @@ export function CategorySliderSkeleton() {
 export function ProfileHeaderSkeleton() {
   return (
     <div className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-md animate-pulse">
-      <div className="h-44 sm:h-60 w-full bg-slate-200 dark:bg-[#171915]" />
+      <div className="h-48 sm:h-64 w-full bg-slate-200 dark:bg-[#171915]" />
       <div className="p-6 sm:p-10 -mt-16 sm:-mt-20 space-y-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5">
@@ -98,7 +98,7 @@ export function ProfileHeaderSkeleton() {
 
 export function ProjectDetailSkeleton() {
   return (
-    <div className="min-h-screen pt-4 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 animate-pulse">
+    <div className="min-h-screen pt-4 pb-20 max-w-6xl xl:max-w-7xl mx-auto px-3 sm:px-6 lg:px-10 space-y-8 animate-pulse">
       <div className="h-4 bg-slate-200 dark:bg-[#1e231b] rounded-md w-48" />
       <div className="space-y-3">
         <div className="h-8 bg-slate-200 dark:bg-[#1e231b] rounded-md w-2/3" />

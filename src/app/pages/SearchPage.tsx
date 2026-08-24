@@ -117,7 +117,7 @@ export default function SearchPage() {
     >
       {/* Search Header Stage */}
       <section className="border-b border-border/40 bg-gradient-to-b from-[#CDF22B]/15 via-card/20 to-background py-8">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+        <div className="max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 space-y-4">
           <div className="max-w-2xl mx-auto space-y-3 text-center">
             <h1 className="text-2xl sm:text-4xl font-display font-extrabold text-foreground tracking-tight">
               Explore & Search Masterworks
@@ -168,7 +168,7 @@ export default function SearchPage() {
 
       {/* Sticky Filter Controls */}
       <div className="sticky top-14 sm:top-16 z-20 bg-background/95 backdrop-blur-md border-b border-border py-3 shadow-xs">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10">
           <FilterBar
             activeCategory={activeCategory}
             onSelectCategory={handleSelectCategory}
@@ -183,7 +183,7 @@ export default function SearchPage() {
       </div>
 
       {/* Main Results Grid */}
-      <section className="pt-6 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <section className="pt-6 max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 space-y-6">
         {/* Matching Creators Preview (if any) */}
         {matchedCreators.length > 0 && (
           <div className="p-4 rounded-2xl border border-border bg-card/60 space-y-3">

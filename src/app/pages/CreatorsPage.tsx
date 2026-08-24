@@ -128,7 +128,7 @@ export default function CreatorsPage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="min-h-screen pt-6 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"
+      className="min-h-screen pt-6 pb-20 max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 space-y-8"
     >
       {/* Page Header */}
       <div className="text-center max-w-2xl mx-auto space-y-3">
@@ -159,8 +159,8 @@ export default function CreatorsPage() {
 
       {/* Creators Grid / Loading / Empty State */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 animate-pulse">
+          {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
               className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-xs flex flex-col justify-between"
@@ -180,7 +180,7 @@ export default function CreatorsPage() {
           ))}
         </div>
       ) : filteredCreators.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {filteredCreators.map((creator) => {
             const isSelf =
               user &&

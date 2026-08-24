@@ -52,7 +52,7 @@ export default function DashboardPage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="min-h-screen pt-8 sm:pt-10 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"
+      className="min-h-screen pt-8 sm:pt-10 pb-20 max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-10 space-y-8"
     >
       {/* Top Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200/80 dark:border-white/10">
@@ -148,7 +148,7 @@ export default function DashboardPage() {
         {loading && userProjects.length === 0 ? (
           <ProjectGridSkeleton count={3} />
         ) : userProjects.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {userProjects.map((p) => (
               <div
                 key={p.id}

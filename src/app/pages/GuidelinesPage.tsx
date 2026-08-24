@@ -9,7 +9,7 @@ export default function GuidelinesPage() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen pt-8 pb-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-8"
+      className="min-h-screen pt-8 pb-24 px-3 sm:px-6 lg:px-10 max-w-5xl mx-auto space-y-8"
     >
       {/* Back Button */}
       <Link

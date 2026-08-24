@@ -84,7 +84,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
   return (
     <>
       <header className="sticky top-0 z-50 glass-nav transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 h-16 flex items-center justify-between gap-4">
           {/* Left: Brand Identity & Links */}
           <div className="flex items-center gap-6 lg:gap-8">
             <Link to="/" className="flex items-center gap-2 group shrink-0">
