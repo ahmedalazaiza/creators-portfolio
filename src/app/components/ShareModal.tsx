@@ -8,8 +8,6 @@ import {
   Twitter,
   Linkedin,
   MessageCircle,
-  Facebook,
-  Mail,
 } from "lucide-react";
 
 interface ShareModalProps {
@@ -67,15 +65,6 @@ export default function ShareModal({
       )}&url=${encodeURIComponent(shareUrl)}`,
       color: "hover:text-sky-500 hover:border-sky-500/30 hover:bg-sky-500/10",
       iconColor: "text-sky-500",
-    },
-    {
-      name: "Facebook",
-      icon: Facebook,
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        shareUrl
-      )}`,
-      color: "hover:text-blue-600 hover:border-blue-600/30 hover:bg-blue-600/10",
-      iconColor: "text-blue-600",
     },
     {
       name: "LinkedIn",
@@ -168,7 +157,7 @@ export default function ShareModal({
             <label className="block text-xs font-bold text-foreground uppercase tracking-wider">
               Share to Social Channels
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-3">
               {shareLinks.map((item) => {
                 const Icon = item.icon;
                 return (
