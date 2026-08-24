@@ -364,7 +364,7 @@ export default function ProjectEditorPage() {
 
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-foreground">
-                Project Title <span className="text-rose-500">*</span>
+                Project Title <span className="text-slate-900 dark:text-white">*</span>
               </label>
               <input
                 type="text"
@@ -379,7 +379,7 @@ export default function ProjectEditorPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-foreground">
-                  Creative Category <span className="text-rose-500">*</span>
+                  Creative Category <span className="text-slate-900 dark:text-white">*</span>
                 </label>
                 <select
                   value={category}
@@ -408,7 +408,7 @@ export default function ProjectEditorPage() {
 
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-foreground">
-                Project Description & Concept <span className="text-rose-500">*</span>
+                Project Description & Concept <span className="text-slate-900 dark:text-white">*</span>
               </label>
               <textarea
                 required
@@ -425,7 +425,7 @@ export default function ProjectEditorPage() {
           <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/10">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-foreground">
-                Cover Image <span className="text-rose-500">* (Main Showcase)</span>
+                Cover Image <span className="text-slate-900 dark:text-white font-medium">* (Main Showcase)</span>
               </label>
               {coverImage && (
                 <button
