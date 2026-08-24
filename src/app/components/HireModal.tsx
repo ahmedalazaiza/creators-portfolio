@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Mail, Check, X, Sparkles, Send, Briefcase, Calendar, DollarSign, Loader2 } from "lucide-react";
+import {
+  Check,
+  X,
+  Send,
+  Calendar,
+  DollarSign,
+  Loader2,
+  User,
+  Mail,
+  Building,
+  MessageSquare,
+  CheckCircle2,
+} from "lucide-react";
 import confetti from "canvas-confetti";
 import { Profile } from "../types";
 import { useInquiries } from "../hooks/useInquiries";
@@ -58,7 +70,7 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
 
       setSubmitted(true);
       confetti({
-        particleCount: 80,
+        particleCount: 75,
         spread: 60,
         origin: { y: 0.6 },
         colors: ["#CDF22B", "#0F172A", "#FFFFFF"],
@@ -81,46 +93,48 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={handleResetAndClose}
-          className="absolute inset-0 bg-black/80 backdrop-blur-xs"
+          className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity"
         />
 
         {/* Modal Container */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative rounded-3xl border border-border bg-card p-6 sm:p-7 max-w-lg w-full shadow-2xl z-10 space-y-5"
+          exit={{ opacity: 0, scale: 0.96, y: 12 }}
+          transition={{ duration: 0.2 }}
+          className="relative w-full max-w-lg bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 rounded-[32px] overflow-hidden z-10 flex flex-col my-auto"
         >
           {/* Header */}
-          <div className="flex items-center justify-between pb-3 border-b border-border">
-            <div className="flex items-center gap-3">
+          <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#11130e] flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <img
                 src={creator.avatarUrl}
                 alt={creator.fullName}
-                className="w-10 h-10 rounded-full object-cover border border-border"
+                className="w-10 h-10 rounded-full object-cover border border-slate-300 dark:border-white/20 shrink-0"
               />
-              <div>
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+              <div className="min-w-0">
+                <h3 className="text-sm sm:text-base font-bold text-foreground truncate flex items-center gap-1.5">
                   <span>Hire & Commission</span>
-                  <span className="text-primary">@{creator.username}</span>
+                  <span className="text-slate-900 dark:text-[#CDF22B] font-mono">@{creator.username}</span>
                 </h3>
-                <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Available for freelance projects
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Available for freelance commissions
                 </span>
               </div>
             </div>
 
             <button
               onClick={handleResetAndClose}
-              className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+              aria-label="Close modal"
             >
               <X size={16} />
             </button>
@@ -128,33 +142,37 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
 
           {submitted ? (
             /* Success State */
-            <div className="py-10 text-center space-y-4">
-              <div className="w-14 h-14 rounded-full bg-primary/20 text-primary flex items-center justify-center mx-auto shadow-md">
-                <Check size={28} />
+            <div className="p-8 sm:p-10 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto border border-[#CDF22B]/30">
+                <CheckCircle2 size={28} />
               </div>
-              <div className="space-y-1">
-                <h4 className="text-base font-bold text-foreground">
+              <div className="space-y-1.5">
+                <h4 className="text-base sm:text-lg font-bold text-foreground">
                   Inquiry Sent Successfully!
                 </h4>
-                <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                  Your project brief has been sent to <strong>{creator.fullName}</strong>. They will review and reply to <strong>{clientEmail}</strong> shortly.
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                  Your project brief has been sent to <strong className="text-foreground">{creator.fullName}</strong>. They will review and reply to <span className="text-foreground underline">{clientEmail}</span> shortly.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={handleResetAndClose}
-                className="px-6 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md cursor-pointer"
-              >
-                Done
-              </button>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleResetAndClose}
+                  className="px-6 py-2.5 rounded-full btn-primary text-xs font-bold cursor-pointer"
+                >
+                  Done & Back to Creator
+                </button>
+              </div>
             </div>
           ) : (
             /* Form */
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-foreground">
-                    Your Name <span className="text-destructive">*</span>
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground flex items-center gap-1.5">
+                    <User size={13} className="text-muted-foreground" />
+                    <span>Your Name</span>
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -162,13 +180,15 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
                     placeholder="e.g. Alex Morgan"
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60"
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] transition-colors"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-foreground">
-                    Your Email <span className="text-destructive">*</span>
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground flex items-center gap-1.5">
+                    <Mail size={13} className="text-muted-foreground" />
+                    <span>Your Email</span>
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -176,54 +196,57 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
                     value={clientEmail}
                     onChange={(e) => setClientEmail(e.target.value)}
                     placeholder="alex@company.com"
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60"
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-foreground">
-                  Company / Organization (Optional)
+              <div className="space-y-1.5">
+                <label className="font-semibold text-foreground flex items-center gap-1.5">
+                  <Building size={13} className="text-muted-foreground" />
+                  <span>Company / Organization (Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="Studio Labs Inc."
-                  className="w-full px-3 py-2 rounded-xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60"
+                  className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] transition-colors"
                 />
               </div>
 
               {/* Budget & Timeline */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-foreground flex items-center gap-1">
-                    <DollarSign size={12} className="text-primary" /> Estimated Budget
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground flex items-center gap-1.5">
+                    <DollarSign size={13} className="text-slate-900 dark:text-[#CDF22B]" />
+                    <span>Estimated Budget</span>
                   </label>
                   <select
                     value={budgetRange}
                     onChange={(e) => setBudgetRange(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground focus:outline-none focus:border-[#CDF22B] cursor-pointer"
                   >
                     {BUDGET_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>
+                      <option key={opt} value={opt} className="bg-white dark:bg-[#151813] text-foreground">
                         {opt}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-foreground flex items-center gap-1">
-                    <Calendar size={12} className="text-primary" /> Desired Timeline
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-foreground flex items-center gap-1.5">
+                    <Calendar size={13} className="text-slate-900 dark:text-[#CDF22B]" />
+                    <span>Desired Timeline</span>
                   </label>
                   <select
                     value={projectTimeline}
                     onChange={(e) => setProjectTimeline(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-input-background text-foreground text-xs focus:outline-none focus:border-primary/60 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground focus:outline-none focus:border-[#CDF22B] cursor-pointer"
                   >
                     {TIMELINE_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>
+                      <option key={opt} value={opt} className="bg-white dark:bg-[#151813] text-foreground">
                         {opt}
                       </option>
                     ))}
@@ -232,26 +255,28 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
               </div>
 
               {/* Project Brief */}
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-foreground">
-                  Project Brief & Scope <span className="text-destructive">*</span>
+              <div className="space-y-1.5">
+                <label className="font-semibold text-foreground flex items-center gap-1.5">
+                  <MessageSquare size={13} className="text-muted-foreground" />
+                  <span>Project Brief & Scope</span>
+                  <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   required
-                  rows={4}
+                  rows={3}
                   value={projectBrief}
                   onChange={(e) => setProjectBrief(e.target.value)}
                   placeholder="Describe your design goals, deliverables needed, reference links, and expectations..."
-                  className="w-full p-3 rounded-xl border border-border bg-input-background text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 resize-none"
+                  className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-[#11130e] border border-slate-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#CDF22B] resize-none transition-colors"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-white/10">
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="px-5 py-2 rounded-full btn-secondary text-xs font-semibold"
+                  className="px-4 py-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-xs font-semibold text-foreground transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -259,7 +284,7 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_15px_rgba(205,242,43,0.3)] hover:opacity-90 active:scale-95 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-6 py-2 rounded-full btn-primary text-xs font-bold flex items-center gap-2 cursor-pointer active:scale-95 transition-transform disabled:opacity-50"
                 >
                   {submitting ? (
                     <>
@@ -281,3 +306,4 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
     </AnimatePresence>
   );
 }
+

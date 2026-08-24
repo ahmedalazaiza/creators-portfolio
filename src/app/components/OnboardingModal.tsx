@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Sparkles, Check, ArrowRight, Compass, Users, CheckCircle2, X } from "lucide-react";
+import { Sparkles, Check, ArrowRight, X } from "lucide-react";
 import confetti from "canvas-confetti";
 import { CATEGORIES } from "../data/categories";
 import { useCreator } from "../hooks/useCreator";
-import { useLanguage } from "../context/LanguageContext";
 
-const LOCAL_STORAGE_ONBOARDING_KEY = "azaiza_onboarding_completed_v3";
+const LOCAL_STORAGE_ONBOARDING_KEY = "portfolios_onboarding_completed_v4";
 
 export default function OnboardingModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>(["ui-ux", "3d-motion"]);
   const { allCreators, toggleFollow } = useCreator();
-  const { t } = useLanguage();
 
   useEffect(() => {
     const completed = localStorage.getItem(LOCAL_STORAGE_ONBOARDING_KEY);
@@ -35,8 +33,8 @@ export default function OnboardingModal() {
     localStorage.setItem(LOCAL_STORAGE_ONBOARDING_KEY, "true");
     setIsOpen(false);
     confetti({
-      particleCount: 70,
-      spread: 55,
+      particleCount: 75,
+      spread: 60,
       origin: { y: 0.6 },
       colors: ["#CDF22B", "#0F172A", "#FFFFFF"],
     });
@@ -44,32 +42,35 @@ export default function OnboardingModal() {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/85 backdrop-blur-md"
+          onClick={handleFinish}
+          className="fixed inset-0 bg-black/80 backdrop-blur-xs transition-opacity"
         />
 
         {/* Modal Window */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 20 }}
+          initial={{ opacity: 0, scale: 0.96, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.92, y: 20 }}
-          className="relative rounded-3xl border border-primary/40 bg-card p-6 sm:p-8 max-w-lg w-full shadow-2xl z-10 space-y-6 overflow-hidden"
+          exit={{ opacity: 0, scale: 0.96, y: 15 }}
+          transition={{ duration: 0.2 }}
+          className="relative w-full max-w-lg bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 rounded-[32px] overflow-hidden z-10 flex flex-col p-6 sm:p-8 space-y-6 my-auto"
         >
-          {/* Neon Glow Header Pill */}
+          {/* Header Pill */}
           <div className="flex items-center justify-between">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-primary text-[11px] font-mono font-bold">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 text-[11px] font-mono font-bold">
               <Sparkles size={12} />
-              <span>Welcome to Azaiza Gallery</span>
+              <span>Welcome to Portfolios</span>
             </div>
 
             <button
               onClick={handleFinish}
-              className="p-1 rounded-full text-muted-foreground hover:text-foreground"
+              className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+              aria-label="Close welcome modal"
             >
               <X size={16} />
             </button>
@@ -78,11 +79,11 @@ export default function OnboardingModal() {
           {step === 1 ? (
             /* Step 1: Creative Fields */
             <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-xl sm:text-2xl font-display font-extrabold text-foreground">
+              <div className="space-y-1.5">
+                <h3 className="text-xl sm:text-2xl font-display font-extrabold text-foreground leading-tight">
                   What creative crafts inspire you?
                 </h3>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Personalize your curated Explore feed by selecting your favorite disciplines.
                 </p>
               </div>
@@ -95,32 +96,32 @@ export default function OnboardingModal() {
                       key={cat.id}
                       type="button"
                       onClick={() => toggleDiscipline(cat.slug)}
-                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 ${
                         isSelected
-                          ? "border-primary bg-primary/10 text-primary font-bold shadow-xs ring-1 ring-primary/30"
-                          : "border-border bg-muted/20 hover:bg-muted/40 text-foreground"
+                          ? "bg-[#CDF22B] text-slate-950 border-[#CDF22B] font-bold"
+                          : "border-slate-200 dark:border-white/10 bg-slate-100/70 dark:bg-white/5 text-foreground/90 hover:border-slate-300 dark:hover:border-white/20"
                       }`}
                     >
-                      <span className="text-xs truncate">{cat.name}</span>
+                      <span className="text-xs font-semibold truncate">{cat.name}</span>
                       <div
-                        className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          isSelected ? "bg-primary text-black border-primary" : "border-border"
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                          isSelected ? "bg-slate-950 text-[#CDF22B] border-slate-950" : "border-slate-300 dark:border-white/20"
                         }`}
                       >
-                        {isSelected && <Check size={10} />}
+                        {isSelected && <Check size={10} strokeWidth={3} />}
                       </div>
                     </button>
                   );
                 })}
               </div>
 
-              <div className="pt-3 flex items-center justify-end">
+              <div className="pt-2 flex items-center justify-end">
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="px-6 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md hover:opacity-90 flex items-center gap-1.5 cursor-pointer"
+                  className="px-6 py-2.5 rounded-full btn-primary text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
                 >
-                  <span>Next: Follow Curators</span>
+                  <span>Next: Follow Creators</span>
                   <ArrowRight size={13} />
                 </button>
               </div>
@@ -128,32 +129,32 @@ export default function OnboardingModal() {
           ) : (
             /* Step 2: Follow Top Creators */
             <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-xl sm:text-2xl font-display font-extrabold text-foreground">
+              <div className="space-y-1.5">
+                <h3 className="text-xl sm:text-2xl font-display font-extrabold text-foreground leading-tight">
                   Follow Visionary Creators
                 </h3>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Stay updated with case studies and spatial interfaces from top verified designers.
                 </p>
               </div>
 
-              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1 no-scrollbar">
                 {allCreators.slice(0, 4).map((c) => (
                   <div
                     key={c.id}
-                    className="flex items-center justify-between p-2.5 rounded-2xl border border-border bg-muted/20 hover:border-primary/40 transition-all"
+                    className="flex items-center justify-between p-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 hover:border-slate-300 dark:hover:border-white/20 transition-all"
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0">
                       <img
                         src={c.avatarUrl}
                         alt={c.fullName}
-                        className="w-9 h-9 rounded-full object-cover border border-border shrink-0"
+                        className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-white/15 shrink-0"
                       />
                       <div className="min-w-0">
                         <div className="text-xs font-bold text-foreground truncate">
                           {c.fullName}
                         </div>
-                        <div className="text-[10px] text-muted-foreground font-mono truncate">
+                        <div className="text-[11px] text-muted-foreground font-mono truncate">
                           @{c.username}
                         </div>
                       </div>
@@ -162,10 +163,10 @@ export default function OnboardingModal() {
                     <button
                       type="button"
                       onClick={() => toggleFollow(c.id)}
-                      className={`text-xs px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                      className={`text-xs px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer ${
                         c.isFollowing
-                          ? "bg-muted text-muted-foreground border border-border"
-                          : "bg-primary text-primary-foreground shadow-xs hover:opacity-90"
+                          ? "border border-slate-200 dark:border-white/15 text-muted-foreground hover:text-foreground"
+                          : "btn-primary text-slate-950 font-bold"
                       }`}
                     >
                       {c.isFollowing ? "Following" : "Follow"}
@@ -174,20 +175,20 @@ export default function OnboardingModal() {
                 ))}
               </div>
 
-              <div className="pt-3 flex items-center justify-between">
+              <div className="pt-2 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="text-xs text-muted-foreground hover:text-foreground"
+                  className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                   Back
                 </button>
                 <button
                   type="button"
                   onClick={handleFinish}
-                  className="px-7 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-[0_0_20px_rgba(0,87,255,0.35)] hover:opacity-90 flex items-center gap-1.5 cursor-pointer"
+                  className="px-7 py-2.5 rounded-full btn-primary text-xs font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-transform"
                 >
-                  <span>Start Exploring Gallery</span>
+                  <span>Start Exploring</span>
                   <Check size={14} />
                 </button>
               </div>
@@ -198,3 +199,4 @@ export default function OnboardingModal() {
     </AnimatePresence>
   );
 }
+
