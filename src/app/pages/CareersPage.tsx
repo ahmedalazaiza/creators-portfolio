@@ -130,7 +130,7 @@ export default function CareersPage() {
 
         <Link
           to="/team"
-          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground font-semibold text-xs hover:bg-slate-200 transition-all"
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full btn-secondary text-xs font-semibold"
         >
           <span>Meet the Team</span>
         </Link>

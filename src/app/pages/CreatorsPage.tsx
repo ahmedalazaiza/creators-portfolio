@@ -239,7 +239,7 @@ export default function CreatorsPage() {
                         onClick={(e) => handleFollow(e, creator)}
                         className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5 ${
                           following
-                            ? "bg-slate-200 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground hover:bg-rose-500 hover:text-white"
+                            ? "btn-secondary hover:bg-rose-500 hover:text-white hover:border-rose-500"
                             : "btn-primary text-slate-950"
                         }`}
                       >

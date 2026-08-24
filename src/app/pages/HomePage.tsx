@@ -271,7 +271,7 @@ export default function HomePage() {
 
           <Link
             to="/creators"
-            className="px-6 py-3 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground text-xs sm:text-sm font-semibold border border-slate-200 dark:border-white/10 shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+            className="px-6 py-3 rounded-full btn-secondary text-xs sm:text-sm font-semibold active:scale-95 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
           >
             <Compass size={15} className="text-foreground" />
             <span>Creators Directory</span>

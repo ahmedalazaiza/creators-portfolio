@@ -2,35 +2,35 @@
 
 :root {
   --font-size: 16px;
-  /* High-Contrast Palette: #CDF22B Lime Yellow + #0F172A Obsidian Slate (Zero Blue) */
+  /* Balanced Color System: #CDF22B Primary (Lime) + #0F172A Secondary (Deep Navy) */
   --background: #f8fafc;
   --foreground: #0f172a;
   
-  --card: rgba(255, 255, 255, 0.9);
+  --card: rgba(255, 255, 255, 0.92);
   --card-foreground: #0f172a;
   
   --popover: #ffffff;
   --popover-foreground: #0f172a;
   
-  /* Primary Color: #CDF22B (Lime Yellow) */
+  /* Primary Color: #CDF22B (Lime) */
   --primary: #CDF22B;
-  --primary-foreground: #090d16;
+  --primary-foreground: #0f172a;
   
-  /* Secondary Color: Deep Charcoal Obsidian #0F172A for maximum AAA contrast */
+  /* Secondary Color: #0F172A (Deep Navy) */
   --secondary: #0f172a;
   --secondary-foreground: #ffffff;
   
   --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --muted-foreground: #475569;
   
   --accent: #CDF22B;
-  --accent-foreground: #090d16;
+  --accent-foreground: #0f172a;
   
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   
-  --border: rgba(226, 232, 240, 0.9);
-  --input: rgba(241, 245, 249, 0.9);
+  --border: rgba(15, 23, 42, 0.12);
+  --input: rgba(15, 23, 42, 0.08);
   --input-background: #ffffff;
   --switch-background: #cbd5e1;
   
@@ -41,7 +41,7 @@
   --sidebar: #ffffff;
   --sidebar-foreground: #0f172a;
   --sidebar-primary: #CDF22B;
-  --sidebar-primary-foreground: #090d16;
+  --sidebar-primary-foreground: #0f172a;
   --sidebar-accent: #f8fafc;
   --sidebar-accent-foreground: #0f172a;
   --sidebar-border: #e2e8f0;
@@ -82,6 +82,7 @@
 
 @theme inline {
   --color-brand-primary: #CDF22B;
+  --color-brand-secondary: #0F172A;
   --color-brand-dark: #070905;
   --color-background: var(--background);
   --color-foreground: var(--foreground);

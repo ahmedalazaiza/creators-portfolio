@@ -484,7 +484,7 @@ export default function CreatorProfilePage() {
 
                   <Link
                     to="/create"
-                    className="px-4 py-2.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-foreground text-xs font-bold transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2.5 rounded-full btn-secondary text-xs font-bold transition-colors flex items-center gap-1.5"
                   >
                     <Plus size={14} />
                     <span>New Project</span>
@@ -506,7 +506,7 @@ export default function CreatorProfilePage() {
                     disabled={followLoading}
                     className={`px-6 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-md active:scale-95 ${
                       following
-                        ? "bg-slate-200 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground hover:bg-rose-500 hover:text-white"
+                        ? "btn-secondary hover:bg-rose-500 hover:text-white hover:border-rose-500"
                         : "btn-primary text-slate-950"
                     }`}
                   >
@@ -526,7 +526,7 @@ export default function CreatorProfilePage() {
                   {/* Hire / Inquire Button */}
                   <a
                     href={`mailto:hello@${profile.username}.design?subject=Project Inquiry via Portfolios`}
-                    className="px-4 py-2.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-foreground text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    className="px-4 py-2.5 rounded-full btn-secondary text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
                   >
                     <Mail size={14} />
                     <span>Contact</span>

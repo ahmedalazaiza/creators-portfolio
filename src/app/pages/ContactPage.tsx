@@ -70,7 +70,7 @@ export default function ContactPage() {
 
         <Link
           to="/faq"
-          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground font-semibold text-xs hover:bg-slate-200 transition-all"
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full btn-secondary text-xs font-semibold"
         >
           <HelpCircle size={13} />
           <span>View FAQs</span>

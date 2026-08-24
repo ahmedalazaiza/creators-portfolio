@@ -294,13 +294,13 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   to="/login"
-                  className="px-4 py-2 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors"
+                  className="px-4 py-2 rounded-full btn-secondary text-xs font-semibold"
                 >
                   Log In
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-4 py-2 rounded-full btn-primary text-xs font-bold active:scale-95 transition-all"
+                  className="px-4 py-2 rounded-full btn-primary text-xs font-bold active:scale-95 transition-all shadow-xs"
                 >
                   Sign Up
                 </Link>

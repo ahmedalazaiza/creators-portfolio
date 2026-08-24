@@ -39,7 +39,7 @@ export default function AboutPage() {
         <div className="flex items-center gap-2 text-xs">
           <Link
             to="/team"
-            className="px-4 py-1.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground font-semibold hover:bg-slate-200"
+            className="px-4 py-1.5 rounded-full btn-secondary text-xs font-semibold"
           >
             Meet the Team
           </Link>
