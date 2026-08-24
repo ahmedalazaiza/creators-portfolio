@@ -114,6 +114,7 @@ export default function ProjectDetailPage() {
   const [likesCount, setLikesCount] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [copied, setCopied] = useState(false);
 
   // Sync initial stats and increment view
@@ -191,25 +192,29 @@ export default function ProjectDetailPage() {
   // Handle Comment Post
   const handlePostComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentText.trim()) return;
+    if (!commentText.trim() || isSubmittingComment) return;
 
     if (!isLoggedIn || !user) {
       navigate("/login");
       return;
     }
 
-    await addComment(
-      project.id,
-      {
-        id: user.id,
-        username: user.username,
-        fullName: user.fullName,
-        avatarUrl: user.avatarUrl,
-      },
-      commentText.trim()
-    );
-
-    setCommentText("");
+    try {
+      setIsSubmittingComment(true);
+      await addComment(
+        project.id,
+        {
+          id: user.id,
+          username: user.username,
+          fullName: user.fullName,
+          avatarUrl: user.avatarUrl,
+        },
+        commentText.trim()
+      );
+      setCommentText("");
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
 
   // Handle Share

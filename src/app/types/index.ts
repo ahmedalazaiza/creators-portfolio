@@ -71,6 +71,7 @@ export interface Project {
   tags: string[];
   images: string[];
   projectImages?: ProjectImage[];
+  contentBlocks?: any[];
   creator: Profile;
   userId: string;
   status: 'published' | 'draft' | 'archived';

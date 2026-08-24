@@ -39,12 +39,14 @@ interface SearchModalProps {
   onClose: () => void;
   initialQuery?: string;
   initialCategory?: string;
+  initialSubCategory?: string;
   initialTool?: string;
   initialSort?: SortOption;
   initialTimeframe?: string;
   onApplyFilters?: (filters: {
     searchQuery: string;
     category: string;
+    subCategory?: string;
     tool: string;
     sortBy: SortOption;
     timeframe: string;
@@ -56,9 +58,10 @@ export default function SearchModal({
   onClose,
   initialQuery = "",
   initialCategory = "all",
-  initialTool = "",
+  initialSubCategory = "all",
+  initialTool = "all",
   initialSort = "featured",
-  initialTimeframe = "all",
+  initialTimeframe = "all-time",
   onApplyFilters,
 }: SearchModalProps) {
   const [query, setQuery] = useState(initialQuery);

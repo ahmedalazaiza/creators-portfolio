@@ -25,6 +25,8 @@ export interface UserProfile {
   skills?: string[];
   socialLinks?: Record<string, string>;
   isEmailVerified?: boolean;
+  followersCount?: number;
+  followingCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }

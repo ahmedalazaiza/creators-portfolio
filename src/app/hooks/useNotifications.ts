@@ -37,7 +37,11 @@ export function useNotifications() {
             id: n.id,
             userId: n.user_id,
             type: n.type,
-            actorName: n.title,
+            actorName: n.actor_name || n.title || "Notification",
+            actorAvatar:
+              n.actor_avatar ||
+              n.actorAvatar ||
+              "https://api.dicebear.com/7.x/shapes/svg?seed=noti",
             title: n.title,
             description: n.description,
             targetUrl: n.target_url || "/dashboard",

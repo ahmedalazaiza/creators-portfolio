@@ -56,7 +56,7 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
     setLoading((prev) => (projects.length === 0 ? true : false));
     try {
       // 1. Fetch in parallel: projects, comments, and (if logged in) user appreciations & saves
-      const fetchPromises: Promise<any>[] = [
+      const fetchPromises: any[] = [
         supabase
           .from("projects")
           .select(`
@@ -238,10 +238,12 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
   // Sort projects
   const sortedProjects = [...filteredProjects].sort((a, b) => {
     if (!filters?.sortBy) return 0;
-    switch (filters.sortBy) {
+    switch (filters.sortBy as string) {
+      case "newest":
       case "recent":
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       case "popular":
+      case "appreciations":
       case "appreciated":
         return (b.appreciationsCount || 0) - (a.appreciationsCount || 0);
       case "views":
