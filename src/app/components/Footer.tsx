@@ -59,10 +59,10 @@ export default function Footer() {
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#CDF22B]/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
       <div className="max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 space-y-12">
-        {/* Top 4-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
-          {/* Column 1: Brand & Manifesto (Col span 4) */}
-          <div className="lg:col-span-4 space-y-4">
+        {/* Top 5-Column Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-8">
+          {/* Column 1: Brand & Manifesto (Col span 3) */}
+          <div className="lg:col-span-3 space-y-4">
             <Link to="/" className="inline-flex items-center gap-2 group">
               <div className="w-8 h-8 rounded-xl bg-[#CDF22B] text-slate-900 flex items-center justify-center font-bold text-sm shadow-md shadow-[#CDF22B]/20 group-hover:scale-105 transition-transform">
                 <Sparkles size={16} />
@@ -72,7 +72,7 @@ export default function Footer() {
               </span>
             </Link>
 
-            <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
               The calm, elevated showcase for product designers, 3D artists, and visual creators to present deep case studies with high-fidelity craft and genuine community feedback.
             </p>
 
@@ -86,13 +86,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Explore Disciplines (Col span 3) */}
-          <div className="lg:col-span-3 space-y-3">
+          {/* Column 2: Explore Disciplines (Col span 2) */}
+          <div className="lg:col-span-2 space-y-3">
             <h4 className="font-bold text-foreground text-xs uppercase tracking-wider">
-              Creative Disciplines
+              Disciplines
             </h4>
             <ul className="space-y-2 text-xs">
-              {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => (
+              {CATEGORIES.filter((c) => c.slug !== "all").slice(0, 6).map((cat) => (
                 <li key={cat.id}>
                   <Link
                     to={`/?category=${cat.slug}`}
@@ -105,7 +105,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Platform & Community (Col span 2) */}
+          {/* Column 3: Platform & Studio (Col span 2) */}
           <div className="lg:col-span-2 space-y-3">
             <h4 className="font-bold text-foreground text-xs uppercase tracking-wider">
               Platform & Studio
@@ -144,7 +144,47 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Newsletter & Stay Inspired (Col span 3) */}
+          {/* Column 4: Company & Business (Col span 2) */}
+          <div className="lg:col-span-2 space-y-3">
+            <h4 className="font-bold text-foreground text-xs uppercase tracking-wider">
+              Company & Team
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <Link to="/about" className="hover:text-foreground transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/team" className="hover:text-foreground transition-colors">
+                  Our Team
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-foreground transition-colors">
+                  Contact & Support
+                </Link>
+              </li>
+              <li>
+                <Link to="/careers" className="hover:text-foreground transition-colors flex items-center gap-1.5">
+                  <span>Careers</span>
+                  <span className="px-1.5 py-0.2 rounded bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] font-mono text-[9px] font-bold">Hiring</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-foreground transition-colors">
+                  FAQ & Help Center
+                </Link>
+              </li>
+              <li>
+                <Link to="/assets" className="hover:text-foreground transition-colors">
+                  Brand Kit & Press
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 5: Newsletter & Stay Inspired (Col span 3) */}
           <div className="lg:col-span-3 space-y-3">
             <h4 className="font-bold text-foreground text-xs uppercase tracking-wider">
               Stay Inspired

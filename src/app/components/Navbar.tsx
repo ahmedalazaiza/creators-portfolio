@@ -122,6 +122,17 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               >
                 Creators
               </Link>
+
+              <Link
+                to="/about"
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  location.pathname === "/about"
+                    ? "bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-slate-50 dark:hover:bg-[#1e231b]/60"
+                }`}
+              >
+                About
+              </Link>
             </nav>
           </div>
 
@@ -409,6 +420,49 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Company & Support Links */}
+              <div className="pt-2 border-t border-slate-200/80 dark:border-white/10 space-y-1">
+                <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Company & Studio
+                </div>
+                <Link
+                  to="/about"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
+                >
+                  About Us
+                </Link>
+                <Link
+                  to="/team"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
+                >
+                  Our Team
+                </Link>
+                <Link
+                  to="/contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
+                >
+                  Contact & Support
+                </Link>
+                <Link
+                  to="/careers"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
+                >
+                  <span>Careers</span>
+                  <span className="px-1.5 py-0.5 rounded bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-[9px] font-mono font-bold">Hiring</span>
+                </Link>
+                <Link
+                  to="/faq"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
+                >
+                  FAQ & Help
+                </Link>
               </div>
             </motion.div>
           )}

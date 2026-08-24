@@ -24,6 +24,11 @@ import GuidelinesPage from "./pages/GuidelinesPage";
 import BrandAssetsPage from "./pages/BrandAssetsPage";
 import CookiePolicyPage from "./pages/CookiePolicyPage";
 import FavoritesPage from "./pages/FavoritesPage";
+import AboutPage from "./pages/AboutPage";
+import TeamPage from "./pages/TeamPage";
+import ContactPage from "./pages/ContactPage";
+import CareersPage from "./pages/CareersPage";
+import FaqPage from "./pages/FaqPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 function PageTitleHandler() {
@@ -51,6 +56,16 @@ function PageTitleHandler() {
       document.title = "Creators Directory — Portfolios";
     } else if (path === "/search") {
       document.title = "Search & Filter — Portfolios";
+    } else if (path === "/about" || path === "/story") {
+      document.title = "About Us — Portfolios";
+    } else if (path === "/team" || path === "/our-team") {
+      document.title = "Our Team — Portfolios";
+    } else if (path === "/contact" || path === "/support") {
+      document.title = "Contact & Inquiries — Portfolios";
+    } else if (path === "/careers" || path === "/jobs") {
+      document.title = "Careers & Join Us — Portfolios";
+    } else if (path === "/faq" || path === "/help") {
+      document.title = "Frequently Asked Questions — Portfolios";
     } else if (path === "/privacy") {
       document.title = "Privacy Policy — Portfolios";
     } else if (path === "/terms") {
@@ -164,7 +179,21 @@ function AppContent({
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/saved" element={<FavoritesPage />} />
 
-            {/* 7. Static Legal & Community Pages */}
+            {/* 7. Company & Business Pages */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/story" element={<AboutPage />} />
+            <Route path="/team" element={<TeamPage />} />
+            <Route path="/our-team" element={<TeamPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/support" element={<ContactPage />} />
+            <Route path="/inquiries" element={<ContactPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/jobs" element={<CareersPage />} />
+            <Route path="/join" element={<CareersPage />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/help" element={<FaqPage />} />
+
+            {/* 8. Static Legal & Community Pages */}
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/guidelines" element={<GuidelinesPage />} />
@@ -172,7 +201,7 @@ function AppContent({
             <Route path="/brand" element={<BrandAssetsPage />} />
             <Route path="/cookies" element={<CookiePolicyPage />} />
 
-            {/* 7. 404 Fallback */}
+            {/* 9. 404 Fallback */}
             <Route path="/404" element={<NotFoundPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
