@@ -35,6 +35,7 @@ interface AuthContextType {
   ) => Promise<{ error?: string; needsEmailVerification?: boolean }>;
   signOut: () => Promise<void>;
   resendVerificationEmail: (targetEmail?: string) => Promise<{ error?: string; success?: boolean }>;
+  refreshSession: () => Promise<{ verified: boolean }>;
   refreshProfile: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error?: string }>;
   isLoggedIn: boolean;
@@ -281,11 +282,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Auto sync on tab focus
-    const handleWindowFocus = async () => {
-      const cached = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
-      if (cached) {
-        try {
+    // Auto sync on tab focus or visibility change (e.g. returning after email verification click)
+    const syncVerificationStatus = async () => {
+      if (!isSupabaseConfigured) return;
+
+      try {
+        // 1. Direct Auth server check
+        const { data: { user: freshUser } } = await supabase.auth.getUser();
+        if (freshUser) {
+          const isVerified = checkEmailVerified(freshUser);
+          if (isVerified) {
+            // Update Supabase profiles table
+            await supabase.from("profiles").update({ is_email_verified: true }).eq("id", freshUser.id);
+            setUser((prev) => {
+              if (!prev) return null;
+              const next = { ...prev, isEmailVerified: true };
+              localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(next));
+              return next;
+            });
+            return;
+          }
+        }
+
+        // 2. Database profiles table check
+        const cached = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+        if (cached) {
           const u = JSON.parse(cached);
           if (u?.username || u?.id) {
             const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(u.id);
@@ -293,28 +314,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (isUuid) q = q.eq("id", u.id);
             else q = q.eq("username", u.username);
             const { data } = await q.maybeSingle();
-            if (data) {
-              const verified = data.is_email_verified === true;
+            if (data && data.is_email_verified === true) {
               setUser((prev) => {
                 if (!prev) return null;
-                const next = { ...prev, isEmailVerified: verified, id: data.id };
+                const next = { ...prev, isEmailVerified: true, id: data.id };
                 localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(next));
                 return next;
               });
             }
           }
-        } catch {
-          // Ignore
         }
+      } catch (e) {
+        console.warn("Auto verification check notice:", e);
       }
     };
 
-    window.addEventListener("focus", handleWindowFocus);
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === "visible") {
+        syncVerificationStatus();
+      }
+    };
+
+    window.addEventListener("focus", handleVisibilityOrFocus);
+    document.addEventListener("visibilitychange", handleVisibilityOrFocus);
 
     return () => {
       isMounted = false;
       subscription?.unsubscribe();
-      window.removeEventListener("focus", handleWindowFocus);
+      window.removeEventListener("focus", handleVisibilityOrFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityOrFocus);
     };
   }, [fetchProfile, checkEmailVerified]);
 
@@ -550,6 +578,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Force Refresh Session & Email Verification Status
+  const refreshSession = async (): Promise<{ verified: boolean }> => {
+    if (!isSupabaseConfigured) return { verified: false };
+
+    try {
+      // 1. Fetch live Auth User from Supabase Auth Server
+      const { data: { user: freshAuthUser } } = await supabase.auth.getUser();
+      const isConfirmed = checkEmailVerified(freshAuthUser);
+
+      if (freshAuthUser) {
+        // Also refresh session tokens
+        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+        if (refreshedSession) {
+          setSession(refreshedSession);
+        }
+
+        if (isConfirmed) {
+          await supabase.from("profiles").update({ is_email_verified: true }).eq("id", freshAuthUser.id);
+        }
+
+        await fetchProfile(
+          freshAuthUser.id,
+          freshAuthUser.email,
+          freshAuthUser.user_metadata,
+          freshAuthUser
+        );
+
+        return { verified: isConfirmed };
+      }
+
+      // 2. Fallback check from DB
+      if (user?.id || user?.username) {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
+        let q = supabase.from("profiles").select("*");
+        if (isUuid) q = q.eq("id", user.id);
+        else q = q.eq("username", user.username);
+        const { data: dbProfile } = await q.maybeSingle();
+        if (dbProfile?.is_email_verified === true) {
+          setUser((prev) => (prev ? { ...prev, isEmailVerified: true } : null));
+          return { verified: true };
+        }
+      }
+
+      return { verified: false };
+    } catch (err) {
+      console.warn("Session refresh error:", err);
+      return { verified: false };
+    }
+  };
+
   // Refresh Profile
   const refreshProfile = async () => {
     if (session?.user?.id) {
@@ -606,6 +684,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signOut,
         resendVerificationEmail,
+        refreshSession,
         refreshProfile,
         updateProfile,
         isLoggedIn: Boolean(user || session),

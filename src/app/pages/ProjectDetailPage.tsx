@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../context/AuthContext";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { ProjectDetailSkeleton } from "../components/LoadingSkeletons";
 import confetti from "canvas-confetti";
 
 export default function ProjectDetailPage() {
@@ -36,6 +38,7 @@ export default function ProjectDetailPage() {
     getProjectComments,
     addComment,
     deleteComment,
+    loading: projectsLoading,
   } = useProjects();
 
   const projectFromHook = getProjectBySlug(slug || "");
@@ -44,17 +47,22 @@ export default function ProjectDetailPage() {
 
   // If not found in hook, query Supabase directly
   useEffect(() => {
-    if (!projectFromHook && slug) {
+    if (!projectFromHook && slug && isSupabaseConfigured) {
       const fetchDirect = async () => {
         setDirectLoading(true);
         try {
-          const { data } = await supabase
-            .from("projects")
-            .select("*, creator:profiles(*)")
-            .or(`slug.eq.${slug},id.eq.${slug}`)
-            .maybeSingle();
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+          let query = supabase.from("projects").select("*, creator:profiles(*)");
 
-          if (data) {
+          if (isUuid) {
+            query = query.or(`id.eq.${slug},slug.eq.${slug}`);
+          } else {
+            query = query.eq("slug", slug);
+          }
+
+          const { data, error } = await query.maybeSingle();
+
+          if (!error && data) {
             setDirectProject({
               id: data.id,
               slug: data.slug || data.id,
@@ -116,13 +124,8 @@ export default function ProjectDetailPage() {
     }
   }, [project?.id]);
 
-  if (directLoading) {
-    return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3">
-        <div className="w-8 h-8 rounded-full border-2 border-[#CDF22B] border-t-transparent animate-spin" />
-        <p className="text-xs text-muted-foreground">Loading case study...</p>
-      </div>
-    );
+  if ((projectsLoading && !project) || directLoading) {
+    return <ProjectDetailSkeleton />;
   }
 
   if (!project) {
@@ -136,7 +139,7 @@ export default function ProjectDetailPage() {
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full btn-primary text-xs font-bold"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full btn-primary text-xs font-bold shadow-md cursor-pointer"
           >
             <ArrowLeft size={14} />
             <span>Return to Explore</span>

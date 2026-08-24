@@ -159,9 +159,25 @@ export default function CreatorsPage() {
 
       {/* Creators Grid / Loading / Empty State */}
       {loading ? (
-        <div className="py-20 text-center flex flex-col items-center justify-center gap-3">
-          <Loader2 size={32} className="animate-spin text-[#CDF22B]" />
-          <p className="text-xs text-muted-foreground">Loading creators directory...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-xs flex flex-col justify-between"
+            >
+              <div className="h-28 bg-slate-200 dark:bg-[#171915]" />
+              <div className="p-6 -mt-10 space-y-3">
+                <div className="w-16 h-16 rounded-2xl bg-slate-300 dark:bg-[#1e231b] border-2 border-background" />
+                <div className="h-4 bg-slate-200 dark:bg-[#1e231b] rounded-md w-32" />
+                <div className="h-3 bg-slate-200 dark:bg-[#1e231b] rounded-md w-48" />
+                <div className="h-3 bg-slate-200 dark:bg-[#1e231b] rounded-md w-24" />
+              </div>
+              <div className="px-6 py-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-between">
+                <div className="h-3 bg-slate-200 dark:bg-[#1e231b] rounded-md w-20" />
+                <div className="h-3 bg-slate-200 dark:bg-[#1e231b] rounded-md w-16" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : filteredCreators.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

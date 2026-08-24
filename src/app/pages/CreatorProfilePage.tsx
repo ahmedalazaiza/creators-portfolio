@@ -26,6 +26,7 @@ import {
   Instagram,
   AlertCircle,
   Loader2,
+  Users,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../hooks/useProjects";
@@ -34,6 +35,7 @@ import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { Profile, Project } from "../types";
 import ProjectCard from "../components/ProjectCard";
 import EditProfileModal from "../components/EditProfileModal";
+import { ProfileHeaderSkeleton, ProjectGridSkeleton } from "../components/LoadingSkeletons";
 
 export default function CreatorProfilePage() {
   const { username } = useParams<{ username: string }>();
@@ -62,35 +64,101 @@ export default function CreatorProfilePage() {
 
   // Fetch real profile and projects from Supabase
   useEffect(() => {
+    let isMounted = true;
+
     const fetchCreatorData = async () => {
       // If viewing own profile and user exists
       if (isOwnProfile && user) {
         setDbProfile(user as any);
-        setLoading(false);
+
+        if (isSupabaseConfigured) {
+          try {
+            // Also fetch own projects from Supabase
+            const { data: ownProjects } = await supabase
+              .from("projects")
+              .select("*, creator:profiles(*)")
+              .eq("user_id", user.id)
+              .order("created_at", { ascending: false });
+
+            if (isMounted && ownProjects && ownProjects.length > 0) {
+              const mapped = ownProjects.map((p: any) => ({
+                id: p.id,
+                userId: p.user_id,
+                title: p.title,
+                slug: p.slug || p.id,
+                description: p.description,
+                fullDescription: p.full_description,
+                category: p.category,
+                categoryId: p.category_id,
+                coverImage: p.cover_image,
+                accentColor: p.accent_color || "#CDF22B",
+                year: p.year || "2025",
+                tools: p.tools || [],
+                tags: p.tags || [],
+                images: p.images || [],
+                contentBlocks: p.content_blocks || [],
+                isFeatured: p.is_featured || false,
+                isAppreciated: false,
+                isSaved: false,
+                viewsCount: p.views_count || 0,
+                appreciationsCount: p.appreciations_count || 0,
+                createdAt: p.created_at,
+                updatedAt: p.updated_at,
+                creator: {
+                  id: user.id,
+                  username: user.username,
+                  fullName: user.fullName || "Creative Member",
+                  avatarUrl: user.avatarUrl,
+                  headline: user.headline,
+                  bio: user.bio,
+                  location: user.location,
+                  website: user.website,
+                  skills: user.skills || [],
+                },
+              }));
+              setDbProjects(mapped);
+            }
+          } catch (e) {
+            console.warn("Error fetching own profile projects:", e);
+          }
+        }
+
+        if (isMounted) setLoading(false);
         return;
       }
 
       if (!cleanUsername) {
-        setNotFound(true);
-        setLoading(false);
+        if (isMounted) {
+          setNotFound(true);
+          setLoading(false);
+        }
         return;
       }
 
       if (!isSupabaseConfigured) {
-        setLoading(false);
+        if (isMounted) setLoading(false);
         return;
       }
 
-      setLoading(true);
-      setNotFound(false);
+      if (isMounted) {
+        setLoading(true);
+        setNotFound(false);
+      }
 
       try {
-        // 1. Fetch Profile from Supabase
-        const { data: profileData, error: profileErr } = await supabase
-          .from("profiles")
-          .select("*")
-          .or(`username.ilike.${cleanUsername},id.eq.${cleanUsername}`)
-          .maybeSingle();
+        // 1. Fetch Profile from Supabase with safe UUID check
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanUsername);
+        let profileQuery = supabase.from("profiles").select("*");
+
+        if (isUuid) {
+          profileQuery = profileQuery.or(`id.eq.${cleanUsername},username.ilike.${cleanUsername}`);
+        } else {
+          profileQuery = profileQuery.ilike("username", cleanUsername);
+        }
+
+        const { data: profileData, error: profileErr } = await profileQuery.maybeSingle();
+
+        if (!isMounted) return;
 
         if (profileErr || !profileData) {
           setNotFound(true);
@@ -131,7 +199,7 @@ export default function CreatorProfilePage() {
             .eq("user_id", profileData.id)
             .order("created_at", { ascending: false });
 
-          if (!projectsErr && projectsData) {
+          if (!projectsErr && projectsData && isMounted) {
             const mapped = projectsData.map((p: any) => ({
               id: p.id,
               userId: p.user_id,
@@ -295,9 +363,12 @@ export default function CreatorProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3">
-        <Loader2 size={32} className="animate-spin text-[#CDF22B]" />
-        <p className="text-xs text-muted-foreground">Loading creator portfolio...</p>
+      <div className="min-h-screen pt-4 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <ProfileHeaderSkeleton />
+        <div className="space-y-4 pt-2">
+          <div className="h-5 w-40 bg-slate-200 dark:bg-[#1e231b] rounded-full animate-pulse" />
+          <ProjectGridSkeleton count={4} />
+        </div>
       </div>
     );
   }

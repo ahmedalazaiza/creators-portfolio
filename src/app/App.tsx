@@ -4,6 +4,8 @@ import { AnimatePresence } from "motion/react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
+import EmailVerificationBanner from "./components/EmailVerificationBanner";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // Pages
@@ -79,8 +81,10 @@ function AppContent({
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-[#CDF22B] selection:text-[#070905]">
+      <ScrollToTop />
       <PageTitleHandler />
       {!isAuthPage && <Navbar isDark={isDark} onToggleTheme={onToggleTheme} />}
+      {!isAuthPage && <EmailVerificationBanner />}
 
       <div className="flex-1">
         <AnimatePresence mode="wait">

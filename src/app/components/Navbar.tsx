@@ -160,7 +160,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             <button
               onClick={() => setSearchModalOpen(true)}
               aria-label="Open search and filter modal"
-              className="sm:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="sm:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
             >
               <Search size={17} />
             </button>
@@ -170,7 +170,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               to="/favorites"
               aria-label="View Saved Favorites"
               title="Saved Favorites"
-              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
             >
               <Bookmark size={16} />
             </Link>
@@ -179,7 +179,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             <button
               onClick={onToggleTheme}
               aria-label="Toggle color theme"
-              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
             >
               {isDark ? <Sun size={16} className="text-[#CDF22B]" /> : <Moon size={16} />}
             </button>

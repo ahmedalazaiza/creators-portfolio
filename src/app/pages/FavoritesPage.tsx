@@ -17,7 +17,7 @@ import {
 import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../context/AuthContext";
 import ProjectCard from "../components/ProjectCard";
-import { CATEGORIES } from "../data/categories";
+import { CATEGORIES, matchesCategory } from "../data/categories";
 
 export default function FavoritesPage() {
   const { allProjects, loading } = useProjects();
@@ -36,8 +36,10 @@ export default function FavoritesPage() {
   const filteredFavorites = useMemo(() => {
     return favoriteProjects.filter((project) => {
       // Category match
-      if (selectedCategory !== "all" && project.categoryId !== selectedCategory) {
-        return false;
+      if (selectedCategory !== "all") {
+        if (!matchesCategory(project.category, project.categoryId, project.tags, selectedCategory)) {
+          return false;
+        }
       }
 
       // Search match

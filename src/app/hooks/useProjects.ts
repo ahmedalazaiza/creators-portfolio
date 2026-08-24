@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Project, ProjectFilters, CommentItem, Profile } from "../types";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { matchesCategory } from "../data/categories";
 
 const LOCAL_STORAGE_PROJECTS_KEY = "portfolios_real_projects_v1";
 const LOCAL_STORAGE_COMMENTS_KEY = "portfolios_real_comments_v1";
@@ -243,12 +244,9 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
 
     // Category
     if (filters.category && filters.category !== "all") {
-      const catSlug = filters.category.toLowerCase();
-      const matchesCat =
-        project.category?.toLowerCase() === catSlug ||
-        project.categoryId?.toLowerCase() === catSlug ||
-        project.tags?.some((t) => t.toLowerCase().includes(catSlug));
-      if (!matchesCat) return false;
+      if (!matchesCategory(project.category, project.categoryId, project.tags, filters.category)) {
+        return false;
+      }
     }
 
     // Sub-category

@@ -146,3 +146,151 @@ export const SORT_OPTIONS = [
   { label: "Most Viewed", value: "views" },
   { label: "Most Recent", value: "newest" },
 ] as const;
+
+export const CATEGORY_ALIASES: Record<string, string[]> = {
+  "ui-ux": [
+    "ui-ux",
+    "ui/ux",
+    "ui / ux",
+    "ui",
+    "ux",
+    "product design",
+    "ui/ux systems",
+    "ui/ux & product design",
+    "web design",
+    "web-design",
+    "mobile apps",
+    "mobile-apps",
+    "design systems",
+    "design-systems",
+    "dashboards",
+    "wireframing",
+    "saas",
+  ],
+  "branding": [
+    "branding",
+    "brand",
+    "brand identity",
+    "branding & visual identity",
+    "visual identity",
+    "visual-identity",
+    "logo design",
+    "logo-design",
+    "logo",
+    "packaging",
+    "typography",
+    "art direction",
+    "art-direction",
+    "identity",
+  ],
+  "3d-motion": [
+    "3d-motion",
+    "3d",
+    "motion",
+    "3d & motion graphics",
+    "3d & cgi motion",
+    "cgi",
+    "motion graphics",
+    "motion-design",
+    "cgi rendering",
+    "cgi-rendering",
+    "character-3d",
+    "vfx",
+    "vfx-simulation",
+    "product-3d",
+    "render",
+    "animation",
+  ],
+  "photography": [
+    "photography",
+    "photo",
+    "portrait",
+    "architecture-photo",
+    "landscape",
+    "street-photo",
+    "commercial-photo",
+    "camera",
+    "editorial photo",
+  ],
+  "illustration": [
+    "illustration",
+    "illustration & concept",
+    "visual art",
+    "concept art",
+    "concept-art",
+    "digital painting",
+    "digital-painting",
+    "vector art",
+    "vector-art",
+    "editorial-ill",
+    "character-concept",
+    "drawing",
+  ],
+  "architecture": [
+    "architecture",
+    "architecture & spatial",
+    "interior design",
+    "interior-design",
+    "spatial",
+    "arch-viz",
+    "urban-spaces",
+    "exhibition-pavilions",
+    "brutalist",
+    "living spaces",
+  ],
+  "ai-art": [
+    "ai-art",
+    "ai & generative art",
+    "generative art",
+    "ai",
+    "midjourney",
+    "midjourney-prompts",
+    "generative-code",
+    "ai-video",
+    "synthetic-photo",
+    "neural",
+  ],
+};
+
+export function matchesCategory(
+  projectCat?: string,
+  projectCatId?: string,
+  projectTags?: string[],
+  targetCategory?: string
+): boolean {
+  if (!targetCategory || targetCategory === "all") return true;
+
+  const targetLower = targetCategory.toLowerCase().trim();
+  const projCatLower = (projectCat || "").toLowerCase().trim();
+  const projCatIdLower = (projectCatId || "").toLowerCase().trim();
+
+  // 1. Direct matches
+  if (projCatLower === targetLower || projCatIdLower === targetLower) return true;
+
+  // 2. Direct slug aliases check
+  for (const [key, aliases] of Object.entries(CATEGORY_ALIASES)) {
+    const isTargetThisKey = key === targetLower || aliases.includes(targetLower);
+    if (isTargetThisKey) {
+      if (aliases.includes(projCatLower) || aliases.includes(projCatIdLower)) return true;
+      if (
+        projectTags &&
+        projectTags.some((t) => aliases.includes(t.toLowerCase().trim()))
+      ) {
+        return true;
+      }
+    }
+  }
+
+  // 3. Fallback partial inclusion
+  if (projCatLower && (projCatLower.includes(targetLower) || targetLower.includes(projCatLower))) {
+    return true;
+  }
+  if (
+    projectTags &&
+    projectTags.some((t) => t.toLowerCase().includes(targetLower))
+  ) {
+    return true;
+  }
+
+  return false;
+}

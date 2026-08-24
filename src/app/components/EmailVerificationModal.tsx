@@ -12,11 +12,38 @@ export default function EmailVerificationModal({
   isOpen,
   onClose,
 }: EmailVerificationModalProps) {
-  const { user, resendVerificationEmail } = useAuth();
+  const { user, resendVerificationEmail, refreshSession } = useAuth();
   const [sending, setSending] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error" | "info"; text: string } | null>(null);
 
   if (!isOpen) return null;
+
+  const handleRefreshStatus = async () => {
+    setChecking(true);
+    setFeedback(null);
+    try {
+      const res = await refreshSession();
+      if (res.verified) {
+        setFeedback({
+          type: "success",
+          text: "Verification confirmed! You can now publish projects.",
+        });
+        setTimeout(() => {
+          onClose();
+        }, 1200);
+      } else {
+        setFeedback({
+          type: "info",
+          text: "Verification not detected yet. Please click the confirmation link in your email, then try again.",
+        });
+      }
+    } catch {
+      setFeedback({ type: "error", text: "Failed to verify status. Please check your connection." });
+    } finally {
+      setChecking(false);
+    }
+  };
 
   const handleResend = async () => {
     setSending(true);
@@ -76,7 +103,9 @@ export default function EmailVerificationModal({
               className={`p-3.5 rounded-2xl text-xs flex items-start gap-2.5 font-medium ${
                 feedback.type === "success"
                   ? "bg-[#CDF22B]/20 text-slate-950 dark:text-[#CDF22B] border border-[#CDF22B]/50"
-                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20"
+                  : feedback.type === "error"
+                  ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20"
+                  : "bg-slate-100 dark:bg-[#1e231b] text-foreground border border-slate-200 dark:border-white/10"
               }`}
             >
               {feedback.type === "success" ? (
@@ -93,24 +122,38 @@ export default function EmailVerificationModal({
         <div className="flex flex-col gap-2 pt-2">
           <button
             type="button"
-            onClick={handleResend}
-            disabled={sending}
+            onClick={handleRefreshStatus}
+            disabled={checking}
             className="w-full py-3 rounded-full btn-primary font-bold text-xs shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            {sending ? (
+            {checking ? (
               <Loader2 size={16} className="animate-spin text-slate-900" />
             ) : (
-              <Send size={14} />
+              <Sparkles size={14} />
             )}
-            <span>Resend Verification Email</span>
+            <span>{checking ? "Checking Verification..." : "I've verified my email – Refresh Status"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={sending}
+            className="w-full py-2.5 rounded-full bg-slate-100 dark:bg-[#1e231b] hover:bg-slate-200 dark:hover:bg-[#2E3823] text-foreground font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {sending ? (
+              <Loader2 size={14} className="animate-spin text-foreground" />
+            ) : (
+              <Send size={13} />
+            )}
+            <span>Resend Verification Link</span>
           </button>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 rounded-full border border-slate-200 dark:border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="w-full py-2 rounded-full text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
-            I'll Verify Later
+            Cancel / Close
           </button>
         </div>
       </motion.div>

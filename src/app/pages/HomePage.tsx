@@ -18,7 +18,8 @@ import { useProjects } from "../hooks/useProjects";
 import ProjectCard from "../components/ProjectCard";
 import CategorySectionSlider from "../components/CategorySectionSlider";
 import SearchModal from "../components/SearchModal";
-import { CATEGORIES, POPULAR_TOOLS, SORT_OPTIONS } from "../data/categories";
+import { CATEGORIES, POPULAR_TOOLS, SORT_OPTIONS, matchesCategory } from "../data/categories";
+import { CategorySliderSkeleton, ProjectGridSkeleton } from "../components/LoadingSkeletons";
 import { SortOption } from "../types";
 
 export default function HomePage() {
@@ -94,18 +95,23 @@ export default function HomePage() {
   const projectsByCategory = useMemo(() => {
     const map: Record<string, typeof allProjects> = {};
     CATEGORIES.filter((c) => c.slug !== "all").forEach((cat) => {
-      const catSlug = cat.slug.toLowerCase();
       map[cat.slug] = allProjects.filter((p) => {
         if (p.status === "draft") return false;
-        return (
-          p.categoryId?.toLowerCase() === catSlug ||
-          p.category.toLowerCase().includes(catSlug) ||
-          catSlug.includes(p.category.toLowerCase().replace(/[^a-z0-9]/g, "-"))
-        );
+        return matchesCategory(p.category, p.categoryId, p.tags, cat.slug);
       });
     });
     return map;
   }, [allProjects]);
+
+  // Dynamically compute project count per category
+  const getCategoryCount = (catSlug: string) => {
+    if (catSlug === "all") {
+      return allProjects.filter((p) => p.status !== "draft").length;
+    }
+    return allProjects.filter(
+      (p) => p.status !== "draft" && matchesCategory(p.category, p.categoryId, p.tags, catSlug)
+    ).length;
+  };
 
   // Update URL params helper
   const updateParams = (newParams: {
@@ -342,15 +348,13 @@ export default function HomePage() {
                 }`}
               >
                 <span>{cat.name}</span>
-                {cat.projectCount && (
-                  <span
-                    className={`text-[10px] opacity-70 ${
-                      isActive ? "text-slate-900 font-mono font-bold" : ""
-                    }`}
-                  >
-                    ({cat.projectCount})
-                  </span>
-                )}
+                <span
+                  className={`text-[10px] opacity-75 font-mono ${
+                    isActive ? "text-slate-900 font-bold" : "text-muted-foreground"
+                  }`}
+                >
+                  ({getCategoryCount(cat.slug)})
+                </span>
               </button>
             );
           })}
@@ -431,7 +435,13 @@ export default function HomePage() {
         {isMultiCategoryMode ? (
           /* Multi-Category Sliders Showcase (Default Home Browsing) */
           <div className="space-y-12 pt-4">
-            {allProjects.length === 0 ? (
+            {loading && allProjects.length === 0 ? (
+              <div className="space-y-12">
+                <CategorySliderSkeleton />
+                <CategorySliderSkeleton />
+                <CategorySliderSkeleton />
+              </div>
+            ) : allProjects.length === 0 ? (
               <div className="glass-card rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 sm:p-16 text-center max-w-lg mx-auto space-y-4 shadow-sm">
                 <div className="w-14 h-14 rounded-2xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto shadow-inner">
                   <Sparkles size={28} />
@@ -493,32 +503,58 @@ export default function HomePage() {
               )}
             </div>
 
-            {projects.length > 0 ? (
+            {loading && projects.length === 0 ? (
+              <ProjectGridSkeleton count={8} />
+            ) : projects.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {projects.map((project) => (
                   <ProjectCard key={project.id} project={project} />
                 ))}
               </div>
             ) : (
-              /* Empty Results */
-              <div className="glass-card rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 text-center max-w-md mx-auto space-y-4 shadow-xs">
+              /* Enhanced Empty Results */
+              <div className="glass-card rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 text-center max-w-lg mx-auto space-y-5 shadow-xs">
                 <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-[#1e231b] text-muted-foreground flex items-center justify-center mx-auto">
                   <FolderOpen size={24} />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h3 className="text-sm font-bold text-foreground">
-                    No matching projects found
+                    {searchQuery
+                      ? `No results for "${searchQuery}"`
+                      : activeCategory !== "all"
+                      ? `No projects in ${currentCategoryObj.name} yet`
+                      : "No matching projects found"}
                   </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Try adjusting your keyword, choosing another category, or resetting filters.
+                  <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
+                    {searchQuery
+                      ? "Try searching for broader keywords, software tools, or explore other creative fields."
+                      : activeCategory !== "all"
+                      ? `Be the first creator to showcase a project in ${currentCategoryObj.name}!`
+                      : "Try adjusting your filters, selecting a different timeframe, or resetting all criteria."}
                   </p>
                 </div>
-                <button
-                  onClick={handleResetFilters}
-                  className="px-5 py-2.5 rounded-full btn-primary text-xs font-bold cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-md"
-                >
-                  Reset All Filters
-                </button>
+                <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+                  <button
+                    onClick={handleResetFilters}
+                    className="px-5 py-2.5 rounded-full btn-primary text-xs font-bold cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-md"
+                  >
+                    Reset All Filters
+                  </button>
+                  {activeCategory !== "all" && (
+                    <button
+                      onClick={() => handleCategoryChange("all")}
+                      className="px-4 py-2.5 rounded-full bg-slate-100 dark:bg-[#1e231b] hover:bg-slate-200 dark:hover:bg-[#2E3823] text-foreground text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      Explore All Categories
+                    </button>
+                  )}
+                  <Link
+                    to={isLoggedIn ? "/create" : "/signup"}
+                    className="px-4 py-2.5 rounded-full bg-[#CDF22B]/20 border border-[#CDF22B]/40 text-slate-900 dark:text-[#CDF22B] text-xs font-bold hover:bg-[#CDF22B]/30 transition-colors"
+                  >
+                    Upload Project
+                  </Link>
+                </div>
               </div>
             )}
           </div>

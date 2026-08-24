@@ -16,10 +16,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../hooks/useProjects";
+import { ProjectGridSkeleton } from "../components/LoadingSkeletons";
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { projects, deleteProject } = useProjects();
+  const { projects, deleteProject, loading } = useProjects();
 
   // Filter projects belonging to current user
   const userProjects = useMemo(() => {
@@ -144,7 +145,9 @@ export default function DashboardPage() {
           </h2>
         </div>
 
-        {userProjects.length > 0 ? (
+        {loading && userProjects.length === 0 ? (
+          <ProjectGridSkeleton count={3} />
+        ) : userProjects.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {userProjects.map((p) => (
               <div
