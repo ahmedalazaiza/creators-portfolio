@@ -108,7 +108,7 @@ export default function DashboardPage() {
         <div className="glass-card p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs font-semibold">Appreciations & Likes</span>
-            <div className="p-2 rounded-xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B]">
+            <div className="p-2 rounded-xl bg-slate-900 dark:bg-slate-800 text-[#CDF22B]">
               <Heart size={16} />
             </div>
           </div>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
             {userProjects.length}
           </div>
           <span className="text-[11px] text-muted-foreground">
-            Live public case studies
+            Live in showcase directory
           </span>
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 text-[11px] font-semibold text-foreground">
+                    <span className="px-2.5 py-1 rounded-full bg-slate-900/90 text-[11px] font-semibold text-[#CDF22B]">
                       {p.category}
                     </span>
                   </div>
@@ -177,7 +177,7 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
                     <div className="flex items-center gap-3 text-muted-foreground text-[11px] font-medium">
                       <span className="flex items-center gap-1">
-                        <Heart size={12} className="text-[#CDF22B]" /> {p.appreciationsCount || 0}
+                        <Heart size={12} className="text-rose-500 fill-rose-500" /> {p.appreciationsCount || 0}
                       </span>
                       <span className="flex items-center gap-1">
                         <Eye size={12} /> {p.viewsCount || 0}

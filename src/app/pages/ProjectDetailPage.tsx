@@ -18,6 +18,7 @@ import {
   Edit3,
   Check,
   AlertCircle,
+  Trash2,
 } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../context/AuthContext";
@@ -34,9 +35,71 @@ export default function ProjectDetailPage() {
     incrementViews,
     getProjectComments,
     addComment,
+    deleteComment,
   } = useProjects();
 
-  const project = getProjectBySlug(slug || "");
+  const projectFromHook = getProjectBySlug(slug || "");
+  const [directProject, setDirectProject] = useState<any>(null);
+  const [directLoading, setDirectLoading] = useState(false);
+
+  // If not found in hook, query Supabase directly
+  useEffect(() => {
+    if (!projectFromHook && slug) {
+      const fetchDirect = async () => {
+        setDirectLoading(true);
+        try {
+          const { data } = await supabase
+            .from("projects")
+            .select("*, creator:profiles(*)")
+            .or(`slug.eq.${slug},id.eq.${slug}`)
+            .maybeSingle();
+
+          if (data) {
+            setDirectProject({
+              id: data.id,
+              slug: data.slug || data.id,
+              title: data.title,
+              description: data.description,
+              fullDescription: data.full_description,
+              category: data.category,
+              coverImage: data.cover_image,
+              accentColor: data.accent_color || "#CDF22B",
+              year: data.year || "2025",
+              tools: data.tools || [],
+              tags: data.tags || [],
+              images: data.images || [],
+              contentBlocks: data.content_blocks || [],
+              creator: data.creator
+                ? {
+                    id: data.creator.id,
+                    username: data.creator.username,
+                    fullName: data.creator.full_name || data.creator.fullName,
+                    avatarUrl: data.creator.avatar_url || data.creator.avatarUrl,
+                    headline: data.creator.headline,
+                    bio: data.creator.bio,
+                    location: data.creator.location,
+                    website: data.creator.website,
+                  }
+                : null,
+              userId: data.user_id,
+              status: data.status,
+              viewsCount: data.views_count || 0,
+              appreciationsCount: data.appreciations_count || 0,
+              createdAt: data.created_at,
+            });
+          }
+        } catch (err) {
+          console.warn("Direct fetch error in ProjectDetailPage:", err);
+        } finally {
+          setDirectLoading(false);
+        }
+      };
+
+      fetchDirect();
+    }
+  }, [projectFromHook, slug]);
+
+  const project = projectFromHook || directProject;
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
@@ -52,6 +115,15 @@ export default function ProjectDetailPage() {
       incrementViews(project.id);
     }
   }, [project?.id]);
+
+  if (directLoading) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3">
+        <div className="w-8 h-8 rounded-full border-2 border-[#CDF22B] border-t-transparent animate-spin" />
+        <p className="text-xs text-muted-foreground">Loading case study...</p>
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -76,6 +148,18 @@ export default function ProjectDetailPage() {
 
   const comments = getProjectComments(project.id);
   const isOwner = user?.id === project.userId || user?.username === project.creator?.username;
+
+  // Handle Favorite / Save
+  const handleToggleFavorite = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
+    const nextState = !isSaved;
+    setIsSaved(nextState);
+    toggleSave(project.id, user?.id);
+  };
 
   // Handle Appreciate
   const handleAppreciate = () => {
@@ -211,19 +295,34 @@ export default function ProjectDetailPage() {
             </div>
           </Link>
 
-          {/* Appreciate CTA Button */}
-          <button
-            onClick={handleAppreciate}
-            className={`px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
-              isLiked
-                ? "bg-[#CDF22B] text-slate-900 shadow-md shadow-[#CDF22B]/30"
-                : "glass-card hover:bg-[#CDF22B] hover:text-slate-900 text-foreground border border-slate-200 dark:border-slate-800"
-            }`}
-          >
-            <Heart size={15} className={isLiked ? "fill-current" : ""} />
-            <span>{isLiked ? "Appreciated" : "Appreciate"}</span>
-            <span className="opacity-75 font-mono">({likesCount})</span>
-          </button>
+          {/* Action Buttons: Favorite & Appreciate */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleToggleFavorite}
+              aria-label="Save to favorites"
+              title={isLoggedIn ? (isSaved ? "Saved to Favorites" : "Save to Favorites") : "Sign in to save"}
+              className={`p-2.5 rounded-full text-xs font-bold flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95 ${
+                isSaved
+                  ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/30 font-bold"
+                  : "glass-card hover:bg-[#CDF22B] hover:text-slate-950 text-foreground border border-slate-200 dark:border-slate-800"
+              }`}
+            >
+              <Bookmark size={15} className={isSaved ? "fill-current text-slate-950" : ""} />
+            </button>
+
+            <button
+              onClick={handleAppreciate}
+              className={`px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
+                isLiked
+                  ? "bg-rose-500 text-white shadow-md shadow-rose-500/30"
+                  : "glass-card hover:bg-rose-500 hover:text-white text-foreground border border-slate-200 dark:border-slate-800"
+              }`}
+            >
+              <Heart size={15} className={isLiked ? "fill-current text-white" : ""} />
+              <span>{isLiked ? "Appreciated" : "Appreciate"}</span>
+              <span className="opacity-75 font-mono">({likesCount})</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -367,39 +466,76 @@ export default function ProjectDetailPage() {
         )}
 
         {/* Comments List */}
-        <div className="space-y-4 pt-2">
+        <div className="space-y-3 pt-2">
           {comments.length > 0 ? (
-            comments.map((c) => (
-              <div
-                key={c.id}
-                className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/60"
-              >
-                <img
-                  src={
-                    c.user?.avatarUrl ||
-                    `https://api.dicebear.com/7.x/shapes/svg?seed=${c.user?.username || "anon"}`
-                  }
-                  alt={c.user?.fullName}
-                  className="w-7 h-7 rounded-full object-cover bg-slate-100 shrink-0"
-                />
-                <div className="space-y-1 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-foreground">
-                      {c.user?.fullName}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground font-mono">
-                      {new Date(c.createdAt).toLocaleDateString()}
-                    </span>
+            comments.map((c) => {
+              const canDelete =
+                user &&
+                (user.id === c.user?.id ||
+                  user.username === c.user?.username ||
+                  user.id === project.userId);
+
+              return (
+                <div
+                  key={c.id}
+                  className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 group"
+                >
+                  <Link to={`/@${c.user?.username || "creator"}`}>
+                    <img
+                      src={
+                        c.user?.avatarUrl ||
+                        `https://api.dicebear.com/7.x/shapes/svg?seed=${c.user?.username || "anon"}`
+                      }
+                      alt={c.user?.fullName}
+                      className="w-8 h-8 rounded-full object-cover bg-slate-100 shrink-0 border border-white dark:border-slate-700"
+                    />
+                  </Link>
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <Link
+                          to={`/@${c.user?.username || "creator"}`}
+                          className="text-xs font-bold text-foreground hover:text-[#CDF22B] transition-colors truncate"
+                        >
+                          {c.user?.fullName || "Creative Member"}
+                        </Link>
+                        {c.user?.username && (
+                          <span className="text-[11px] text-muted-foreground font-mono">
+                            @{c.user.username}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] text-muted-foreground font-mono">
+                          {new Date(c.createdAt).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+
+                        {canDelete && (
+                          <button
+                            onClick={() => deleteComment(c.id)}
+                            aria-label="Delete comment"
+                            title="Delete comment"
+                            className="p-1 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                      {c.content}
+                    </p>
                   </div>
-                  <p className="text-xs text-foreground/90 leading-relaxed">
-                    {c.content}
-                  </p>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
-            <p className="text-xs text-muted-foreground text-center py-4">
-              Be the first to leave a comment on this project!
+            <p className="text-xs text-muted-foreground text-center py-6">
+              Be the first to share feedback and start the conversation on this project!
             </p>
           )}
         </div>

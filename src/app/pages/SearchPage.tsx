@@ -52,7 +52,8 @@ export default function SearchPage() {
     sortBy,
   });
 
-  const { allCreators } = useCreator();
+  const { creatorsList } = useCreator();
+  const allCreators = creatorsList || [];
 
   // Sync with URL params
   useEffect(() => {

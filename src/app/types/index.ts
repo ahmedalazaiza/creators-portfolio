@@ -31,6 +31,14 @@ export interface Profile {
   createdAt?: string;
 }
 
+export interface SubCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -38,6 +46,7 @@ export interface Category {
   description?: string;
   icon?: string;
   projectCount?: number;
+  subCategories?: SubCategory[];
 }
 
 export interface ProjectImage {
@@ -149,9 +158,11 @@ export type SortOption = 'featured' | 'appreciations' | 'views' | 'newest';
 
 export interface ProjectFilters {
   category?: string;
+  subCategory?: string;
   tool?: string;
   searchQuery?: string;
   sortBy?: SortOption;
   color?: string;
   feedType?: FeedType;
+  timeframe?: string;
 }

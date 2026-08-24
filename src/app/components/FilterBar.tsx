@@ -48,7 +48,7 @@ export default function FilterBar({
   return (
     <div className="space-y-3.5">
       {/* Behance Top Discipline Pills Bar (Scrollable horizontally) */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar border-b border-border/40">
+      <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 no-scrollbar border-b border-border/40">
         {CATEGORIES.map((cat) => {
           const isSelected = activeCategory === cat.slug;
           return (

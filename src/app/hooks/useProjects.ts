@@ -1,45 +1,43 @@
 import { useState, useEffect, useCallback } from "react";
-import { Project, ProjectFilters, Comment, Profile } from "../types";
-import { MOCK_PROJECTS, MOCK_COMMENTS, MOCK_CREATORS } from "../data/mockData";
+import { Project, ProjectFilters, CommentItem, Profile } from "../types";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
-const LOCAL_STORAGE_PROJECTS_KEY = "azaiza_gallery_projects_v3";
-const LOCAL_STORAGE_COMMENTS_KEY = "azaiza_gallery_comments_v3";
-const LOCAL_STORAGE_APPRECIATIONS_KEY = "azaiza_gallery_appreciations_v3";
-const LOCAL_STORAGE_SAVES_KEY = "azaiza_gallery_saves_v3";
+const LOCAL_STORAGE_PROJECTS_KEY = "portfolios_real_projects_v1";
+const LOCAL_STORAGE_COMMENTS_KEY = "portfolios_real_comments_v1";
+const LOCAL_STORAGE_APPRECIATIONS_KEY = "portfolios_real_appreciations_v1";
+const LOCAL_STORAGE_SAVES_KEY = "portfolios_real_saves_v1";
 
-export function useProjects(filters?: ProjectFilters) {
+export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
   const [projects, setProjects] = useState<Project[]>(() => {
+    if (typeof window === "undefined") return [];
     const saved = localStorage.getItem(LOCAL_STORAGE_PROJECTS_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
+        if (Array.isArray(parsed)) return parsed;
       } catch {
-        return MOCK_PROJECTS;
+        return [];
       }
     }
-    return MOCK_PROJECTS;
+    return [];
   });
 
-  const [comments, setComments] = useState<Comment[]>(() => {
+  const [comments, setComments] = useState<CommentItem[]>(() => {
+    if (typeof window === "undefined") return [];
     const saved = localStorage.getItem(LOCAL_STORAGE_COMMENTS_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
+        if (Array.isArray(parsed)) return parsed;
       } catch {
-        return MOCK_COMMENTS;
+        return [];
       }
     }
-    return MOCK_COMMENTS;
+    return [];
   });
 
   const [appreciatedMap, setAppreciatedMap] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
     const saved = localStorage.getItem(LOCAL_STORAGE_APPRECIATIONS_KEY);
     if (saved) {
       try {
@@ -52,6 +50,7 @@ export function useProjects(filters?: ProjectFilters) {
   });
 
   const [savedMap, setSavedMap] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
     const saved = localStorage.getItem(LOCAL_STORAGE_SAVES_KEY);
     if (saved) {
       try {
@@ -63,25 +62,35 @@ export function useProjects(filters?: ProjectFilters) {
     return {};
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Sync state to localStorage
   useEffect(() => {
-    if (projects.length > 0) {
-      localStorage.setItem(LOCAL_STORAGE_PROJECTS_KEY, JSON.stringify(projects));
-    }
+    localStorage.setItem(LOCAL_STORAGE_PROJECTS_KEY, JSON.stringify(projects));
   }, [projects]);
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_COMMENTS_KEY, JSON.stringify(comments));
   }, [comments]);
 
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_APPRECIATIONS_KEY, JSON.stringify(appreciatedMap));
+  }, [appreciatedMap]);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_SAVES_KEY, JSON.stringify(savedMap));
+  }, [savedMap]);
+
   // Load live data from Supabase
   const refreshProjects = useCallback(async () => {
-    if (!isSupabaseConfigured) return;
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     try {
+      // 1. Fetch published projects with creator profiles
       const { data, error } = await supabase
         .from("projects")
         .select(`
@@ -90,7 +99,7 @@ export function useProjects(filters?: ProjectFilters) {
         `)
         .order("created_at", { ascending: false });
 
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         const mapped: Project[] = data.map((item: any) => ({
           id: item.id,
           slug: item.slug || item.id,
@@ -100,46 +109,80 @@ export function useProjects(filters?: ProjectFilters) {
           category: item.category,
           categoryId: item.category_id,
           coverImage: item.cover_image,
-          accentColor: item.accent_color || "#0057ff",
+          accentColor: item.accent_color || "#CDF22B",
           year: item.year || "2025",
           tools: item.tools || [],
           tags: item.tags || [],
           images: item.images || [],
+          contentBlocks: item.content_blocks || [],
           creator: item.creator
             ? {
                 id: item.creator.id,
                 username: item.creator.username,
-                fullName: item.creator.full_name,
-                headline: item.creator.headline,
-                bio: item.creator.bio,
-                avatarUrl: item.creator.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-                bannerUrl: item.creator.banner_url,
+                fullName: item.creator.full_name || item.creator.fullName || "Creative Member",
+                headline: item.creator.headline || "Designer & Creator",
+                bio: item.creator.bio || "",
+                avatarUrl:
+                  item.creator.avatar_url ||
+                  item.creator.avatarUrl ||
+                  `https://api.dicebear.com/7.x/shapes/svg?seed=${item.creator.username || "user"}`,
+                bannerUrl: item.creator.banner_url || item.creator.bannerUrl,
                 location: item.creator.location,
                 website: item.creator.website,
-                availableForWork: item.creator.available_for_work,
+                availableForWork: item.creator.available_for_work ?? true,
+                skills: item.creator.skills || [],
               }
-            : MOCK_CREATORS[0],
+            : {
+                id: item.user_id,
+                username: "creator",
+                fullName: "Creator",
+                avatarUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=creator",
+              },
           userId: item.user_id,
-          status: item.status,
-          isFeatured: item.is_featured,
+          status: item.status || "published",
+          isFeatured: item.is_featured || false,
           viewsCount: item.views_count || 0,
           appreciationsCount: item.appreciations_count || 0,
           createdAt: item.created_at,
           updatedAt: item.updated_at,
+          isAppreciated: Boolean(appreciatedMap[item.id]),
+          isSaved: Boolean(savedMap[item.id]),
         }));
 
-        // Merge with mock projects so richer content is preserved
-        const combined = [...mapped];
-        MOCK_PROJECTS.forEach((mp) => {
-          if (!combined.some((p) => p.slug === mp.slug || p.id === mp.id)) {
-            combined.push(mp);
-          }
-        });
-
-        setProjects(combined);
+        setProjects(mapped);
       }
 
-      // Fetch live comments
+      // 2. Fetch user's appreciations if authenticated
+      if (currentUserId && !currentUserId.startsWith("guest-")) {
+        const { data: appData } = await supabase
+          .from("appreciations")
+          .select("project_id")
+          .eq("user_id", currentUserId);
+
+        if (appData) {
+          const appMap: Record<string, boolean> = {};
+          appData.forEach((a: any) => {
+            appMap[a.project_id] = true;
+          });
+          setAppreciatedMap((prev) => ({ ...prev, ...appMap }));
+        }
+
+        // 3. Fetch user's saved favorites
+        const { data: favData } = await supabase
+          .from("favorites")
+          .select("project_id")
+          .eq("user_id", currentUserId);
+
+        if (favData) {
+          const favMap: Record<string, boolean> = {};
+          favData.forEach((f: any) => {
+            favMap[f.project_id] = true;
+          });
+          setSavedMap((prev) => ({ ...prev, ...favMap }));
+        }
+      }
+
+      // 4. Fetch all comments from Supabase
       const { data: commentsData } = await supabase
         .from("comments")
         .select(`
@@ -148,174 +191,202 @@ export function useProjects(filters?: ProjectFilters) {
         `)
         .order("created_at", { ascending: false });
 
-      if (commentsData && commentsData.length > 0) {
-        const mappedComments: Comment[] = commentsData.map((c: any) => ({
+      if (commentsData) {
+        const mappedComments: CommentItem[] = commentsData.map((c: any) => ({
           id: c.id,
           projectId: c.project_id,
           userId: c.user_id,
           content: c.content,
           createdAt: c.created_at,
-          user: c.user
-            ? {
-                id: c.user.id,
-                username: c.user.username,
-                fullName: c.user.full_name,
-                avatarUrl: c.user.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-              }
-            : MOCK_CREATORS[0],
+          user: {
+            id: c.user?.id || c.user_id,
+            username: c.user?.username || "member",
+            fullName: c.user?.full_name || "Creative Member",
+            avatarUrl:
+              c.user?.avatar_url ||
+              `https://api.dicebear.com/7.x/shapes/svg?seed=${c.user?.username || "anon"}`,
+          },
         }));
-
-        // Merge comments
-        const mergedComments = [...mappedComments];
-        MOCK_COMMENTS.forEach((mc) => {
-          if (!mergedComments.some((c) => c.id === mc.id)) {
-            mergedComments.push(mc);
-          }
-        });
-        setComments(mergedComments);
+        setComments(mappedComments);
       }
     } catch (err) {
-      console.warn("Supabase load projects error, fallback active:", err);
+      console.warn("Supabase fetch error in useProjects:", err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentUserId, appreciatedMap, savedMap]);
 
+  // Initial load
   useEffect(() => {
     refreshProjects();
   }, [refreshProjects]);
 
-  // Filter & Sort Projects
-  const filteredProjects = projects
-    .map((p) => ({
-      ...p,
-      isAppreciated: Boolean(appreciatedMap[p.id]),
-      isSaved: Boolean(savedMap[p.id]),
-      appreciationsCount: (p.appreciationsCount || 0) + (appreciatedMap[p.id] ? 1 : 0),
-    }))
-    .filter((project) => {
-      // For general exploration feed, show only published projects
-      if (project.status === "draft") return false;
+  // Filter projects dynamically
+  const filteredProjects = projects.filter((project) => {
+    if (!filters) return true;
 
-      if (filters?.category && filters.category !== "all") {
-        const matchesCat =
-          project.categoryId?.toLowerCase() === filters.category.toLowerCase() ||
-          project.category.toLowerCase().includes(filters.category.toLowerCase());
-        if (!matchesCat) return false;
-      }
+    // Search query
+    if (filters.searchQuery) {
+      const q = filters.searchQuery.toLowerCase();
+      const matchTitle = project.title.toLowerCase().includes(q);
+      const matchDesc = project.description.toLowerCase().includes(q);
+      const matchCreator =
+        project.creator?.fullName?.toLowerCase().includes(q) ||
+        project.creator?.username?.toLowerCase().includes(q);
+      const matchTags = project.tags?.some((t) => t.toLowerCase().includes(q));
+      const matchTools = project.tools?.some((t) => t.toLowerCase().includes(q));
 
-      if (filters?.tool && filters.tool.trim()) {
-        const matchesTool = project.tools.some((t) =>
-          t.toLowerCase().includes(filters.tool!.toLowerCase())
-        );
-        if (!matchesTool) return false;
-      }
-
-      if (filters?.searchQuery && filters.searchQuery.trim()) {
-        const q = filters.searchQuery.toLowerCase();
-        const matchesSearch =
-          project.title.toLowerCase().includes(q) ||
-          project.description.toLowerCase().includes(q) ||
-          project.creator.fullName.toLowerCase().includes(q) ||
-          project.creator.username.toLowerCase().includes(q) ||
-          project.tags.some((t) => t.toLowerCase().includes(q)) ||
-          project.tools.some((t) => t.toLowerCase().includes(q));
-        if (!matchesSearch) return false;
-      }
-
-      return true;
-    })
-    .sort((a, b) => {
-      const sort = filters?.sortBy || "featured";
-      if (sort === "featured") {
-        if (a.isFeatured && !b.isFeatured) return -1;
-        if (!a.isFeatured && b.isFeatured) return 1;
-        return (b.appreciationsCount || 0) - (a.appreciationsCount || 0);
-      }
-      if (sort === "appreciations") {
-        return (b.appreciationsCount || 0) - (a.appreciationsCount || 0);
-      }
-      if (sort === "views") {
-        return (b.viewsCount || 0) - (a.viewsCount || 0);
-      }
-      if (sort === "newest") {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-      return 0;
-    });
-
-  const getProjectBySlug = useCallback(
-    (slug: string): Project | null => {
-      const found = projects.find(
-        (p) => p.slug?.toLowerCase() === slug.toLowerCase() || p.id === slug
-      );
-      if (!found) return null;
-      return {
-        ...found,
-        isAppreciated: Boolean(appreciatedMap[found.id]),
-        isSaved: Boolean(savedMap[found.id]),
-        appreciationsCount:
-          (found.appreciationsCount || 0) + (appreciatedMap[found.id] ? 1 : 0),
-      };
-    },
-    [projects, appreciatedMap, savedMap]
-  );
-
-  // Appreciate (Like) toggle with Supabase sync
-  const toggleAppreciation = useCallback(async (projectId: string, currentUserId?: string) => {
-    const isCurrentlyLiked = Boolean(appreciatedMap[projectId]);
-    const nextState = !isCurrentlyLiked;
-
-    setAppreciatedMap((prev) => {
-      const next = { ...prev, [projectId]: nextState };
-      localStorage.setItem(LOCAL_STORAGE_APPRECIATIONS_KEY, JSON.stringify(next));
-      return next;
-    });
-
-    // Update project count in state
-    setProjects((prev) =>
-      prev.map((p) => {
-        if (p.id === projectId) {
-          const currentCount = p.appreciationsCount || 0;
-          return {
-            ...p,
-            appreciationsCount: Math.max(0, currentCount + (nextState ? 1 : -1)),
-          };
-        }
-        return p;
-      })
-    );
-
-    // Sync with Supabase
-    if (isSupabaseConfigured && currentUserId) {
-      try {
-        if (nextState) {
-          await supabase.from("appreciations").insert({
-            user_id: currentUserId,
-            project_id: projectId,
-          });
-        } else {
-          await supabase
-            .from("appreciations")
-            .delete()
-            .match({ user_id: currentUserId, project_id: projectId });
-        }
-      } catch (err) {
-        console.warn("Supabase appreciation sync error:", err);
+      if (!matchTitle && !matchDesc && !matchCreator && !matchTags && !matchTools) {
+        return false;
       }
     }
-  }, [appreciatedMap]);
 
-  // Moodboard / Save toggle
-  const toggleSave = useCallback((projectId: string) => {
-    setSavedMap((prev) => {
-      const next = { ...prev, [projectId]: !prev[projectId] };
-      localStorage.setItem(LOCAL_STORAGE_SAVES_KEY, JSON.stringify(next));
-      return next;
-    });
-  }, []);
+    // Category
+    if (filters.category && filters.category !== "all") {
+      const catSlug = filters.category.toLowerCase();
+      const matchesCat =
+        project.category?.toLowerCase() === catSlug ||
+        project.categoryId?.toLowerCase() === catSlug ||
+        project.tags?.some((t) => t.toLowerCase().includes(catSlug));
+      if (!matchesCat) return false;
+    }
 
-  // Increment Views
+    // Sub-category
+    if (filters.subCategory && filters.subCategory !== "all") {
+      const subSlug = filters.subCategory.toLowerCase();
+      const matchesSub =
+        project.tags?.some((t) => t.toLowerCase().includes(subSlug)) ||
+        project.title.toLowerCase().includes(subSlug) ||
+        project.tools?.some((t) => t.toLowerCase().includes(subSlug));
+      if (!matchesSub) return false;
+    }
+
+    // Tool
+    if (filters.tool) {
+      const toolName = filters.tool.toLowerCase();
+      const matchesTool = project.tools?.some((t) => t.toLowerCase().includes(toolName));
+      if (!matchesTool) return false;
+    }
+
+    return true;
+  });
+
+  // Sort projects
+  const sortedProjects = [...filteredProjects].sort((a, b) => {
+    if (!filters?.sortBy) return 0;
+    switch (filters.sortBy) {
+      case "recent":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      case "popular":
+      case "appreciated":
+        return (b.appreciationsCount || 0) - (a.appreciationsCount || 0);
+      case "views":
+        return (b.viewsCount || 0) - (a.viewsCount || 0);
+      case "featured":
+      default:
+        if (a.isFeatured && !b.isFeatured) return -1;
+        if (!a.isFeatured && b.isFeatured) return 1;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+  });
+
+  // Get single project by slug or ID
+  const getProjectBySlug = useCallback(
+    (slugOrId: string): Project | undefined => {
+      const target = slugOrId.toLowerCase();
+      return projects.find((p) => p.slug?.toLowerCase() === target || p.id === slugOrId);
+    },
+    [projects]
+  );
+
+  // Toggle Appreciation (Like)
+  const toggleAppreciation = useCallback(
+    async (projectId: string, userId?: string) => {
+      if (!userId || userId.startsWith("guest-")) {
+        return;
+      }
+
+      const isCurrentlyAppreciated = Boolean(appreciatedMap[projectId]);
+      const nextState = !isCurrentlyAppreciated;
+
+      // Optimistic update
+      setAppreciatedMap((prev) => ({ ...prev, [projectId]: nextState }));
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.id === projectId
+            ? {
+                ...p,
+                isAppreciated: nextState,
+                appreciationsCount: Math.max(
+                  0,
+                  (p.appreciationsCount || 0) + (nextState ? 1 : -1)
+                ),
+              }
+            : p
+        )
+      );
+
+      // Sync with Supabase
+      if (isSupabaseConfigured) {
+        try {
+          if (nextState) {
+            await supabase.from("appreciations").upsert({
+              user_id: userId,
+              project_id: projectId,
+            });
+          } else {
+            await supabase
+              .from("appreciations")
+              .delete()
+              .match({ user_id: userId, project_id: projectId });
+          }
+        } catch (err) {
+          console.warn("Supabase appreciation error:", err);
+        }
+      }
+    },
+    [appreciatedMap]
+  );
+
+  // Toggle Save (Favorites / Moodboard)
+  const toggleSave = useCallback(
+    async (projectId: string, userId?: string) => {
+      if (!userId || userId.startsWith("guest-")) {
+        return;
+      }
+
+      const isCurrentlySaved = Boolean(savedMap[projectId]);
+      const nextState = !isCurrentlySaved;
+
+      // Optimistic update
+      setSavedMap((prev) => ({ ...prev, [projectId]: nextState }));
+      setProjects((prev) =>
+        prev.map((p) => (p.id === projectId ? { ...p, isSaved: nextState } : p))
+      );
+
+      // Sync with Supabase favorites table
+      if (isSupabaseConfigured) {
+        try {
+          if (nextState) {
+            await supabase.from("favorites").upsert({
+              user_id: userId,
+              project_id: projectId,
+            });
+          } else {
+            await supabase
+              .from("favorites")
+              .delete()
+              .match({ user_id: userId, project_id: projectId });
+          }
+        } catch (err) {
+          console.warn("Supabase favorites sync error:", err);
+        }
+      }
+    },
+    [savedMap]
+  );
+
+  // Increment project views
   const incrementViews = useCallback(async (projectId: string) => {
     setProjects((prev) =>
       prev.map((p) =>
@@ -325,61 +396,52 @@ export function useProjects(filters?: ProjectFilters) {
 
     if (isSupabaseConfigured) {
       try {
-        await supabase.rpc("increment_project_views", { project_id: projectId });
+        await supabase.rpc("increment_project_views", { p_id: projectId });
       } catch {
         // Fallback standard update
-        try {
-          const found = projects.find((p) => p.id === projectId);
-          if (found) {
-            await supabase
-              .from("projects")
-              .update({ views_count: (found.viewsCount || 0) + 1 })
-              .eq("id", projectId);
-          }
-        } catch {
-          // ignore
+        const { data } = await supabase.from("projects").select("views_count").eq("id", projectId).single();
+        if (data) {
+          await supabase.from("projects").update({ views_count: (data.views_count || 0) + 1 }).eq("id", projectId);
         }
       }
     }
-  }, [projects]);
+  }, []);
 
+  // Comments for a specific project
   const getProjectComments = useCallback(
-    (projectId: string): Comment[] => {
+    (projectId: string): CommentItem[] => {
       return comments.filter((c) => c.projectId === projectId);
     },
     [comments]
   );
 
-  // Add Comment with Supabase insert
+  // Add Comment
   const addComment = useCallback(
     async (
       projectId: string,
-      user: { id: string; username: string; fullName: string; avatarUrl?: string },
+      user: { id: string; fullName: string; username: string; avatarUrl?: string },
       content: string
     ) => {
       const newCommentId = `comment-${Date.now()}`;
-      const newComment: Comment = {
+      const newComment: CommentItem = {
         id: newCommentId,
         projectId,
         userId: user.id,
+        content,
+        createdAt: new Date().toISOString(),
         user: {
           id: user.id,
           username: user.username,
           fullName: user.fullName,
-          avatarUrl:
-            user.avatarUrl ||
-            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+          avatarUrl: user.avatarUrl,
         },
-        content,
-        createdAt: new Date().toISOString(),
       };
 
       setComments((prev) => [newComment, ...prev]);
 
-      if (isSupabaseConfigured && user.id && !user.id.startsWith("guest-")) {
+      if (isSupabaseConfigured && !user.id.startsWith("guest-")) {
         try {
           await supabase.from("comments").insert({
-            id: newCommentId,
             project_id: projectId,
             user_id: user.id,
             content,
@@ -393,141 +455,130 @@ export function useProjects(filters?: ProjectFilters) {
   );
 
   // Delete Comment
-  const deleteComment = useCallback(
-    async (commentId: string) => {
-      setComments((prev) => prev.filter((c) => c.id !== commentId));
-      if (isSupabaseConfigured) {
-        try {
-          await supabase.from("comments").delete().eq("id", commentId);
-        } catch (err) {
-          console.warn("Supabase delete comment error:", err);
-        }
+  const deleteComment = useCallback(async (commentId: string) => {
+    setComments((prev) => prev.filter((c) => c.id !== commentId));
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from("comments").delete().eq("id", commentId);
+      } catch (err) {
+        console.warn("Supabase delete comment error:", err);
       }
-    },
-    []
-  );
+    }
+  }, []);
 
-  // Create or Update Project in Supabase + Local State
+  // Create or Update Project in Supabase
   const saveProject = useCallback(
     async (projectData: Partial<Project>, currentUser?: Profile | null): Promise<Project> => {
-      const id = projectData.id || `project-${Date.now()}`;
+      const id = projectData.id || `proj-${Date.now()}`;
       const slug =
         projectData.slug ||
         projectData.title?.toLowerCase().replace(/[^a-z0-9]+/g, "-") ||
         id;
-
-      const existingIndex = projects.findIndex((p) => p.id === id);
 
       const creator = currentUser
         ? {
             id: currentUser.id,
             username: currentUser.username,
             fullName: currentUser.fullName,
+            avatarUrl: currentUser.avatarUrl,
             headline: currentUser.headline,
             bio: currentUser.bio,
-            avatarUrl: currentUser.avatarUrl,
             location: currentUser.location,
-            availableForWork: currentUser.availableForWork,
+            website: currentUser.website,
+            skills: currentUser.skills,
           }
-        : MOCK_CREATORS[0];
+        : {
+            id: projectData.userId || "creator",
+            username: "creator",
+            fullName: "Creative Member",
+            avatarUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=creator",
+          };
 
-      const newProject: Project = {
+      const finalProject: Project = {
         id,
         slug,
-        title: projectData.title || "Untitled Project",
+        title: projectData.title || "Untitled Case Study",
         description: projectData.description || "",
         fullDescription: projectData.fullDescription || "",
-        category: projectData.category || "UI/UX Design",
+        category: projectData.category || "UI/UX & Product Design",
         categoryId: projectData.categoryId || "ui-ux",
         coverImage:
           projectData.coverImage ||
           "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80",
-        accentColor: projectData.accentColor || "#0057ff",
+        accentColor: projectData.accentColor || "#CDF22B",
         year: projectData.year || new Date().getFullYear().toString(),
-        tools: projectData.tools || ["Figma"],
-        tags: projectData.tags || ["Design"],
+        tools: projectData.tools || [],
+        tags: projectData.tags || [],
         images: projectData.images || [],
+        contentBlocks: projectData.contentBlocks || [],
         creator,
-        userId: currentUser?.id || MOCK_CREATORS[0].id,
+        userId: currentUser?.id || projectData.userId || "creator",
         status: projectData.status || "published",
-        isFeatured: projectData.isFeatured ?? false,
-        viewsCount: projectData.viewsCount || 1,
+        isFeatured: projectData.isFeatured || false,
+        viewsCount: projectData.viewsCount || 0,
         appreciationsCount: projectData.appreciationsCount || 0,
         createdAt: projectData.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      // Optimistic update
-      if (existingIndex >= 0) {
-        setProjects((prev) => {
+      // Local state update
+      setProjects((prev) => {
+        const index = prev.findIndex((p) => p.id === id || p.slug === slug);
+        if (index >= 0) {
           const updated = [...prev];
-          updated[existingIndex] = { ...updated[existingIndex], ...newProject };
+          updated[index] = finalProject;
           return updated;
-        });
-      } else {
-        setProjects((prev) => [newProject, ...prev]);
-      }
+        }
+        return [finalProject, ...prev];
+      });
 
-      // Sync to Supabase
-      if (isSupabaseConfigured && currentUser && !currentUser.id.startsWith("guest-")) {
+      // Supabase persistence
+      if (isSupabaseConfigured && currentUser?.id && !currentUser.id.startsWith("guest-")) {
         try {
-          const payload = {
-            id,
+          await supabase.from("projects").upsert({
+            id: id.startsWith("proj-") ? undefined : id,
             user_id: currentUser.id,
-            title: newProject.title,
-            slug: newProject.slug,
-            description: newProject.description,
-            full_description: newProject.fullDescription,
-            category: newProject.category,
-            category_id: newProject.categoryId,
-            cover_image: newProject.coverImage,
-            accent_color: newProject.accentColor,
-            year: newProject.year,
-            tools: newProject.tools,
-            tags: newProject.tags,
-            images: newProject.images,
-            status: newProject.status,
-            is_featured: newProject.isFeatured,
-            updated_at: new Date().toISOString(),
-          };
-
-          const { error } = await supabase.from("projects").upsert(payload);
-          if (error) {
-            console.warn("Supabase upsert project error:", error.message);
-          }
+            title: finalProject.title,
+            slug: finalProject.slug,
+            description: finalProject.description,
+            full_description: finalProject.fullDescription,
+            category: finalProject.category,
+            category_id: finalProject.categoryId,
+            cover_image: finalProject.coverImage,
+            accent_color: finalProject.accentColor,
+            year: finalProject.year,
+            tools: finalProject.tools,
+            tags: finalProject.tags,
+            images: finalProject.images,
+            content_blocks: finalProject.contentBlocks,
+            status: finalProject.status,
+            is_featured: finalProject.isFeatured,
+          });
         } catch (err) {
-          console.warn("Failed to persist project to Supabase:", err);
+          console.warn("Supabase save project error:", err);
         }
       }
 
-      return newProject;
-    },
-    [projects]
-  );
-
-  // Delete Project
-  const deleteProject = useCallback(
-    async (projectId: string) => {
-      setProjects((prev) => prev.filter((p) => p.id !== projectId));
-
-      if (isSupabaseConfigured) {
-        try {
-          await supabase.from("projects").delete().eq("id", projectId);
-        } catch (err) {
-          console.warn("Supabase delete project error:", err);
-        }
-      }
+      return finalProject;
     },
     []
   );
 
+  // Delete Project
+  const deleteProject = useCallback(async (projectId: string) => {
+    setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from("projects").delete().eq("id", projectId);
+      } catch (err) {
+        console.warn("Supabase delete project error:", err);
+      }
+    }
+  }, []);
+
   return {
-    projects: filteredProjects,
-    allProjects: projects.map((p) => ({
-      ...p,
-      isAppreciated: Boolean(appreciatedMap[p.id]),
-      isSaved: Boolean(savedMap[p.id]),
-    })),
+    projects: sortedProjects,
+    allProjects: projects,
     loading,
     refreshProjects,
     getProjectBySlug,

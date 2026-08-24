@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { Profile } from "../types";
-import { MOCK_CREATORS } from "../data/mockData";
 import { useProjects } from "./useProjects";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
@@ -15,12 +14,12 @@ export function useCreator(usernameOrId?: string) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       } catch {
-        return MOCK_CREATORS;
+        return [];
       }
     }
-    return MOCK_CREATORS;
+    return [];
   });
 
   const [followingMap, setFollowingMap] = useState<Record<string, boolean>>(() => {
@@ -40,18 +39,19 @@ export function useCreator(usernameOrId?: string) {
     if (!isSupabaseConfigured) return;
 
     try {
-      const { data, error } = await supabase.from("profiles").select("*");
+      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
       if (!error && data && data.length > 0) {
         const mapped: Profile[] = data.map((p: any) => ({
           id: p.id,
           username: p.username,
-          fullName: p.full_name,
+          fullName: p.full_name || p.fullName || "Creative Member",
           headline: p.headline,
           bio: p.bio,
           avatarUrl:
             p.avatar_url ||
-            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-          bannerUrl: p.banner_url,
+            p.avatarUrl ||
+            `https://api.dicebear.com/7.x/shapes/svg?seed=${p.username || "user"}`,
+          bannerUrl: p.banner_url || p.bannerUrl,
           location: p.location,
           website: p.website,
           availableForWork: p.available_for_work ?? true,
@@ -59,150 +59,24 @@ export function useCreator(usernameOrId?: string) {
           socialLinks: p.social_links || {},
           followersCount: p.followers_count || 0,
           followingCount: p.following_count || 0,
+          totalAppreciations: p.total_appreciations || 0,
+          totalViews: p.total_views || 0,
+          isFollowing: Boolean(followingMap[p.id] || followingMap[p.username]),
+          createdAt: p.created_at,
         }));
-
-        // Merge with mock creators to keep rich content
-        const merged = [...mapped];
-        MOCK_CREATORS.forEach((mc) => {
-          if (!merged.some((m) => m.username === mc.username || m.id === mc.id)) {
-            merged.push(mc);
-          }
-        });
-        setCreatorsList(merged);
+        setCreatorsList(mapped);
       }
     } catch (err) {
-      console.warn("Supabase fetch profiles error:", err);
+      console.warn("Supabase fetch error in useCreator:", err);
     }
-  }, []);
+  }, [followingMap]);
 
   useEffect(() => {
     refreshCreators();
   }, [refreshCreators]);
 
-  // Clean and normalize target username
-  const rawInput = (usernameOrId || "").trim();
-  const cleanInput = rawInput.replace(/^@/, "").toLowerCase();
-  const isGenericProfilePath = !cleanInput || cleanInput === "profile" || cleanInput === "my-profile";
-
-  const norm = (s: string) => s.toLowerCase().replace(/[@_\s-]/g, "");
-
-  const rawCreator: Profile = isGenericProfilePath
-    ? (creatorsList.find((c) => norm(c.username).includes("azaiza")) || creatorsList[0])
-    : (creatorsList.find(
-        (c) =>
-          norm(c.username) === norm(cleanInput) ||
-          norm(c.id) === norm(cleanInput) ||
-          norm(c.fullName) === norm(cleanInput) ||
-          c.username.toLowerCase() === cleanInput ||
-          c.id.toLowerCase() === cleanInput
-      ) ||
-      creatorsList.find((c) => norm(c.username).includes("azaiza")) ||
-      creatorsList[0]);
-
-  const creatorProjects = rawCreator
-    ? allProjects.filter(
-        (p) =>
-          p.userId === rawCreator.id ||
-          p.creator?.username?.toLowerCase() === rawCreator.username.toLowerCase() ||
-          norm(p.creator?.username || "") === norm(rawCreator.username)
-      )
-    : [];
-
-  const appreciatedProjects = rawCreator
-    ? allProjects.filter((p) => p.isAppreciated)
-    : [];
-
-  const savedProjects = rawCreator
-    ? allProjects.filter((p) => p.isSaved)
-    : [];
-
-  const totalAppreciations = creatorProjects.reduce(
-    (sum, p) => sum + (p.appreciationsCount || 0),
-    0
-  );
-
-  const totalViews = creatorProjects.reduce(
-    (sum, p) => sum + (p.viewsCount || 0),
-    0
-  );
-
-  const isFollowing = rawCreator ? Boolean(followingMap[rawCreator.id]) : false;
-
-  const toggleFollow = useCallback(
-    async (creatorId: string, currentUserId?: string) => {
-      const willFollow = !followingMap[creatorId];
-
-      setFollowingMap((prev) => {
-        const next = { ...prev, [creatorId]: willFollow };
-        localStorage.setItem(LOCAL_STORAGE_FOLLOWS_KEY, JSON.stringify(next));
-        return next;
-      });
-
-      // Update creator follower count in state
-      setCreatorsList((prevList) => {
-        const updated = prevList.map((c) => {
-          if (c.id === creatorId) {
-            const currentCount = c.followersCount || 0;
-            return {
-              ...c,
-              followersCount: Math.max(0, currentCount + (willFollow ? 1 : -1)),
-            };
-          }
-          return c;
-        });
-        localStorage.setItem(LOCAL_STORAGE_CREATORS_KEY, JSON.stringify(updated));
-        return updated;
-      });
-
-      // If Supabase is configured, record follow
-      if (isSupabaseConfigured && currentUserId) {
-        try {
-          if (willFollow) {
-            await supabase.from("follows").insert({
-              follower_id: currentUserId,
-              following_id: creatorId,
-            });
-          } else {
-            await supabase
-              .from("follows")
-              .delete()
-              .eq("follower_id", currentUserId)
-              .eq("following_id", creatorId);
-          }
-        } catch (err) {
-          console.warn("Supabase toggle follow error:", err);
-        }
-      }
-    },
-    [followingMap]
-  );
-
-  const getCreatorById = useCallback(
-    (id: string) => {
-      return (
-        creatorsList.find((c) => c.id === id || norm(c.username) === norm(id)) || null
-      );
-    },
-    [creatorsList]
-  );
-
-  const followersList = creatorsList.filter((c) => followingMap[c.id]);
-
   return {
-    creator: rawCreator,
-    allCreators: creatorsList.map((c) => ({
-      ...c,
-      isFollowing: Boolean(followingMap[c.id]),
-    })),
-    creatorProjects,
-    appreciatedProjects,
-    savedProjects,
-    followersList,
-    totalAppreciations,
-    totalViews,
-    isFollowing,
-    toggleFollow,
-    getCreatorById,
+    creatorsList,
     refreshCreators,
   };
 }

@@ -1,124 +1,130 @@
 import { useState, useEffect, useCallback } from "react";
 import { NotificationItem } from "../types";
 import { useAuth } from "../context/AuthContext";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
-const LOCAL_STORAGE_NOTIFICATIONS_KEY = "azaiza_gallery_notifications_v3";
-
-const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: "notif-1",
-    userId: "ahmed-azaiza",
-    type: "inquiry",
-    actorName: "Sarah Jenkins",
-    actorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
-    title: "New Project Inquiry",
-    description: "Sarah Jenkins sent a commission request for Spatial Reality OS interface ($5k - $10k).",
-    targetUrl: "/dashboard",
-    isRead: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-  },
-  {
-    id: "notif-2",
-    userId: "ahmed-azaiza",
-    type: "appreciation",
-    actorName: "Zaid Al-Khatib",
-    actorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-    title: "Project Appreciated",
-    description: "Zaid appreciated your case study 'Lumina — Spatial Reality OS Interface'.",
-    targetUrl: "/project/lumina-spatial-ui",
-    isRead: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-  },
-  {
-    id: "notif-3",
-    userId: "ahmed-azaiza",
-    type: "follow",
-    actorName: "Nour Design",
-    actorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-    title: "New Follower",
-    description: "Nour Design started following your creative portfolio.",
-    targetUrl: "/@nour_creative",
-    isRead: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-  },
-  {
-    id: "notif-4",
-    userId: "ahmed-azaiza",
-    type: "comment",
-    actorName: "Elena Rostova",
-    actorAvatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
-    title: "New Case Study Comment",
-    description: "Elena commented: 'The glassmorphic lighting tokens in this system are pure perfection!'",
-    targetUrl: "/project/lumina-spatial-ui",
-    isRead: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
-  },
-  {
-    id: "notif-5",
-    userId: "ahmed-azaiza",
-    type: "curated",
-    actorName: "Azaiza Curators",
-    actorAvatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80",
-    title: "Featured in UI/UX Benchmark",
-    description: "Your masterwork 'Chronos — Horological Watch OS' was featured on the Explore front page.",
-    targetUrl: "/project/chronos-horology",
-    isRead: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-];
+const LOCAL_STORAGE_NOTIFICATIONS_KEY = "portfolios_notifications_v1";
 
 export function useNotifications() {
   const { user } = useAuth();
 
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+    if (typeof window === "undefined") return [];
     const saved = localStorage.getItem(LOCAL_STORAGE_NOTIFICATIONS_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       } catch {
-        return DEFAULT_NOTIFICATIONS;
+        return [];
       }
     }
-    return DEFAULT_NOTIFICATIONS;
+    return [];
   });
 
+  // Save to localStorage
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_NOTIFICATIONS_KEY, JSON.stringify(notifications));
   }, [notifications]);
 
-  const markAsRead = useCallback((notificationId: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n))
-    );
-  }, []);
+  // Load real notifications from Supabase
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user?.id || user.id.startsWith("guest-")) {
+      return;
+    }
 
-  const markAllAsRead = useCallback(() => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  }, []);
+    const fetchNotifications = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
-  const deleteNotification = useCallback((notificationId: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
-  }, []);
-
-  const addNotification = useCallback((item: Omit<NotificationItem, "id" | "createdAt" | "isRead">) => {
-    const newNotif: NotificationItem = {
-      ...item,
-      id: `notif-${Date.now()}`,
-      isRead: false,
-      createdAt: new Date().toISOString(),
+        if (!error && data) {
+          const mapped: NotificationItem[] = data.map((n: any) => ({
+            id: n.id,
+            userId: n.user_id,
+            type: n.type,
+            actorName: n.title,
+            title: n.title,
+            description: n.description,
+            targetUrl: n.target_url || "/dashboard",
+            isRead: Boolean(n.is_read),
+            createdAt: n.created_at,
+          }));
+          setNotifications(mapped);
+        }
+      } catch (err) {
+        console.warn("Supabase notifications fetch error:", err);
+      }
     };
-    setNotifications((prev) => [newNotif, ...prev]);
-  }, []);
+
+    fetchNotifications();
+  }, [user?.id]);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const markAsRead = useCallback(
+    async (id: string) => {
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      );
+
+      if (isSupabaseConfigured && user?.id && !user.id.startsWith("guest-")) {
+        try {
+          await supabase
+            .from("notifications")
+            .update({ is_read: true })
+            .eq("id", id)
+            .eq("user_id", user.id);
+        } catch (err) {
+          console.warn("Error marking notification as read:", err);
+        }
+      }
+    },
+    [user?.id]
+  );
+
+  const markAllAsRead = useCallback(async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+
+    if (isSupabaseConfigured && user?.id && !user.id.startsWith("guest-")) {
+      try {
+        await supabase
+          .from("notifications")
+          .update({ is_read: true })
+          .eq("user_id", user.id);
+      } catch (err) {
+        console.warn("Error marking all notifications as read:", err);
+      }
+    }
+  }, [user?.id]);
+
+  const clearNotification = useCallback(
+    async (id: string) => {
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+
+      if (isSupabaseConfigured && user?.id && !user.id.startsWith("guest-")) {
+        try {
+          await supabase
+            .from("notifications")
+            .delete()
+            .eq("id", id)
+            .eq("user_id", user.id);
+        } catch (err) {
+          console.warn("Error deleting notification:", err);
+        }
+      }
+    },
+    [user?.id]
+  );
 
   return {
     notifications,
     unreadCount,
     markAsRead,
     markAllAsRead,
-    deleteNotification,
-    addNotification,
+    clearNotification,
   };
 }

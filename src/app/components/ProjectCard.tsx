@@ -17,6 +17,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   const [isLiked, setIsLiked] = useState(Boolean(project.isAppreciated));
   const [likesCount, setLikesCount] = useState(project.appreciationsCount || 0);
+  const [isSaved, setIsSaved] = useState(Boolean(project.isSaved));
 
   const handleAppreciate = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -31,6 +32,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     setIsLiked(nextState);
     setLikesCount((prev) => Math.max(0, prev + (nextState ? 1 : -1)));
     toggleAppreciation(project.id, user?.id);
+  };
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
+    const nextState = !isSaved;
+    setIsSaved(nextState);
+    toggleSave(project.id, user?.id);
   };
 
   const projectUrl = `/project/${project.slug || project.id}`;
@@ -67,13 +82,29 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
         {/* Hover Quick Appreciate & Save Overlay */}
         <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Favorite / Bookmark Button */}
+          <button
+            onClick={handleToggleFavorite}
+            aria-label="Save to favorites"
+            title={isLoggedIn ? (isSaved ? "Saved to Favorites" : "Save to Favorites") : "Sign in to save"}
+            className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
+              isSaved
+                ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/40 font-bold"
+                : "bg-white/90 dark:bg-slate-900/90 text-foreground hover:bg-[#CDF22B] hover:text-slate-950"
+            }`}
+          >
+            <Bookmark size={14} className={isSaved ? "fill-current text-slate-950" : ""} />
+          </button>
+
+          {/* Like / Appreciate Button */}
           <button
             onClick={handleAppreciate}
             aria-label="Appreciate project"
+            title={isLoggedIn ? "Appreciate project" : "Sign in to appreciate"}
             className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
               isLiked
-                ? "bg-[#CDF22B] text-slate-900 shadow-md shadow-[#CDF22B]/40"
-                : "bg-white/90 dark:bg-slate-900/90 text-foreground hover:bg-[#CDF22B] hover:text-slate-900"
+                ? "bg-rose-500 text-white shadow-md shadow-rose-500/40"
+                : "bg-white/90 dark:bg-slate-900/90 text-foreground hover:bg-rose-500 hover:text-white"
             }`}
           >
             <Heart size={14} className={isLiked ? "fill-current" : ""} />
