@@ -19,16 +19,16 @@ import ProjectCard from "../components/ProjectCard";
 import { CATEGORIES, matchesCategory } from "../data/categories";
 
 export default function FavoritesPage() {
-  const { allProjects, loading } = useProjects();
   const { user, isLoggedIn } = useAuth();
+  const { allProjects, loading } = useProjects(undefined, user?.id);
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Filter projects favorited/liked by the user
+  // Filter projects favorited/appreciated by the user
   const favoriteProjects = useMemo(() => {
-    return allProjects.filter((p) => Boolean(p.isLiked));
+    return allProjects.filter((p) => Boolean(p.isAppreciated));
   }, [allProjects]);
 
   // Apply search & category filter inside favorites

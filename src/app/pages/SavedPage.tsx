@@ -21,8 +21,8 @@ import ProjectCard from "../components/ProjectCard";
 import { CATEGORIES, matchesCategory } from "../data/categories";
 
 export default function SavedPage() {
-  const { allProjects, loading } = useProjects();
   const { user, isLoggedIn } = useAuth();
+  const { allProjects, loading } = useProjects(undefined, user?.id);
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
