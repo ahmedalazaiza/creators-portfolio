@@ -18,8 +18,25 @@ import {
   FileText,
   Cookie,
   Sliders,
+  Twitter,
+  Instagram,
+  Github,
+  Dribbble,
+  Linkedin,
 } from "lucide-react";
 import { CATEGORIES } from "../data/categories";
+
+const BehanceIcon = ({ size = 15, className = "" }: { size?: number; className?: string }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-4.116 0-6.625-3.007-6.625-6.857 0-4.047 2.656-7.143 6.744-7.143 4.249 0 6.256 3.109 6.256 6.719 0 .54-.055 1.281-.055 1.281h-9.922c0 2.617 1.83 4.148 4.095 4.148 1.936 0 3.324-.954 3.738-2.148h1.87zm-9.907-4.542h7.027c-.085-1.748-1.099-3.458-3.414-3.458-2.316 0-3.376 1.637-3.613 3.458zm-11.819-7.458h6.417c2.253 0 3.583 1.059 3.583 2.87 0 1.238-.636 2.195-1.761 2.666 1.547.458 2.361 1.704 2.361 3.238 0 2.296-1.764 3.226-4.07 3.226h-6.53v-12zm3.016 4.756h3.044c.95 0 1.621-.368 1.621-1.281 0-.854-.627-1.258-1.579-1.258h-3.086v2.539zm0 5.034h3.336c1.11 0 1.877-.456 1.877-1.472 0-.961-.75-1.408-1.877-1.408h-3.336v2.88z" />
+  </svg>
+);
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -163,23 +180,26 @@ export default function Footer() {
               )}
             </form>
 
-            {/* Social Media Links */}
-            <div className="pt-2 flex flex-wrap items-center gap-1.5">
+            {/* Social Media Links (Icon Buttons) */}
+            <div className="pt-2 flex flex-wrap items-center gap-2">
               {[
-                { name: "X / Twitter", url: "https://twitter.com" },
-                { name: "Behance", url: "https://behance.net" },
-                { name: "Dribbble", url: "https://dribbble.com" },
-                { name: "Instagram", url: "https://instagram.com" },
-                { name: "GitHub", url: "https://github.com" },
+                { name: "Twitter / X", icon: <Twitter size={15} />, url: "https://twitter.com" },
+                { name: "Behance", icon: <BehanceIcon size={15} />, url: "https://behance.net" },
+                { name: "Dribbble", icon: <Dribbble size={15} />, url: "https://dribbble.com" },
+                { name: "Instagram", icon: <Instagram size={15} />, url: "https://instagram.com" },
+                { name: "GitHub", icon: <Github size={15} />, url: "https://github.com" },
+                { name: "LinkedIn", icon: <Linkedin size={15} />, url: "https://linkedin.com" },
               ].map((platform) => (
                 <a
                   key={platform.name}
                   href={platform.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-2.5 py-1 rounded-lg bg-slate-200/60 dark:bg-slate-800/60 hover:bg-[#CDF22B] hover:text-slate-900 text-[10px] font-semibold text-muted-foreground transition-colors cursor-pointer"
+                  title={platform.name}
+                  aria-label={platform.name}
+                  className="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:bg-[#CDF22B] hover:text-slate-950 dark:hover:bg-[#CDF22B] dark:hover:text-slate-950 flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
                 >
-                  {platform.name}
+                  {platform.icon}
                 </a>
               ))}
             </div>
