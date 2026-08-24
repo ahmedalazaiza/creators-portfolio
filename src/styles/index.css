@@ -25,16 +25,15 @@
   }
 
   .project-card-hover {
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
   }
 
   .project-card-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
   }
 
   .dark .project-card-hover:hover {
-    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.7), 0 0 20px -5px rgba(205, 242, 43, 0.15);
+    transform: translateY(-3px);
   }
 
   .btn-primary {

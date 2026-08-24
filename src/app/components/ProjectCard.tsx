@@ -64,15 +64,15 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.25 }}
-      className="group flex flex-col rounded-3xl overflow-hidden glass-card border border-slate-200/80 dark:border-white/10 hover:border-[#CDF22B]/80 shadow-xs hover:shadow-xl hover:shadow-[#CDF22B]/10 transition-all"
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.2 }}
+      className="group flex flex-col rounded-[28px] overflow-hidden bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 hover:border-slate-400 dark:hover:border-white/30 transition-colors"
     >
       {/* Cover Image Container */}
-      <Link to={projectUrl} className="relative aspect-4/3 overflow-hidden bg-slate-100 dark:bg-[#171915] block">
+      <Link to={projectUrl} className="relative aspect-4/3 overflow-hidden bg-slate-100 dark:bg-[#1a1d17] block">
         <img
           src={project.coverImage}
           alt={project.title}
@@ -82,7 +82,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
         {/* Floating Category Badge */}
         <div className="absolute top-3 left-3 z-10">
-          <span className="px-2.5 py-1 rounded-full bg-white/90 dark:bg-[#070905]/90 backdrop-blur-md text-[11px] font-semibold text-foreground border border-white/40 dark:border-white/10 shadow-xs">
+          <span className="px-3 py-1 rounded-full bg-black/85 dark:bg-black/90 backdrop-blur-md text-[11px] font-semibold text-white border border-white/20">
             {project.category}
           </span>
         </div>
@@ -96,8 +96,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             title={isLoggedIn ? (isSaved ? "Saved to Favorites" : "Save to Favorites") : "Sign in to save"}
             className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
               isSaved
-                ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/40 font-bold"
-                : "bg-white/90 dark:bg-[#070905]/90 text-foreground hover:bg-[#CDF22B] hover:text-slate-950"
+                ? "bg-[#CDF22B] text-slate-950 font-bold"
+                : "bg-black/75 dark:bg-black/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 border border-white/20"
             }`}
           >
             <Bookmark size={14} className={isSaved ? "fill-current text-slate-950" : ""} />
@@ -110,8 +110,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             title={isLoggedIn ? "Appreciate project" : "Sign in to appreciate"}
             className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
               isLiked
-                ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/35"
-                : "bg-white/90 dark:bg-[#070905]/90 text-foreground hover:bg-[#CDF22B] hover:text-slate-950"
+                ? "bg-[#CDF22B] text-slate-950 font-bold"
+                : "bg-black/75 dark:bg-black/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 border border-white/20"
             }`}
           >
             <Heart size={14} className={isLiked ? "fill-current text-slate-950" : ""} />
@@ -120,7 +120,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       </Link>
 
       {/* Card Content & Metadata */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-3">
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-3 bg-white dark:bg-[#151813]">
         {/* Title */}
         <Link to={projectUrl} className="block group-hover:text-slate-900 dark:group-hover:text-[#CDF22B] transition-colors">
           <h3 className="text-sm font-bold font-display text-foreground line-clamp-1 leading-snug">
@@ -132,7 +132,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </Link>
 
         {/* Creator & Metrics Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/10 text-xs">
+        <div className="flex items-center justify-between pt-3 border-t border-slate-200/90 dark:border-white/10 text-xs">
           {/* Creator Profile Link */}
           <Link
             to={`/@${creatorUsername}`}
@@ -141,7 +141,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <img
               src={creatorAvatar}
               alt={creatorName}
-              className="w-5 h-5 rounded-full object-cover bg-slate-100 shrink-0 border border-white dark:border-white/10"
+              className="w-5 h-5 rounded-full object-cover bg-slate-100 shrink-0 border border-slate-200 dark:border-white/10"
             />
             <span className="font-semibold text-foreground truncate text-[11px]">
               {creatorName}
