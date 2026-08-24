@@ -78,11 +78,21 @@ export default function ProjectEditorPage() {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  // Load project if editing
+  // Load project if editing & verify creator ownership
   useEffect(() => {
     if (id) {
       const existing = getProjectBySlug(id);
       if (existing) {
+        // Prevent editing someone else's project
+        if (
+          user &&
+          existing.userId &&
+          existing.userId !== user.id &&
+          existing.creator?.username?.toLowerCase() !== user.username?.toLowerCase()
+        ) {
+          navigate("/dashboard");
+          return;
+        }
         setTitle(existing.title || "");
         setDescription(existing.description || existing.fullDescription || "");
         setCategory(existing.category || "UI/UX Systems");
@@ -92,7 +102,7 @@ export default function ProjectEditorPage() {
         setTools(existing.tools || []);
       }
     }
-  }, [id, getProjectBySlug]);
+  }, [id, user, getProjectBySlug, navigate]);
 
   // Helper for Uploading to Supabase Storage or Base64 fallback
   const uploadImageFile = async (file: File): Promise<string> => {
