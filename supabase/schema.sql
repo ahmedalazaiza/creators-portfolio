@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS public.follows (
   CHECK (follower_id <> following_id)
 );
 
--- 2.8 Favorites (Saved Projects / Moodboard) Table
+-- 2.8 Favorites (Saved Projects / Bookmarks) Table
 CREATE TABLE IF NOT EXISTS public.favorites (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
@@ -114,7 +114,33 @@ CREATE TABLE IF NOT EXISTS public.favorites (
   UNIQUE(user_id, project_id)
 );
 
--- 2.9 Notifications Table
+-- 2.9 Inquiries Table (Client Inquiries & Hire Requests)
+CREATE TABLE IF NOT EXISTS public.inquiries (
+  id TEXT PRIMARY KEY,
+  creator_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  client_name TEXT NOT NULL,
+  client_email TEXT NOT NULL,
+  company_name TEXT,
+  budget_range TEXT,
+  project_timeline TEXT,
+  project_brief TEXT NOT NULL,
+  status TEXT DEFAULT 'unread' CHECK (status IN ('unread', 'read', 'accepted', 'declined', 'archived')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2.10 Job Applications Table (Careers applications)
+CREATE TABLE IF NOT EXISTS public.job_applications (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  job_id TEXT NOT NULL,
+  job_title TEXT NOT NULL,
+  applicant_name TEXT NOT NULL,
+  applicant_email TEXT NOT NULL,
+  portfolio_link TEXT NOT NULL,
+  applicant_note TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2.11 Notifications Table
 CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
@@ -145,6 +171,7 @@ CREATE INDEX IF NOT EXISTS idx_follows_following_id ON public.follows(following_
 CREATE INDEX IF NOT EXISTS idx_follows_follower_id ON public.follows(follower_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON public.favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_project_id ON public.favorites(project_id);
+CREATE INDEX IF NOT EXISTS idx_inquiries_creator_id ON public.inquiries(creator_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id);
 
 -- ==============================================================================
@@ -159,6 +186,8 @@ ALTER TABLE public.appreciations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.follows ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.job_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
 -- 4.1 Profiles RLS
@@ -239,7 +268,24 @@ CREATE POLICY "Users can view their own favorites" ON public.favorites FOR SELEC
 CREATE POLICY "Authenticated users can favorite projects" ON public.favorites FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can remove their favorites" ON public.favorites FOR DELETE USING (auth.uid() = user_id);
 
--- 4.9 Notifications RLS
+-- 4.9 Inquiries RLS
+DROP POLICY IF EXISTS "Creators can view their inquiries" ON public.inquiries;
+DROP POLICY IF EXISTS "Anyone can send an inquiry" ON public.inquiries;
+DROP POLICY IF EXISTS "Creators can update their inquiries" ON public.inquiries;
+
+CREATE POLICY "Creators can view their inquiries" ON public.inquiries 
+  FOR SELECT USING (auth.uid() = creator_id);
+CREATE POLICY "Anyone can send an inquiry" ON public.inquiries 
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Creators can update their inquiries" ON public.inquiries 
+  FOR UPDATE USING (auth.uid() = creator_id);
+
+-- 4.10 Job Applications RLS
+DROP POLICY IF EXISTS "Anyone can submit job applications" ON public.job_applications;
+CREATE POLICY "Anyone can submit job applications" ON public.job_applications 
+  FOR INSERT WITH CHECK (true);
+
+-- 4.11 Notifications RLS
 DROP POLICY IF EXISTS "Users can view own notifications" ON public.notifications;
 DROP POLICY IF EXISTS "Users can update own notifications" ON public.notifications;
 
@@ -254,32 +300,44 @@ CREATE POLICY "Users can update own notifications" ON public.notifications FOR U
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, username, full_name, avatar_url)
+  INSERT INTO public.profiles (id, username, full_name, avatar_url, is_email_verified)
   VALUES (
     NEW.id,
     LOWER(COALESCE(NEW.raw_user_meta_data->>'username', 'creator_' || substr(NEW.id::text, 1, 8))),
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'Creative Member'),
-    COALESCE(NEW.raw_user_meta_data->>'avatar_url', 'https://api.dicebear.com/7.x/shapes/svg?seed=' || NEW.id::text)
+    COALESCE(NEW.raw_user_meta_data->>'avatar_url', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'),
+    COALESCE((NEW.email_confirmed_at IS NOT NULL), false)
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO UPDATE SET
+    is_email_verified = COALESCE((NEW.email_confirmed_at IS NOT NULL), false);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
+  AFTER INSERT OR UPDATE OF email_confirmed_at ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- 5.2 Trigger: Sync Appreciations Count on Projects Table
+-- 5.2 Trigger: Sync Appreciations Count on Projects and Profiles
 CREATE OR REPLACE FUNCTION public.sync_project_appreciations()
 RETURNS TRIGGER AS $$
+DECLARE
+  project_owner UUID;
 BEGIN
   IF TG_OP = 'INSERT' THEN
     UPDATE public.projects SET appreciations_count = appreciations_count + 1 WHERE id = NEW.project_id;
+    SELECT user_id INTO project_owner FROM public.projects WHERE id = NEW.project_id;
+    IF project_owner IS NOT NULL THEN
+      UPDATE public.profiles SET total_appreciations = total_appreciations + 1 WHERE id = project_owner;
+    END IF;
     RETURN NEW;
   ELSIF TG_OP = 'DELETE' THEN
     UPDATE public.projects SET appreciations_count = GREATEST(0, appreciations_count - 1) WHERE id = OLD.project_id;
+    SELECT user_id INTO project_owner FROM public.projects WHERE id = OLD.project_id;
+    IF project_owner IS NOT NULL THEN
+      UPDATE public.profiles SET total_appreciations = GREATEST(0, total_appreciations - 1) WHERE id = project_owner;
+    END IF;
     RETURN OLD;
   END IF;
   RETURN NULL;
@@ -323,6 +381,20 @@ CREATE TRIGGER on_follow_removed
   AFTER DELETE ON public.follows
   FOR EACH ROW EXECUTE PROCEDURE public.sync_profile_follows();
 
+-- 5.4 RPC Helper: Increment Project Views Count
+CREATE OR REPLACE FUNCTION public.increment_project_views(target_project_id UUID)
+RETURNS VOID AS $$
+DECLARE
+  project_owner UUID;
+BEGIN
+  UPDATE public.projects SET views_count = views_count + 1 WHERE id = target_project_id;
+  SELECT user_id INTO project_owner FROM public.projects WHERE id = target_project_id;
+  IF project_owner IS NOT NULL THEN
+    UPDATE public.profiles SET total_views = total_views + 1 WHERE id = project_owner;
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- ==============================================================================
 -- 6. Initial Taxonomy Seed (Categories)
 -- ==============================================================================
@@ -348,7 +420,8 @@ ON CONFLICT (id) DO UPDATE SET
 INSERT INTO storage.buckets (id, name, public)
 VALUES
   ('projects', 'projects', true),
-  ('avatars', 'avatars', true)
+  ('avatars', 'avatars', true),
+  ('banners', 'banners', true)
 ON CONFLICT (id) DO NOTHING;
 
 DROP POLICY IF EXISTS "Public can view project images" ON storage.objects;
@@ -357,22 +430,22 @@ DROP POLICY IF EXISTS "Users can update own uploaded images" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete own uploaded images" ON storage.objects;
 
 CREATE POLICY "Public can view project images" ON storage.objects
-  FOR SELECT USING (bucket_id IN ('projects', 'avatars'));
+  FOR SELECT USING (bucket_id IN ('projects', 'avatars', 'banners'));
 
 CREATE POLICY "Authenticated users can upload project images" ON storage.objects
   FOR INSERT WITH CHECK (
-    bucket_id IN ('projects', 'avatars')
+    bucket_id IN ('projects', 'avatars', 'banners')
     AND auth.role() = 'authenticated'
   );
 
 CREATE POLICY "Users can update own uploaded images" ON storage.objects
   FOR UPDATE USING (
-    bucket_id IN ('projects', 'avatars')
+    bucket_id IN ('projects', 'avatars', 'banners')
     AND auth.role() = 'authenticated'
   );
 
 CREATE POLICY "Users can delete own uploaded images" ON storage.objects
   FOR DELETE USING (
-    bucket_id IN ('projects', 'avatars')
+    bucket_id IN ('projects', 'avatars', 'banners')
     AND auth.role() = 'authenticated'
   );
