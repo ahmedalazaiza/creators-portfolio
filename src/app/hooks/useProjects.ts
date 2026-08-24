@@ -52,7 +52,8 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
       return;
     }
 
-    setLoading(true);
+    // Only show full loading skeleton on cold initial load when memory is empty
+    setLoading((prev) => (projects.length === 0 ? true : false));
     try {
       // 1. Fetch in parallel: projects, comments, and (if logged in) user appreciations & saves
       const fetchPromises: Promise<any>[] = [

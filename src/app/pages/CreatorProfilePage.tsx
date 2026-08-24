@@ -41,7 +41,7 @@ import { ProfileHeaderSkeleton, ProjectGridSkeleton } from "../components/Loadin
 
 export default function CreatorProfilePage() {
   const { username } = useParams<{ username: string }>();
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, loading: authLoading } = useAuth();
   const { allProjects } = useProjects(undefined, user?.id);
   const { isFollowing, toggleFollow, getFollowersCount } = useSocial(user?.id);
   const navigate = useNavigate();
@@ -64,6 +64,13 @@ export default function CreatorProfilePage() {
   const isOwnProfile =
     !username ||
     (user && (user.username?.toLowerCase() === cleanUsername || user.id === username));
+
+  // If visiting /profile directly without a user session, redirect to login
+  useEffect(() => {
+    if (!username && !authLoading && !isLoggedIn) {
+      navigate("/login", { replace: true, state: { from: "/profile" } });
+    }
+  }, [username, authLoading, isLoggedIn, navigate]);
 
   // Fetch real profile and projects from Supabase
   useEffect(() => {
@@ -245,12 +252,22 @@ export default function CreatorProfilePage() {
         console.warn("Error loading creator from Supabase:", err);
         setNotFound(true);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchCreatorData();
-  }, [cleanUsername, isOwnProfile, user]);
+
+    // Safety fallback timeout: prevent stuck loading under any circumstances
+    const timeout = setTimeout(() => {
+      if (isMounted) setLoading(false);
+    }, 2000);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
+  }, [cleanUsername, isOwnProfile, user?.id]);
 
   // Resolved Creator Profile Object
   const profile = useMemo(() => {
@@ -362,7 +379,7 @@ export default function CreatorProfilePage() {
     setIsShareModalOpen(true);
   };
 
-  if (loading) {
+  if (loading && !profile && !dbProfile) {
     return (
       <div className="min-h-screen pt-4 pb-20 max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-10 space-y-8">
         <ProfileHeaderSkeleton />

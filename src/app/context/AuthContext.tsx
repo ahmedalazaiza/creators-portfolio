@@ -159,7 +159,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             updatedAt: profile.updated_at,
           };
 
-          setUser(fullProfile);
+          setUser((prev) => {
+            if (
+              prev &&
+              prev.id === fullProfile.id &&
+              prev.username === fullProfile.username &&
+              prev.fullName === fullProfile.fullName &&
+              prev.avatarUrl === fullProfile.avatarUrl &&
+              prev.isEmailVerified === fullProfile.isEmailVerified &&
+              prev.headline === fullProfile.headline &&
+              prev.bio === fullProfile.bio &&
+              prev.location === fullProfile.location &&
+              prev.website === fullProfile.website &&
+              prev.availableForWork === fullProfile.availableForWork &&
+              prev.updatedAt === fullProfile.updatedAt
+            ) {
+              return prev;
+            }
+            return fullProfile;
+          });
           try {
             localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(fullProfile));
           } catch {}
@@ -195,7 +213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (isUuid) {
             try {
-              await supabase.from("profiles").upsert({
+              const { error: upsertErr } = await supabase.from("profiles").upsert({
                 id: userId,
                 username: generatedUsername,
                 full_name: fullName,
@@ -203,6 +221,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 is_email_verified: verified,
                 created_at: new Date().toISOString(),
               });
+              if (upsertErr) {
+                console.warn("Profile auto-upsert notice:", upsertErr);
+              }
             } catch (upsertErr) {
               console.warn("Profile auto-upsert notice:", upsertErr);
             }
@@ -261,25 +282,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { verified, user: updatedProfile };
       }
 
-      // 2. Fallback check from DB if user state exists
-      if (user?.id) {
-        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
-        let q = supabase.from("profiles").select("*");
-        if (isUuid) q = q.eq("id", user.id);
-        else q = q.eq("username", user.username);
-        const { data: dbProfile } = await q.maybeSingle();
-
-        if (dbProfile?.is_email_verified === true) {
-          setUser((prev) => {
-            if (!prev) return null;
-            const next = { ...prev, isEmailVerified: true };
-            try {
-              localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(next));
-            } catch {}
-            return next;
-          });
-          return { verified: true, user };
-        }
+      // If user is invalid or deleted from Supabase Auth server, clear broken session:
+      if (userError && userError.message?.toLowerCase().includes("user from sub claim")) {
+        await supabase.auth.signOut().catch(() => {});
+        setUser(null);
+        setSession(null);
+        try {
+          localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+        } catch {}
       }
 
       return { verified: false, user: null };
@@ -287,7 +297,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn("Session refresh error:", err);
       return { verified: false, user: null };
     }
-  }, [user, fetchProfile]);
+  }, [fetchProfile]);
 
   /**
    * Initialize Session & real-time Auth State Listener
@@ -309,14 +319,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (isMounted) {
           if (activeSession?.user) {
             setSession(activeSession);
-            await fetchProfile(
+            const fetched = await fetchProfile(
               activeSession.user.id,
               activeSession.user.email,
               activeSession.user.user_metadata,
               activeSession.user
             );
+
+            // If account was deleted in Supabase, cleanly reset auth
+            if (!fetched) {
+              await supabase.auth.signOut().catch(() => {});
+              setUser(null);
+              setSession(null);
+              try {
+                localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+              } catch {}
+            }
           } else {
-            // No active Supabase session: clear local cached user to prevent stale auth states
             setUser(null);
             setSession(null);
             try {
@@ -359,23 +378,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    // Auto-sync email verification status when the user switches tabs back to this window
-    const handleVisibilityOrFocus = () => {
-      if (document.visibilityState === "visible") {
-        refreshSession();
-      }
-    };
-
-    window.addEventListener("focus", handleVisibilityOrFocus);
-    document.addEventListener("visibilitychange", handleVisibilityOrFocus);
-
     return () => {
       isMounted = false;
       subscription?.unsubscribe();
-      window.removeEventListener("focus", handleVisibilityOrFocus);
-      document.removeEventListener("visibilitychange", handleVisibilityOrFocus);
     };
-  }, [fetchProfile, refreshSession]);
+  }, [fetchProfile]);
 
   /**
    * Sign In with Email & Password
