@@ -221,28 +221,27 @@ export default function SearchModal({
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity"
-        />
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity"
+          />
 
-        {/* Modal Container */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          transition={{ type: "spring", damping: 25, stiffness: 320 }}
-          className="relative w-full max-w-3xl bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl shadow-slate-900/20 dark:shadow-black/70 overflow-hidden z-10 flex flex-col max-h-[90vh]"
-        >
+          {/* Modal Container */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+            transition={{ type: "spring", damping: 25, stiffness: 320 }}
+            className="relative w-full max-w-3xl bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl shadow-slate-900/20 dark:shadow-black/70 overflow-hidden z-10 flex flex-col max-h-[90vh]"
+          >
           {/* Header Search Field */}
           <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070905]">
             <div className="flex items-center gap-3">
@@ -547,6 +546,7 @@ export default function SearchModal({
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
-  );
+    )}
+  </AnimatePresence>
+);
 }

@@ -57,11 +57,22 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Listen to custom event to open search modal from any page component
+  // Listen to custom event and Cmd+K / Ctrl+K keybinding to open search modal
   useEffect(() => {
     const handleOpenSearch = () => setSearchModalOpen(true);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchModalOpen((prev) => !prev);
+      }
+    };
+
     window.addEventListener("open-search-modal", handleOpenSearch);
-    return () => window.removeEventListener("open-search-modal", handleOpenSearch);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("open-search-modal", handleOpenSearch);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   // Close dropdown on outside click
@@ -141,23 +152,16 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
 
           {/* Right: Actions & Auth */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* Search Icon Trigger (Appears when scrolled or on subpages, always accessible) */}
-            <AnimatePresence>
-              {(isScrolled || location.pathname !== "/") && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.85 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={() => setSearchModalOpen(true)}
-                  aria-label="Open search and filter modal (⌘K)"
-                  title="Search & Filter Showcase (⌘K)"
-                  className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer group shadow-2xs"
-                >
-                  <Search size={16} className="text-foreground group-hover:scale-105 transition-transform" />
-                </motion.button>
-              )}
-            </AnimatePresence>
+            {/* Search Icon Trigger (Always accessible, opens Search Modal) */}
+            <button
+              type="button"
+              onClick={() => setSearchModalOpen(true)}
+              aria-label="Open search and filter modal (⌘K)"
+              title="Search & Filter (⌘K)"
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer group shadow-2xs"
+            >
+              <Search size={16} className="text-foreground group-hover:scale-105 transition-transform" />
+            </button>
 
             {/* Quick Favorites / Moodboard Link */}
             <Link
