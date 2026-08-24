@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Heart, Eye, Bookmark, Sparkles, User } from "lucide-react";
@@ -18,6 +18,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const [isLiked, setIsLiked] = useState(Boolean(project.isAppreciated));
   const [likesCount, setLikesCount] = useState(project.appreciationsCount || 0);
   const [isSaved, setIsSaved] = useState(Boolean(project.isSaved));
+
+  // Sync state when project props update
+  useEffect(() => {
+    setIsLiked(Boolean(project.isAppreciated));
+    setLikesCount(project.appreciationsCount || 0);
+    setIsSaved(Boolean(project.isSaved));
+  }, [project.isAppreciated, project.appreciationsCount, project.isSaved]);
 
   const handleAppreciate = (e: React.MouseEvent) => {
     e.preventDefault();

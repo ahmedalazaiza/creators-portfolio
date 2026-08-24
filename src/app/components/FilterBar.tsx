@@ -57,7 +57,7 @@ export default function FilterBar({
               onClick={() => onSelectCategory(cat.slug)}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                 isSelected
-                  ? "bg-primary text-primary-foreground shadow-[0_0_12px_rgba(170,255,56,0.25)]"
+                  ? "bg-primary text-primary-foreground shadow-[0_0_12px_rgba(205,242,43,0.25)]"
                   : "bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/60"
               }`}
             >

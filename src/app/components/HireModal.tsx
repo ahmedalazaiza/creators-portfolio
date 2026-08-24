@@ -61,7 +61,7 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
         particleCount: 80,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ["#0057ff", "#38bdf8", "#ffffff"],
+        colors: ["#CDF22B", "#0F172A", "#FFFFFF"],
       });
     } catch (err) {
       console.warn("Failed to submit inquiry:", err);

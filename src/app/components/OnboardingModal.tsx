@@ -38,7 +38,7 @@ export default function OnboardingModal() {
       particleCount: 70,
       spread: 55,
       origin: { y: 0.6 },
-      colors: ["#0057ff", "#38bdf8", "#ffffff"],
+      colors: ["#CDF22B", "#0F172A", "#FFFFFF"],
     });
   };
 
