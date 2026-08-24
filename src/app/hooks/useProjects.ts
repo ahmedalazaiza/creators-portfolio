@@ -303,6 +303,19 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
               .delete()
               .match({ user_id: userId, project_id: projectId });
           }
+
+          // Keep appreciations_count column in sync on projects table
+          const { count } = await supabase
+            .from("appreciations")
+            .select("id", { count: "exact", head: true })
+            .eq("project_id", projectId);
+
+          if (typeof count === "number") {
+            await supabase
+              .from("projects")
+              .update({ appreciations_count: count })
+              .eq("id", projectId);
+          }
         } catch (err) {
           console.warn("Supabase appreciation error:", err);
         }
@@ -498,8 +511,8 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
       // Supabase persistence
       if (isSupabaseConfigured && currentUser?.id && !currentUser.id.startsWith("guest-")) {
         try {
-          await supabase.from("projects").upsert({
-            id: id.startsWith("proj-") ? undefined : id,
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+          const payload: any = {
             user_id: currentUser.id,
             title: finalProject.title,
             slug: finalProject.slug,
@@ -516,7 +529,27 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
             content_blocks: finalProject.contentBlocks,
             status: finalProject.status,
             is_featured: finalProject.isFeatured,
-          });
+            updated_at: new Date().toISOString(),
+          };
+
+          if (isUuid) {
+            payload.id = id;
+          }
+
+          const { data: savedDbRow, error } = await supabase
+            .from("projects")
+            .upsert(payload)
+            .select("*, creator:profiles(*)")
+            .single();
+
+          if (!error && savedDbRow) {
+            finalProject.id = savedDbRow.id;
+            finalProject.slug = savedDbRow.slug || savedDbRow.id;
+            // Update local state with real DB row
+            setProjects((prev) =>
+              prev.map((p) => (p.id === id || p.slug === slug ? finalProject : p))
+            );
+          }
         } catch (err) {
           console.warn("Supabase save project error:", err);
         }

@@ -87,6 +87,11 @@ export function useSocial(currentUserId?: string) {
         return { nextState: false, error: "AUTH_REQUIRED" };
       }
 
+      // Prevent following yourself
+      if (targetCreator.id === userId) {
+        return { nextState: false, error: "CANNOT_FOLLOW_SELF" };
+      }
+
       const creatorKey = targetCreator.username.toLowerCase().replace(/^@/, "");
       const currentFollowState = Boolean(followingMap[creatorKey] || followingMap[targetCreator.id]);
       const nextState = !currentFollowState;
@@ -99,18 +104,17 @@ export function useSocial(currentUserId?: string) {
       }));
 
       // Update followers count
-      setFollowersCountMap((prev) => {
-        const currentCount =
-          typeof prev[creatorKey] === "number"
-            ? prev[creatorKey]
-            : targetCreator.followersCount || 0;
-        const nextCount = Math.max(0, currentCount + (nextState ? 1 : -1));
-        return {
-          ...prev,
-          [creatorKey]: nextCount,
-          [targetCreator.id]: nextCount,
-        };
-      });
+      const currentCount =
+        typeof followersCountMap[creatorKey] === "number"
+          ? followersCountMap[creatorKey]
+          : targetCreator.followersCount || 0;
+      const nextCount = Math.max(0, currentCount + (nextState ? 1 : -1));
+
+      setFollowersCountMap((prev) => ({
+        ...prev,
+        [creatorKey]: nextCount,
+        [targetCreator.id]: nextCount,
+      }));
 
       // Sync with Supabase follows table
       if (isSupabaseConfigured && userId) {
@@ -126,6 +130,12 @@ export function useSocial(currentUserId?: string) {
               .delete()
               .match({ follower_id: userId, following_id: targetCreator.id });
           }
+
+          // Update profiles table followers_count
+          await supabase
+            .from("profiles")
+            .update({ followers_count: nextCount })
+            .eq("id", targetCreator.id);
         } catch (err) {
           console.warn("Supabase follow sync error:", err);
         }
@@ -133,7 +143,7 @@ export function useSocial(currentUserId?: string) {
 
       return { nextState };
     },
-    [followingMap]
+    [followingMap, followersCountMap]
   );
 
   return {
