@@ -102,110 +102,109 @@ function AppContent({
       {!isAuthPage && <EmailVerificationBanner />}
 
       <div className="flex-1">
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            {/* 1. Public Discovery & Feeds */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/explore" element={<HomePage />} />
-            <Route path="/inspiration" element={<HomePage />} />
-            <Route path="/creators" element={<CreatorsPage />} />
-            <Route path="/search" element={<SearchPage />} />
+        <Routes>
+          {/* 1. Public Discovery & Feeds */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/explore" element={<HomePage />} />
+          <Route path="/inspiration" element={<HomePage />} />
+          <Route path="/creators" element={<CreatorsPage />} />
+          <Route path="/search" element={<SearchPage />} />
 
-            {/* 2. Project Detail Showcase */}
-            <Route path="/project/:slug" element={<ProjectDetailPage />} />
-            <Route path="/p/:slug" element={<ProjectDetailPage />} />
+          {/* 2. Project Detail Showcase */}
+          <Route path="/project/:slug" element={<ProjectDetailPage />} />
+          <Route path="/p/:slug" element={<ProjectDetailPage />} />
 
-            {/* 3. Authentication */}
-            <Route path="/login" element={<AuthPage />} />
-            <Route path="/signup" element={<AuthPage />} />
+          {/* 3. Authentication */}
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/signup" element={<AuthPage />} />
 
-            {/* 4. Public Creator Profiles */}
-            <Route path="/profile" element={<CreatorProfilePage />} />
-            <Route path="/profile/:username" element={<CreatorProfilePage />} />
-            <Route path="/u/:username" element={<CreatorProfilePage />} />
-            <Route path="/:username" element={<CreatorProfilePage />} />
+          {/* 4. Protected Creator Studio & Project Builder */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create"
+            element={
+              <ProtectedRoute>
+                <ProjectEditorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/new"
+            element={
+              <ProtectedRoute>
+                <ProjectEditorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/studio/new"
+            element={
+              <ProtectedRoute>
+                <ProjectEditorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/project/edit/:id"
+            element={
+              <ProtectedRoute>
+                <ProjectEditorPage />
+              </ProtectedRoute>
+            }
+          />
 
-            {/* 5. Protected Creator Studio & Project Builder */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <SettingsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/create"
-              element={
-                <ProtectedRoute>
-                  <ProjectEditorPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/new"
-              element={
-                <ProtectedRoute>
-                  <ProjectEditorPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/studio/new"
-              element={
-                <ProtectedRoute>
-                  <ProjectEditorPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/project/edit/:id"
-              element={
-                <ProtectedRoute>
-                  <ProjectEditorPage />
-                </ProtectedRoute>
-              }
-            />
+          {/* 5. Favorites / Saved Projects */}
+          <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/saved" element={<FavoritesPage />} />
 
-            {/* 6. Favorites / Saved Projects */}
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/saved" element={<FavoritesPage />} />
+          {/* 6. Company & Business Pages (Must be before wildcard :username) */}
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/story" element={<AboutPage />} />
+          <Route path="/team" element={<TeamPage />} />
+          <Route path="/our-team" element={<TeamPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/support" element={<ContactPage />} />
+          <Route path="/inquiries" element={<ContactPage />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/jobs" element={<CareersPage />} />
+          <Route path="/join" element={<CareersPage />} />
+          <Route path="/faq" element={<FaqPage />} />
+          <Route path="/help" element={<FaqPage />} />
 
-            {/* 7. Company & Business Pages */}
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/story" element={<AboutPage />} />
-            <Route path="/team" element={<TeamPage />} />
-            <Route path="/our-team" element={<TeamPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/support" element={<ContactPage />} />
-            <Route path="/inquiries" element={<ContactPage />} />
-            <Route path="/careers" element={<CareersPage />} />
-            <Route path="/jobs" element={<CareersPage />} />
-            <Route path="/join" element={<CareersPage />} />
-            <Route path="/faq" element={<FaqPage />} />
-            <Route path="/help" element={<FaqPage />} />
+          {/* 7. Static Legal & Community Pages */}
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/guidelines" element={<GuidelinesPage />} />
+          <Route path="/assets" element={<BrandAssetsPage />} />
+          <Route path="/brand" element={<BrandAssetsPage />} />
+          <Route path="/cookies" element={<CookiePolicyPage />} />
 
-            {/* 8. Static Legal & Community Pages */}
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/guidelines" element={<GuidelinesPage />} />
-            <Route path="/assets" element={<BrandAssetsPage />} />
-            <Route path="/brand" element={<BrandAssetsPage />} />
-            <Route path="/cookies" element={<CookiePolicyPage />} />
+          {/* 8. Public Creator Profiles (Specific prefixes + fallback single segment) */}
+          <Route path="/profile" element={<CreatorProfilePage />} />
+          <Route path="/profile/:username" element={<CreatorProfilePage />} />
+          <Route path="/u/:username" element={<CreatorProfilePage />} />
+          <Route path="/@:username" element={<CreatorProfilePage />} />
+          <Route path="/:username" element={<CreatorProfilePage />} />
 
-            {/* 9. 404 Fallback */}
-            <Route path="/404" element={<NotFoundPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </AnimatePresence>
+          {/* 9. 404 Fallback */}
+          <Route path="/404" element={<NotFoundPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
       </div>
 
       {!isAuthPage && <Footer />}
