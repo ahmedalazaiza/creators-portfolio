@@ -2,54 +2,21 @@ import { useState, useEffect, useCallback } from "react";
 import { Inquiry } from "../types";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { useAuth } from "../context/AuthContext";
+import { getStorageItem, setStorageItem } from "../../lib/storage";
 
-const LOCAL_STORAGE_INQUIRIES_KEY = "azaiza_gallery_inquiries_v3";
+const LOCAL_STORAGE_INQUIRIES_KEY = "portfolios_inquiries_v3";
 
-const DEFAULT_INQUIRIES: Inquiry[] = [
-  {
-    id: "inq-1",
-    creatorId: "ahmed-azaiza",
-    clientName: "Sarah Jenkins",
-    clientEmail: "sarah@lumina-studios.io",
-    companyName: "Lumina Labs San Francisco",
-    budgetRange: "$5,000 - $10,000",
-    projectTimeline: "2 - 4 Weeks",
-    projectBrief: "We loved your Spatial Reality OS interface and would love to commission a 3D interactive design system for our upcoming hardware release.",
-    status: "unread",
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-  },
-  {
-    id: "inq-2",
-    creatorId: "ahmed-azaiza",
-    clientName: "Marcus Vance",
-    clientEmail: "marcus@vancecreative.de",
-    companyName: "Vance Agency Berlin",
-    budgetRange: "$10,000+",
-    projectTimeline: "1 - 2 Months",
-    projectBrief: "Looking for an Art Director to lead the rebrand and 3D motion package for a global fintech client.",
-    status: "read",
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-  },
-];
+const DEFAULT_INQUIRIES: Inquiry[] = [];
 
 export function useInquiries() {
   const { user } = useAuth();
 
-  const [inquiries, setInquiries] = useState<Inquiry[]>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_INQUIRIES_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch {
-        return DEFAULT_INQUIRIES;
-      }
-    }
-    return DEFAULT_INQUIRIES;
-  });
+  const [inquiries, setInquiries] = useState<Inquiry[]>(() =>
+    getStorageItem<Inquiry[]>(LOCAL_STORAGE_INQUIRIES_KEY, DEFAULT_INQUIRIES)
+  );
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_INQUIRIES_KEY, JSON.stringify(inquiries));
+    setStorageItem(LOCAL_STORAGE_INQUIRIES_KEY, inquiries);
   }, [inquiries]);
 
   // Send Inquiry

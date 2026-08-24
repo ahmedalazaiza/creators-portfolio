@@ -84,7 +84,7 @@ export interface Project {
   updatedAt: string;
 }
 
-export interface Comment {
+export interface CommentItem {
   id: string;
   projectId: string;
   userId?: string;
@@ -92,6 +92,8 @@ export interface Comment {
   content: string;
   createdAt: string;
 }
+
+export type Comment = CommentItem;
 
 export interface Appreciation {
   id?: string;
@@ -165,4 +167,51 @@ export interface ProjectFilters {
   color?: string;
   feedType?: FeedType;
   timeframe?: string;
+}
+
+// ─── Database Row Schemas (Supabase Direct) ──────────────────────────────────
+export interface DbProfileRow {
+  id: string;
+  username: string;
+  full_name?: string;
+  fullName?: string;
+  headline?: string;
+  bio?: string;
+  avatar_url?: string;
+  avatarUrl?: string;
+  banner_url?: string;
+  bannerUrl?: string;
+  location?: string;
+  website?: string;
+  available_for_work?: boolean;
+  skills?: string[];
+  social_links?: Record<string, string>;
+  is_email_verified?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DbProjectRow {
+  id: string;
+  slug?: string;
+  title: string;
+  description: string;
+  full_description?: string;
+  category: string;
+  category_id?: string;
+  cover_image: string;
+  accent_color?: string;
+  year?: string;
+  tools?: string[];
+  tags?: string[];
+  images?: string[];
+  content_blocks?: any[];
+  creator?: DbProfileRow;
+  user_id: string;
+  status?: 'published' | 'draft' | 'archived';
+  is_featured?: boolean;
+  views_count?: number;
+  appreciations_count?: number;
+  created_at: string;
+  updated_at: string;
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Project, ProjectFilters, CommentItem, Profile } from "../types";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { matchesCategory } from "../data/categories";
+import { getStorageItem, setStorageItem } from "../../lib/storage";
 
 const LOCAL_STORAGE_PROJECTS_KEY = "portfolios_real_projects_v1";
 const LOCAL_STORAGE_COMMENTS_KEY = "portfolios_real_comments_v1";
@@ -9,77 +10,39 @@ const LOCAL_STORAGE_APPRECIATIONS_KEY = "portfolios_real_appreciations_v1";
 const LOCAL_STORAGE_SAVES_KEY = "portfolios_real_saves_v1";
 
 export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
-  const [projects, setProjects] = useState<Project[]>(() => {
-    if (typeof window === "undefined") return [];
-    const saved = localStorage.getItem(LOCAL_STORAGE_PROJECTS_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
+  const [projects, setProjects] = useState<Project[]>(() =>
+    getStorageItem<Project[]>(LOCAL_STORAGE_PROJECTS_KEY, [])
+  );
 
-  const [comments, setComments] = useState<CommentItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    const saved = localStorage.getItem(LOCAL_STORAGE_COMMENTS_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
+  const [comments, setComments] = useState<CommentItem[]>(() =>
+    getStorageItem<CommentItem[]>(LOCAL_STORAGE_COMMENTS_KEY, [])
+  );
 
-  const [appreciatedMap, setAppreciatedMap] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {};
-    const saved = localStorage.getItem(LOCAL_STORAGE_APPRECIATIONS_KEY);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return {};
-      }
-    }
-    return {};
-  });
+  const [appreciatedMap, setAppreciatedMap] = useState<Record<string, boolean>>(() =>
+    getStorageItem<Record<string, boolean>>(LOCAL_STORAGE_APPRECIATIONS_KEY, {})
+  );
 
-  const [savedMap, setSavedMap] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {};
-    const saved = localStorage.getItem(LOCAL_STORAGE_SAVES_KEY);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return {};
-      }
-    }
-    return {};
-  });
+  const [savedMap, setSavedMap] = useState<Record<string, boolean>>(() =>
+    getStorageItem<Record<string, boolean>>(LOCAL_STORAGE_SAVES_KEY, {})
+  );
 
   const [loading, setLoading] = useState(true);
 
   // Sync state to localStorage
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_PROJECTS_KEY, JSON.stringify(projects));
+    setStorageItem(LOCAL_STORAGE_PROJECTS_KEY, projects);
   }, [projects]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_COMMENTS_KEY, JSON.stringify(comments));
+    setStorageItem(LOCAL_STORAGE_COMMENTS_KEY, comments);
   }, [comments]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_APPRECIATIONS_KEY, JSON.stringify(appreciatedMap));
+    setStorageItem(LOCAL_STORAGE_APPRECIATIONS_KEY, appreciatedMap);
   }, [appreciatedMap]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_SAVES_KEY, JSON.stringify(savedMap));
+    setStorageItem(LOCAL_STORAGE_SAVES_KEY, savedMap);
   }, [savedMap]);
 
   // Load live data from Supabase

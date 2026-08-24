@@ -1,48 +1,28 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { getStorageItem, setStorageItem } from "../../lib/storage";
 
 const LOCAL_STORAGE_FOLLOWS_KEY = "portfolios_follows_v1";
 const LOCAL_STORAGE_FOLLOWERS_COUNT_KEY = "portfolios_followers_count_v1";
 
 export function useSocial(currentUserId?: string) {
   // Map of targetUserId -> boolean (is current user following target)
-  const [followingMap, setFollowingMap] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {};
-    const saved = localStorage.getItem(LOCAL_STORAGE_FOLLOWS_KEY);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return {};
-      }
-    }
-    return {};
-  });
+  const [followingMap, setFollowingMap] = useState<Record<string, boolean>>(() =>
+    getStorageItem<Record<string, boolean>>(LOCAL_STORAGE_FOLLOWS_KEY, {})
+  );
 
   // Map of creatorId -> followers count override
-  const [followersCountMap, setFollowersCountMap] = useState<Record<string, number>>(() => {
-    if (typeof window === "undefined") return {};
-    const saved = localStorage.getItem(LOCAL_STORAGE_FOLLOWERS_COUNT_KEY);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return {};
-      }
-    }
-    return {};
-  });
+  const [followersCountMap, setFollowersCountMap] = useState<Record<string, number>>(() =>
+    getStorageItem<Record<string, number>>(LOCAL_STORAGE_FOLLOWERS_COUNT_KEY, {})
+  );
 
   // Save to localStorage
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_FOLLOWS_KEY, JSON.stringify(followingMap));
+    setStorageItem(LOCAL_STORAGE_FOLLOWS_KEY, followingMap);
   }, [followingMap]);
 
   useEffect(() => {
-    localStorage.setItem(
-      LOCAL_STORAGE_FOLLOWERS_COUNT_KEY,
-      JSON.stringify(followersCountMap)
-    );
+    setStorageItem(LOCAL_STORAGE_FOLLOWERS_COUNT_KEY, followersCountMap);
   }, [followersCountMap]);
 
   // Load follows from Supabase if authenticated

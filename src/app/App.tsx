@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import ErrorBoundary from "./components/ErrorBoundary";
 import EmailVerificationBanner from "./components/EmailVerificationBanner";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -245,10 +246,12 @@ export default function App() {
   };
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppContent isDark={isDark} onToggleTheme={toggleTheme} />
-      </BrowserRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppContent isDark={isDark} onToggleTheme={toggleTheme} />
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

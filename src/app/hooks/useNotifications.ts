@@ -2,29 +2,20 @@ import { useState, useEffect, useCallback } from "react";
 import { NotificationItem } from "../types";
 import { useAuth } from "../context/AuthContext";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { getStorageItem, setStorageItem } from "../../lib/storage";
 
 const LOCAL_STORAGE_NOTIFICATIONS_KEY = "portfolios_notifications_v1";
 
 export function useNotifications() {
   const { user } = useAuth();
 
-  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    const saved = localStorage.getItem(LOCAL_STORAGE_NOTIFICATIONS_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() =>
+    getStorageItem<NotificationItem[]>(LOCAL_STORAGE_NOTIFICATIONS_KEY, [])
+  );
 
   // Save to localStorage
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_NOTIFICATIONS_KEY, JSON.stringify(notifications));
+    setStorageItem(LOCAL_STORAGE_NOTIFICATIONS_KEY, notifications);
   }, [notifications]);
 
   // Load real notifications from Supabase
