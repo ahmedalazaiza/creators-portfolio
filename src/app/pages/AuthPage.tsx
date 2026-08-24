@@ -19,8 +19,8 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const { signIn, signUp, isLoggedIn } = useAuth();
 
-  const isSignUpInitial = location.pathname === "/signup";
-  const [isSignUp, setIsSignUp] = useState(isSignUpInitial);
+  const isSignUpPath = location.pathname === "/signup";
+  const [isSignUp, setIsSignUp] = useState(isSignUpPath);
 
   // Form states
   const [email, setEmail] = useState("");
@@ -31,6 +31,13 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  // Sync with URL route changes
+  useEffect(() => {
+    setIsSignUp(location.pathname === "/signup");
+    setErrorMessage("");
+    setSuccessMessage("");
+  }, [location.pathname]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -49,7 +56,13 @@ export default function AuthPage() {
     try {
       if (isSignUp) {
         if (!fullName.trim() || !username.trim()) {
-          setErrorMessage("Please provide your full name and username.");
+          setErrorMessage("Please provide both your full name and a username.");
+          setLoading(false);
+          return;
+        }
+
+        if (password.length < 6) {
+          setErrorMessage("Password must be at least 6 characters long.");
           setLoading(false);
           return;
         }
@@ -58,7 +71,7 @@ export default function AuthPage() {
         if (res.error) {
           setErrorMessage(res.error);
         } else {
-          setSuccessMessage("Account created successfully! Welcome aboard.");
+          setSuccessMessage("Account created successfully! Redirecting...");
           setTimeout(() => {
             const from = (location.state as any)?.from?.pathname || "/dashboard";
             navigate(from, { replace: true });
@@ -74,7 +87,7 @@ export default function AuthPage() {
         }
       }
     } catch (err: any) {
-      setErrorMessage(err.message || "An unexpected error occurred.");
+      setErrorMessage(err.message || "An unexpected error occurred during authentication.");
     } finally {
       setLoading(false);
     }
@@ -105,40 +118,32 @@ export default function AuthPage() {
           <p className="text-xs text-muted-foreground">
             {isSignUp
               ? "Join a calm, creative community to publish and explore work"
-              : "Sign in to access your portfolio studio and projects"}
+              : "Sign in to access your creator studio and manage projects"}
           </p>
         </div>
 
         {/* Tab Switcher (Log In / Sign Up) */}
         <div className="p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 flex items-center gap-1 border border-slate-200/50 dark:border-slate-700/50">
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUp(false);
-              setErrorMessage("");
-            }}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+          <Link
+            to="/login"
+            className={`flex-1 py-2 text-center rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               !isSignUp
                 ? "bg-white dark:bg-slate-900 text-foreground shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Log In
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUp(true);
-              setErrorMessage("");
-            }}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+          </Link>
+          <Link
+            to="/signup"
+            className={`flex-1 py-2 text-center rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               isSignUp
                 ? "bg-white dark:bg-slate-900 text-foreground shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Sign Up
-          </button>
+          </Link>
         </div>
 
         {/* Error / Success Feedback */}
@@ -189,7 +194,7 @@ export default function AuthPage() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Ahmed Al-Azaiza"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-foreground text-xs focus:outline-none focus:border-[#CDF22B] focus:ring-2 focus:ring-[#CDF22B]/30 transition-all font-medium"
                   />
                 </div>
               </div>
@@ -270,24 +275,22 @@ export default function AuthPage() {
             {isSignUp ? (
               <>
                 Already have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => setIsSignUp(false)}
+                <Link
+                  to="/login"
                   className="text-slate-900 dark:text-[#CDF22B] font-bold hover:underline cursor-pointer"
                 >
                   Log In
-                </button>
+                </Link>
               </>
             ) : (
               <>
                 Don't have an account yet?{" "}
-                <button
-                  type="button"
-                  onClick={() => setIsSignUp(true)}
+                <Link
+                  to="/signup"
                   className="text-slate-900 dark:text-[#CDF22B] font-bold hover:underline cursor-pointer"
                 >
                   Create one for free
-                </button>
+                </Link>
               </>
             )}
           </p>
