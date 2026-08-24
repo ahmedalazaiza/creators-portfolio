@@ -202,21 +202,18 @@ export default function HomePage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.2 }}
       className="min-h-screen pt-4 sm:pt-6 pb-24 relative overflow-hidden"
     >
-      {/* Background Soft Atmospheric Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[550px] brand-glow pointer-events-none -z-10" />
-
       {/* Hero Section */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-8 sm:pb-10 text-center space-y-5">
         {/* Soft Badge */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 shadow-xs text-xs font-semibold text-slate-900 dark:text-[#CDF22B] backdrop-blur-md"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs text-xs font-semibold text-slate-700 dark:text-slate-300"
         >
-          <div className="w-2 h-2 rounded-full bg-[#CDF22B] shadow-xs" />
+          <Sparkles size={13} className="text-slate-500 dark:text-slate-400" />
           <span>Curated Creative Showcase Platform</span>
         </motion.div>
 
@@ -228,10 +225,7 @@ export default function HomePage() {
           className="text-4xl sm:text-6xl lg:text-7xl font-bold font-display tracking-tight text-foreground leading-[1.1]"
         >
           Discover & publish <br className="hidden sm:inline" />
-          <span className="relative inline-block">
-            <span className="relative z-10">exceptional case studies.</span>
-            <span className="absolute bottom-2 left-0 right-0 h-3 bg-[#CDF22B]/60 -z-1 rounded-sm transform -rotate-1" />
-          </span>
+          <span>exceptional case studies.</span>
         </motion.h1>
 
         {/* Subtitle */}
@@ -283,7 +277,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Advanced Search Bar with Filter Button */}
         <div className="max-w-3xl mx-auto">
-          <div className="relative flex items-center rounded-full glass-card border border-slate-200/90 dark:border-slate-800/90 shadow-lg shadow-slate-900/5 dark:shadow-black/20 focus-within:border-[#CDF22B] focus-within:ring-4 focus-within:ring-[#CDF22B]/20 transition-all p-1.5 pl-4 gap-2 backdrop-blur-xl">
+          <div className="relative flex items-center rounded-full glass-card border border-slate-200/90 dark:border-slate-800/90 shadow-lg shadow-slate-900/5 dark:shadow-black/20 focus-within:border-slate-400 dark:focus-within:border-slate-500 focus-within:ring-4 focus-within:ring-slate-400/15 transition-all p-1.5 pl-4 gap-2 backdrop-blur-xl">
             {/* Search Icon */}
             <Search size={18} className="text-slate-400 dark:text-slate-500 shrink-0" />
 
