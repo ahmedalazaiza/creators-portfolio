@@ -27,6 +27,7 @@ import {
   AlertCircle,
   Loader2,
   Users,
+  Layers,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../hooks/useProjects";
@@ -557,16 +558,19 @@ export default function CreatorProfilePage() {
 
           {/* Bio & Details Snippet */}
           <div className="space-y-4 pt-2 border-t border-slate-200/80 dark:border-white/10">
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-3xl">
-              {profile.bio}
-            </p>
+            {profile.bio && (
+              <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed max-w-3xl">
+                {profile.bio}
+              </p>
+            )}
 
             {/* Metadata Pills & Social Links */}
             <div className="flex flex-wrap items-center justify-between gap-4 text-xs">
-              <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-2.5 text-muted-foreground">
                 {profile.location && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin size={13} className="text-[#CDF22B]" /> {profile.location}
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs font-medium text-foreground">
+                    <MapPin size={13} className="text-slate-700 dark:text-[#CDF22B]" />
+                    <span>{profile.location}</span>
                   </span>
                 )}
                 {profile.website && (
@@ -574,22 +578,24 @@ export default function CreatorProfilePage() {
                     href={profile.website}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs font-medium text-foreground hover:text-slate-900 dark:hover:text-[#CDF22B] transition-colors"
                   >
-                    <Globe size={13} className="text-[#CDF22B]" /> {profile.website.replace(/^https?:\/\//, "")}
+                    <Globe size={13} className="text-slate-700 dark:text-[#CDF22B]" />
+                    <span>{profile.website.replace(/^https?:\/\//, "")}</span>
                   </a>
                 )}
               </div>
 
               {/* Social Icons */}
               {profile.socialLinks && Object.keys(profile.socialLinks).length > 0 && (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-1.5">
                   {profile.socialLinks.twitter && (
                     <a
                       href={profile.socialLinks.twitter}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-sky-500"
+                      aria-label="Twitter / X"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:border-sky-500/40 hover:bg-sky-500/10 text-slate-700 dark:text-slate-300 hover:text-sky-500 transition-all cursor-pointer"
                     >
                       <Twitter size={14} />
                     </a>
@@ -599,7 +605,8 @@ export default function CreatorProfilePage() {
                       href={profile.socialLinks.dribbble}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-pink-500"
+                      aria-label="Dribbble"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:border-pink-500/40 hover:bg-pink-500/10 text-slate-700 dark:text-slate-300 hover:text-pink-500 transition-all cursor-pointer"
                     >
                       <Dribbble size={14} />
                     </a>
@@ -609,7 +616,8 @@ export default function CreatorProfilePage() {
                       href={profile.socialLinks.linkedin}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600"
+                      aria-label="LinkedIn"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:border-blue-600/40 hover:bg-blue-600/10 text-slate-700 dark:text-slate-300 hover:text-blue-600 transition-all cursor-pointer"
                     >
                       <Linkedin size={14} />
                     </a>
@@ -619,7 +627,8 @@ export default function CreatorProfilePage() {
                       href={profile.socialLinks.github}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-foreground"
+                      aria-label="GitHub"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:border-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-foreground transition-all cursor-pointer"
                     >
                       <Github size={14} />
                     </a>
@@ -634,7 +643,7 @@ export default function CreatorProfilePage() {
                 {profile.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-[11px] font-semibold text-foreground"
+                    className="px-3 py-1 rounded-full bg-slate-100/90 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-[11px] font-semibold text-foreground"
                   >
                     {skill}
                   </span>
@@ -644,34 +653,57 @@ export default function CreatorProfilePage() {
           </div>
 
           {/* ─── 4 Statistics Metrics Bar ──────────────────────────────── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-200/80 dark:border-white/10">
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-center">
-              <p className="text-lg sm:text-2xl font-bold font-display text-foreground">
-                {creatorProjects.length}
-              </p>
-              <p className="text-[11px] text-muted-foreground font-medium">Projects</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-slate-200/80 dark:border-white/10">
+            {/* Projects */}
+            <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
+              <div className="w-10 h-10 rounded-xl bg-slate-200/70 dark:bg-white/10 text-slate-800 dark:text-white flex items-center justify-center shrink-0">
+                <Layers size={18} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
+                  {creatorProjects.length}
+                </p>
+                <p className="text-[11px] text-muted-foreground font-medium truncate">Projects</p>
+              </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-center">
-              <p className="text-lg sm:text-2xl font-bold font-display text-foreground flex items-center justify-center gap-1.5">
-                <Heart size={16} className="text-slate-900 dark:text-[#CDF22B] fill-current" />
-                <span>{totalAppreciations}</span>
-              </p>
-              <p className="text-[11px] text-muted-foreground font-medium">Appreciations</p>
+            {/* Appreciations */}
+            <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center shrink-0">
+                <Heart size={18} className="fill-rose-500" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
+                  {totalAppreciations}
+                </p>
+                <p className="text-[11px] text-muted-foreground font-medium truncate">Appreciations</p>
+              </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-center">
-              <p className="text-lg sm:text-2xl font-bold font-display text-foreground">
-                {liveFollowersCount}
-              </p>
-              <p className="text-[11px] text-muted-foreground font-medium">Followers</p>
+            {/* Followers */}
+            <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
+              <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+                <Users size={18} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
+                  {liveFollowersCount}
+                </p>
+                <p className="text-[11px] text-muted-foreground font-medium truncate">Followers</p>
+              </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-center">
-              <p className="text-lg sm:text-2xl font-bold font-display text-foreground">
-                {profile.followingCount}
-              </p>
-              <p className="text-[11px] text-muted-foreground font-medium">Following</p>
+            {/* Following */}
+            <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <UserCheck size={18} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
+                  {profile.followingCount || 0}
+                </p>
+                <p className="text-[11px] text-muted-foreground font-medium truncate">Following</p>
+              </div>
             </div>
           </div>
         </div>
