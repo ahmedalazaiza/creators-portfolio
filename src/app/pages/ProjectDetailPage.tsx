@@ -24,6 +24,7 @@ import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../context/AuthContext";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { ProjectDetailSkeleton } from "../components/LoadingSkeletons";
+import ShareModal from "../components/ShareModal";
 import confetti from "canvas-confetti";
 
 export default function ProjectDetailPage() {
@@ -44,6 +45,7 @@ export default function ProjectDetailPage() {
   const projectFromHook = getProjectBySlug(slug || "");
   const [directProject, setDirectProject] = useState<any>(null);
   const [directLoading, setDirectLoading] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   // If not found in hook, query Supabase directly
   useEffect(() => {
@@ -212,9 +214,7 @@ export default function ProjectDetailPage() {
 
   // Handle Share
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setIsShareOpen(true);
   };
 
   const imagesToShow = project.images && project.images.length > 0 ? project.images : [project.coverImage];
@@ -256,9 +256,10 @@ export default function ProjectDetailPage() {
           <button
             onClick={handleShare}
             className="p-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            title="Copy link"
+            title="Share Project"
+            aria-label="Share project"
           >
-            {copied ? <Check size={15} className="text-emerald-500" /> : <Share2 size={15} />}
+            <Share2 size={15} />
           </button>
         </div>
       </div>
@@ -549,6 +550,19 @@ export default function ProjectDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Share Modal */}
+      {project && (
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          type="project"
+          title={project.title}
+          subtitle={`By ${project.creator?.fullName || "Creator"} • ${project.category}`}
+          coverImage={project.coverImage}
+          url={window.location.href}
+        />
+      )}
     </motion.main>
   );
 }

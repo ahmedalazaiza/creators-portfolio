@@ -35,6 +35,7 @@ import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { Profile, Project } from "../types";
 import ProjectCard from "../components/ProjectCard";
 import EditProfileModal from "../components/EditProfileModal";
+import ShareModal from "../components/ShareModal";
 import { ProfileHeaderSkeleton, ProjectGridSkeleton } from "../components/LoadingSkeletons";
 
 export default function CreatorProfilePage() {
@@ -46,6 +47,7 @@ export default function CreatorProfilePage() {
 
   const [activeTab, setActiveTab] = useState<"projects" | "about" | "saved">("projects");
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
@@ -356,9 +358,7 @@ export default function CreatorProfilePage() {
   };
 
   const handleShareProfile = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
+    setIsShareModalOpen(true);
   };
 
   if (loading) {
@@ -490,6 +490,15 @@ export default function CreatorProfilePage() {
                     <span>New Project</span>
                   </Link>
 
+                  <button
+                    onClick={handleShareProfile}
+                    aria-label="Share your profile"
+                    title="Share Profile"
+                    className="p-2.5 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    <Share2 size={15} />
+                  </button>
+
                   <Link
                     to="/settings"
                     aria-label="Settings"
@@ -535,10 +544,11 @@ export default function CreatorProfilePage() {
                   {/* Share Profile */}
                   <button
                     onClick={handleShareProfile}
-                    aria-label="Share profile link"
+                    aria-label="Share profile"
+                    title="Share Profile"
                     className="p-2.5 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
-                    {copiedLink ? <Check size={15} className="text-emerald-500" /> : <Share2 size={15} />}
+                    <Share2 size={15} />
                   </button>
                 </>
               )}
@@ -829,6 +839,19 @@ export default function CreatorProfilePage() {
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
       />
+
+      {/* ─── 5. Share Profile Modal ─────────────────────────────── */}
+      {profile && (
+        <ShareModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          type="profile"
+          title={profile.username}
+          subtitle={`${profile.fullName}${profile.headline ? ` • ${profile.headline}` : ""}`}
+          avatarUrl={profile.avatarUrl}
+          url={window.location.href}
+        />
+      )}
     </motion.main>
   );
 }
