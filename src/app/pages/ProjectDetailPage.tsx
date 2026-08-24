@@ -314,13 +314,13 @@ export default function ProjectDetailPage() {
               onClick={handleAppreciate}
               className={`px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
                 isLiked
-                  ? "bg-rose-500 text-white shadow-md shadow-rose-500/30"
-                  : "glass-card hover:bg-rose-500 hover:text-white text-foreground border border-slate-200 dark:border-slate-800"
+                  ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/35 border border-[#CDF22B]"
+                  : "glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground border border-slate-200 dark:border-slate-800 hover:border-[#CDF22B]/60"
               }`}
             >
-              <Heart size={15} className={isLiked ? "fill-current text-white" : ""} />
+              <Heart size={15} className={isLiked ? "fill-slate-950 text-slate-950" : "text-foreground"} />
               <span>{isLiked ? "Appreciated" : "Appreciate"}</span>
-              <span className="opacity-75 font-mono">({likesCount})</span>
+              <span className="opacity-80 font-mono">({likesCount})</span>
             </button>
           </div>
         </div>
@@ -357,7 +357,7 @@ export default function ProjectDetailPage() {
           {project.tools && project.tools.length > 0 && (
             <div className="space-y-1.5">
               <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
-                <Wrench size={13} className="text-[#CDF22B]" />
+                <Wrench size={13} className="text-slate-800 dark:text-[#CDF22B]" />
                 <span>Tools Used</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -376,14 +376,14 @@ export default function ProjectDetailPage() {
           {project.tags && project.tags.length > 0 && (
             <div className="space-y-1.5">
               <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
-                <Tag size={13} className="text-[#CDF22B]" />
+                <Tag size={13} className="text-slate-800 dark:text-[#CDF22B]" />
                 <span>Tags</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {project.tags.map((t) => (
                   <span
                     key={t}
-                    className="px-3 py-1 rounded-full bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-xs font-medium border border-[#CDF22B]/40"
+                    className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-foreground text-xs font-medium border border-slate-200 dark:border-slate-700"
                   >
                     #{t}
                   </span>
@@ -409,7 +409,7 @@ export default function ProjectDetailPage() {
           onClick={handleAppreciate}
           className="px-8 py-3 rounded-full btn-primary text-xs font-bold shadow-md active:scale-95 flex items-center gap-2 cursor-pointer"
         >
-          <Heart size={16} className={isLiked ? "fill-current" : ""} />
+          <Heart size={16} className={isLiked ? "fill-current text-slate-950" : "text-slate-950"} />
           <span>{isLiked ? "Appreciated" : "Give Appreciation"} ({likesCount})</span>
         </button>
       </div>
@@ -417,7 +417,7 @@ export default function ProjectDetailPage() {
       {/* Comments & Community Discussion Section */}
       <div className="glass-card rounded-3xl p-6 sm:p-10 border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-6">
         <div className="flex items-center gap-2">
-          <MessageSquare size={16} className="text-[#CDF22B]" />
+          <MessageSquare size={16} className="text-slate-800 dark:text-[#CDF22B]" />
           <h3 className="text-base font-bold font-display text-foreground">
             Comments & Feedback ({comments.length})
           </h3>

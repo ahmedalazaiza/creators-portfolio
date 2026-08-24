@@ -572,8 +572,8 @@ export default function CreatorProfilePage() {
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
-              <p className="text-lg sm:text-2xl font-bold font-display text-foreground flex items-center justify-center gap-1">
-                <Heart size={15} className="text-rose-500 fill-rose-500" />
+              <p className="text-lg sm:text-2xl font-bold font-display text-foreground flex items-center justify-center gap-1.5">
+                <Heart size={16} className="text-slate-900 dark:text-[#CDF22B] fill-current" />
                 <span>{totalAppreciations}</span>
               </p>
               <p className="text-[11px] text-muted-foreground font-medium">Appreciations</p>

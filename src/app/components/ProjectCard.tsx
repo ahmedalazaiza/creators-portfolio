@@ -103,11 +103,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             title={isLoggedIn ? "Appreciate project" : "Sign in to appreciate"}
             className={`p-2 rounded-full backdrop-blur-md transition-all cursor-pointer ${
               isLiked
-                ? "bg-rose-500 text-white shadow-md shadow-rose-500/40"
-                : "bg-white/90 dark:bg-slate-900/90 text-foreground hover:bg-rose-500 hover:text-white"
+                ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/35"
+                : "bg-white/90 dark:bg-slate-900/90 text-foreground hover:bg-[#CDF22B] hover:text-slate-950"
             }`}
           >
-            <Heart size={14} className={isLiked ? "fill-current" : ""} />
+            <Heart size={14} className={isLiked ? "fill-current text-slate-950" : ""} />
           </button>
         </div>
       </Link>

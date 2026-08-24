@@ -177,7 +177,7 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
                     <div className="flex items-center gap-3 text-muted-foreground text-[11px] font-medium">
                       <span className="flex items-center gap-1">
-                        <Heart size={12} className="text-rose-500 fill-rose-500" /> {p.appreciationsCount || 0}
+                        <Heart size={12} className="text-slate-900 dark:text-[#CDF22B] fill-current" /> {p.appreciationsCount || 0}
                       </span>
                       <span className="flex items-center gap-1">
                         <Eye size={12} /> {p.viewsCount || 0}

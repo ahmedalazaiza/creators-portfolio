@@ -235,7 +235,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
                         >
-                          <User size={14} className="text-foreground" />
+                          <User size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>My Profile</span>
                         </Link>
 
@@ -244,7 +244,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
                         >
-                          <Bookmark size={14} className="text-[#CDF22B]" />
+                          <Bookmark size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>My Favorites</span>
                         </Link>
 
@@ -253,7 +253,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
                         >
-                          <LayoutDashboard size={14} className="text-[#CDF22B]" />
+                          <LayoutDashboard size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>Creator Dashboard</span>
                         </Link>
 
@@ -262,7 +262,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
                         >
-                          <Plus size={14} className="text-[#CDF22B]" />
+                          <Plus size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>Upload Project</span>
                         </Link>
 
@@ -271,7 +271,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                             onClick={handleSignOut}
                             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 transition-colors font-medium text-left cursor-pointer"
                           >
-                            <LogOut size={14} />
+                            <LogOut size={15} className="shrink-0" />
                             <span>Sign Out</span>
                           </button>
                         </div>
@@ -326,7 +326,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-foreground cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <Search size={15} className="text-[#CDF22B]" />
+                  <Search size={15} className="text-slate-800 dark:text-slate-200" />
                   <span>Search & Filter Projects</span>
                 </div>
                 <SlidersHorizontal size={14} className="text-muted-foreground" />
@@ -346,7 +346,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
-                  <Bookmark size={14} className="text-[#CDF22B]" />
+                  <Bookmark size={15} className="text-slate-800 dark:text-slate-200" />
                   <span>My Favorites</span>
                 </Link>
                 <Link

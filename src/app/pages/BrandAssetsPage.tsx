@@ -72,7 +72,7 @@ export default function BrandAssetsPage() {
         {/* Color Palette */}
         <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
-            <Palette size={18} className="text-[#CDF22B]" />
+            <Palette size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>Color Tokens</h2>
           </div>
 

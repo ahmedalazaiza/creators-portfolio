@@ -46,15 +46,15 @@ export default function AppreciationButton({
       whileTap={{ scale: 0.92 }}
       onClick={handleClick}
       aria-label={isAppreciated ? "Remove appreciation" : "Appreciate project"}
-      className={`relative group inline-flex items-center justify-center rounded-full font-semibold transition-all duration-200 cursor-pointer select-none ${
+      className={`relative group inline-flex items-center justify-center rounded-full font-bold transition-all duration-200 cursor-pointer select-none ${
         isAppreciated
-          ? "bg-rose-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] border border-rose-400"
-          : "bg-card/90 hover:bg-card border border-border text-foreground hover:border-primary/50 hover:text-primary shadow-sm"
+          ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/35 border border-[#CDF22B]"
+          : "glass-card hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-foreground hover:border-[#CDF22B]/60 shadow-xs"
       } ${buttonClasses[size]} ${className}`}
     >
       {/* Burst particles */}
       {animating && isAppreciated && (
-        <span className="absolute inset-0 rounded-full pointer-events-none animate-ping bg-rose-500/30" />
+        <span className="absolute inset-0 rounded-full pointer-events-none animate-ping bg-[#CDF22B]/40" />
       )}
 
       <motion.span
@@ -68,7 +68,7 @@ export default function AppreciationButton({
         <Heart
           size={iconSizes[size]}
           className={`transition-colors ${
-            isAppreciated ? "fill-white text-white" : "text-muted-foreground group-hover:text-rose-500"
+            isAppreciated ? "fill-slate-950 text-slate-950" : "text-foreground group-hover:text-slate-950 dark:group-hover:text-[#CDF22B]"
           }`}
         />
       </motion.span>

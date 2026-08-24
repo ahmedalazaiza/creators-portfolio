@@ -510,7 +510,7 @@ export default function HomePage() {
           <div className="space-y-6 pt-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <LayoutGrid size={18} className="text-[#CDF22B]" />
+                <LayoutGrid size={18} className="text-slate-900 dark:text-[#CDF22B]" />
                 <h2 className="text-lg font-bold text-foreground">
                   {currentCategoryObj.slug !== "all"
                     ? currentCategoryObj.name
