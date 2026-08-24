@@ -150,17 +150,9 @@ const BATCH_INCREMENT = 4;
 
 export default function TeamPage() {
   const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH_SIZE);
-  const [activeDepartment, setActiveDepartment] = useState<string>("all");
 
-  const departments = ["all", "Leadership", "Community", "Design & CGI", "Engineering", "Product"];
-
-  const filteredMembers = ALL_TEAM_MEMBERS.filter((m) => {
-    if (activeDepartment === "all") return true;
-    return m.department === activeDepartment;
-  });
-
-  const visibleMembers = filteredMembers.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredMembers.length;
+  const visibleMembers = ALL_TEAM_MEMBERS.slice(0, visibleCount);
+  const hasMore = visibleCount < ALL_TEAM_MEMBERS.length;
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + BATCH_INCREMENT);
@@ -214,38 +206,23 @@ export default function TeamPage() {
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl mx-auto">
           The passionate curators, engineers, and designers building the elevated sanctuary for world-class digital craft.
         </p>
-
-        {/* Department Filter Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
-          {departments.map((dept) => (
-            <button
-              key={dept}
-              onClick={() => {
-                setActiveDepartment(dept);
-                setVisibleCount(INITIAL_BATCH_SIZE);
-              }}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                activeDepartment === dept
-                  ? "bg-[#0F172A] text-[#CDF22B] dark:bg-[#CDF22B] dark:text-[#070905] shadow-xs font-bold"
-                  : "bg-slate-100 dark:bg-[#171915] text-muted-foreground hover:text-foreground border border-transparent dark:border-white/10"
-              }`}
-            >
-              {dept === "all" ? "All Members" : dept}
-            </button>
-          ))}
-        </div>
       </section>
 
-      {/* ─── Team Grid (Exact User Image Reference Layout) ───────────── */}
+      {/* ─── Team Grid (Styled with ProjectCard standard tokens & hover effects) ───────────── */}
       <section className="space-y-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7">
           {visibleMembers.map((member) => (
-            <div
+            <motion.div
               key={member.id}
-              className="bg-white dark:bg-[#151813] rounded-2xl border border-slate-200/90 dark:border-white/10 overflow-hidden shadow-xs hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all flex flex-col group"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -3 }}
+              transition={{ duration: 0.2 }}
+              className="group flex flex-col rounded-[28px] overflow-hidden bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 hover:border-slate-400 dark:hover:border-white/30 transition-colors"
             >
               {/* Top: Portrait Image with Pastel Background */}
-              <div className={`w-full h-64 sm:h-72 relative overflow-hidden ${member.bgColor} flex items-end justify-center`}>
+              <div className={`w-full aspect-4/3 sm:h-72 relative overflow-hidden ${member.bgColor} flex items-end justify-center`}>
                 <img
                   src={member.avatar}
                   alt={member.name}
@@ -255,30 +232,30 @@ export default function TeamPage() {
               </div>
 
               {/* Bottom: Name, Role, Bio & Left-Aligned Social Icons */}
-              <div className="p-5 sm:p-6 text-left flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-1">
-                  <h3 className="text-base sm:text-lg font-bold font-display text-slate-900 dark:text-white tracking-tight leading-snug">
+              <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-3.5 bg-white dark:bg-[#151813]">
+                <div className="space-y-1 text-left">
+                  <h3 className="text-sm sm:text-base font-bold font-display text-foreground leading-snug group-hover:text-slate-900 dark:group-hover:text-[#CDF22B] transition-colors">
                     {member.name}
                   </h3>
-                  <p className="text-xs sm:text-sm font-normal text-slate-500 dark:text-slate-400">
+                  <p className="text-xs font-medium text-muted-foreground">
                     {member.role}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 pt-1 leading-relaxed line-clamp-2">
+                  <p className="text-xs text-muted-foreground pt-1 leading-relaxed line-clamp-2">
                     {member.bio}
                   </p>
                 </div>
 
                 {/* Social Circle Icons (Left Aligned) */}
-                <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-2 pt-3 border-t border-slate-200/90 dark:border-white/10">
                   {member.socials.facebook && (
                     <a
                       href={member.socials.facebook}
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on Facebook`}
-                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
+                      className="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Facebook size={14} />
+                      <Facebook size={13} />
                     </a>
                   )}
 
@@ -288,9 +265,9 @@ export default function TeamPage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on Instagram`}
-                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
+                      className="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Instagram size={14} />
+                      <Instagram size={13} />
                     </a>
                   )}
 
@@ -300,9 +277,9 @@ export default function TeamPage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on Twitter / X`}
-                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
+                      className="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Twitter size={14} />
+                      <Twitter size={13} />
                     </a>
                   )}
 
@@ -312,9 +289,9 @@ export default function TeamPage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on LinkedIn`}
-                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
+                      className="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Linkedin size={14} />
+                      <Linkedin size={13} />
                     </a>
                   )}
 
@@ -324,14 +301,14 @@ export default function TeamPage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on GitHub`}
-                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
+                      className="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Github size={14} />
+                      <Github size={13} />
                     </a>
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -346,7 +323,7 @@ export default function TeamPage() {
               <Plus size={14} />
             </button>
             <p className="text-[11px] text-muted-foreground mt-2 font-mono">
-              Showing {visibleMembers.length} of {filteredMembers.length} team members
+              Showing {visibleMembers.length} of {ALL_TEAM_MEMBERS.length} team members
             </p>
           </div>
         )}
