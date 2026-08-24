@@ -10,7 +10,7 @@ export default function EmailVerificationBanner() {
   const [dismissed, setDismissed] = useState(false);
 
   // If not logged in, or already verified, or user dismissed for this session, don't show
-  if (!isLoggedIn || isEmailVerified || dismissed || !user?.email) {
+  if (!isLoggedIn || isEmailVerified || user?.isEmailVerified === true || dismissed || !user?.email) {
     return null;
   }
 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { User, Session, AuthError } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 export interface UserProfile {
@@ -45,23 +45,20 @@ const LOCAL_STORAGE_USER_KEY = "portfolios_user_profile_v3";
 
 // Helper function to auto-generate logical, clean username from Full Name and Email
 export function generateUsernameFromFullName(fullName: string, email: string): string {
-  // Try to create latin slug from full name
   let slug = fullName
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
-    .replace(/[^a-z0-9]/g, "_") // replace non-alphanumeric with underscore
-    .replace(/_+/g, "_") // collapse underscores
-    .replace(/^_+|_+$/g, ""); // trim underscores
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "");
 
-  // If name was in Arabic or non-latin characters, fallback to email prefix
   if (!slug || slug.length < 2) {
     const emailPrefix = email.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_");
     slug = emailPrefix || "creator";
   }
 
-  // Ensure minimum length
   if (slug.length < 3) {
     slug = `${slug}_${Math.floor(100 + Math.random() * 900)}`;
   }
@@ -87,7 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   // Check email verification status from Supabase Auth User object or profiles table
-  const checkEmailVerified = (authUser?: User | null, profileObj?: any): boolean => {
+  const checkEmailVerified = useCallback((authUser?: User | null, profileObj?: any): boolean => {
     if (profileObj?.is_email_verified === true) return true;
     if (!authUser) return false;
     return Boolean(
@@ -96,10 +93,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (authUser.user_metadata as any)?.email_verified ||
       (authUser.user_metadata as any)?.is_email_verified
     );
-  };
+  }, []);
 
   const isEmailVerified = Boolean(
-    user?.isEmailVerified || checkEmailVerified(session?.user)
+    user?.isEmailVerified === true ||
+    checkEmailVerified(session?.user)
   );
 
   // Fetch or create profile row in Supabase
@@ -108,15 +106,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!isSupabaseConfigured) return;
 
       try {
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", userId)
-          .single();
+        let profile: any = null;
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+
+        if (isUuid) {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", userId)
+            .maybeSingle();
+          if (!error && data) profile = data;
+        }
+
+        if (!profile && email) {
+          const usernamePrefix = email.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "_");
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .ilike("username", usernamePrefix)
+            .maybeSingle();
+          if (data) profile = data;
+        }
 
         const verified = checkEmailVerified(authUser, profile);
 
-        if (profile && !error) {
+        if (profile) {
           const fullProfile: UserProfile = {
             id: profile.id,
             email: email || profile.email || "",
@@ -171,6 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               username: generatedUsername,
               full_name: fullName,
               avatar_url: avatarUrl,
+              is_email_verified: verified,
               created_at: new Date().toISOString(),
             });
           } catch (upsertErr) {
@@ -185,7 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn("Supabase fetch profile error:", err);
       }
     },
-    []
+    [checkEmailVerified]
   );
 
   // Initialize Session and Auth state listener
@@ -210,9 +225,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               activeSession.user
             );
           } else {
-            setSession(null);
-            setUser(null);
-            localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+            // Check local storage cached user & re-sync verification from DB
+            const cachedStr = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+            if (cachedStr) {
+              try {
+                const cachedUser = JSON.parse(cachedStr);
+                if (cachedUser?.id || cachedUser?.username || cachedUser?.email) {
+                  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cachedUser.id);
+                  let liveProfile: any = null;
+
+                  if (isUuid) {
+                    const { data } = await supabase
+                      .from("profiles")
+                      .select("*")
+                      .eq("id", cachedUser.id)
+                      .maybeSingle();
+                    liveProfile = data;
+                  }
+
+                  if (!liveProfile && cachedUser.username) {
+                    const { data } = await supabase
+                      .from("profiles")
+                      .select("*")
+                      .eq("username", cachedUser.username)
+                      .maybeSingle();
+                    liveProfile = data;
+                  }
+
+                  if (liveProfile) {
+                    const isNowVerified = liveProfile.is_email_verified === true;
+                    const syncedUser: UserProfile = {
+                      ...cachedUser,
+                      id: liveProfile.id,
+                      username: liveProfile.username,
+                      fullName: liveProfile.full_name || cachedUser.fullName,
+                      avatarUrl: liveProfile.avatar_url || cachedUser.avatarUrl,
+                      isEmailVerified: isNowVerified,
+                    };
+                    setUser(syncedUser);
+                    localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(syncedUser));
+                  }
+                }
+              } catch {
+                // Ignore parse error
+              }
+            }
           }
         }
       } catch (err) {
@@ -246,11 +303,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
+    // Auto sync on tab focus
+    const handleWindowFocus = async () => {
+      const cached = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+      if (cached) {
+        try {
+          const u = JSON.parse(cached);
+          if (u?.username || u?.id) {
+            const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(u.id);
+            let q = supabase.from("profiles").select("*");
+            if (isUuid) q = q.eq("id", u.id);
+            else q = q.eq("username", u.username);
+            const { data } = await q.maybeSingle();
+            if (data) {
+              const verified = data.is_email_verified === true;
+              setUser((prev) => {
+                if (!prev) return null;
+                const next = { ...prev, isEmailVerified: verified, id: data.id };
+                localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(next));
+                return next;
+              });
+            }
+          }
+        } catch {
+          // Ignore
+        }
+      }
+    };
+
+    window.addEventListener("focus", handleWindowFocus);
+
     return () => {
       isMounted = false;
       subscription?.unsubscribe();
+      window.removeEventListener("focus", handleWindowFocus);
     };
-  }, [fetchProfile]);
+  }, [fetchProfile, checkEmailVerified]);
 
   // Sign In Function
   const signIn = async (email: string, password: string) => {
@@ -263,7 +351,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         let msg = error.message;
-        // If Supabase has "Confirm email" enabled on the backend, allow the user into the platform with unverified status
+        // If Supabase has "Confirm email" enabled on the backend, allow user in and read DB verified state
         if (msg.includes("Email not confirmed")) {
           let userProfile: UserProfile | null = null;
 
@@ -354,11 +442,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: "Please enter your full name." };
       }
 
-      // Auto-generate logical username
       let baseUsername = generateUsernameFromFullName(cleanFullName, cleanEmail);
       let uniqueUsername = baseUsername;
 
-      // Check collision and add suffix if needed
       if (isSupabaseConfigured) {
         try {
           const { data: existing } = await supabase
@@ -399,13 +485,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (data.user) {
-        // Guarantee profile row in Supabase profiles table
         try {
           await supabase.from("profiles").upsert({
             id: data.user.id,
             username: uniqueUsername,
             full_name: cleanFullName,
             avatar_url: avatarUrl,
+            is_email_verified: false,
             created_at: new Date().toISOString(),
           });
         } catch (dbErr) {
@@ -437,7 +523,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setSession(data.session);
         }
 
-        // If email confirmation is required and user is not verified yet
         if (!isVerified) {
           return { needsEmailVerification: true };
         }
@@ -491,6 +576,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshProfile = async () => {
     if (session?.user?.id) {
       await fetchProfile(session.user.id, session.user.email, null, session.user);
+    } else if (user?.id) {
+      await fetchProfile(user.id, user.email);
     }
   };
 
