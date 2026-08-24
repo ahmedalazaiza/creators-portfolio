@@ -186,7 +186,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 }
               />
               {favoritesCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#CDF22B] text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
+                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold flex items-center justify-center border border-white dark:border-slate-950 shadow-xs leading-none">
                   {favoritesCount > 99 ? "99+" : favoritesCount}
                 </span>
               )}
@@ -288,7 +288,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                             <span>My Favorites</span>
                           </div>
                           {favoritesCount > 0 && (
-                            <span className="px-2 py-0.5 rounded-full bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-[10px] font-mono font-bold">
+                            <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-foreground text-[10px] font-mono font-bold">
                               {favoritesCount}
                             </span>
                           )}
@@ -413,7 +413,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                     <span>My Favorites</span>
                   </div>
                   {favoritesCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-[#CDF22B] text-slate-950 text-[10px] font-mono font-bold">
+                    <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-foreground text-[10px] font-mono font-bold">
                       {favoritesCount}
                     </span>
                   )}
