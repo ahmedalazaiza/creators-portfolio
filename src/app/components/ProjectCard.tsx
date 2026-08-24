@@ -69,7 +69,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       viewport={{ once: true }}
       whileHover={{ y: -3 }}
       transition={{ duration: 0.2 }}
-      className="group flex flex-col rounded-[28px] overflow-hidden bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 hover:border-slate-400 dark:hover:border-white/30 transition-colors"
+      className="group flex flex-col rounded-[28px] overflow-hidden bg-white dark:bg-[#151813] border border-slate-300 dark:border-[#CDF22B] hover:border-slate-400 dark:hover:border-[#CDF22B] transition-colors"
     >
       {/* Cover Image Container */}
       <Link to={projectUrl} className="relative aspect-4/3 overflow-hidden bg-slate-100 dark:bg-[#1a1d17] block">
