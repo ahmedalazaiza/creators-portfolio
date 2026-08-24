@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { generateUsernameFromFullName } from "../../lib/authUtils";
 
 export interface UserProfile {
   id: string;
@@ -42,29 +43,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_USER_KEY = "portfolios_user_profile_v3";
-
-// Helper function to auto-generate logical, clean username from Full Name and Email
-export function generateUsernameFromFullName(fullName: string, email: string): string {
-  let slug = fullName
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_+|_+$/g, "");
-
-  if (!slug || slug.length < 2) {
-    const emailPrefix = email.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_");
-    slug = emailPrefix || "creator";
-  }
-
-  if (slug.length < 3) {
-    slug = `${slug}_${Math.floor(100 + Math.random() * 900)}`;
-  }
-
-  return slug;
-}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
