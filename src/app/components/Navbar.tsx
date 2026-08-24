@@ -136,52 +136,44 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             </nav>
           </div>
 
-          {/* Center: Scroll Search & Filter Bar Trigger */}
-          <div className="flex-1 max-w-xs sm:max-w-sm hidden sm:flex items-center justify-center">
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Right: Actions & Auth */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            {/* Search Icon Trigger (Appears when scrolled or on subpages, always accessible) */}
             <AnimatePresence>
               {(isScrolled || location.pathname !== "/") && (
                 <motion.button
-                  initial={{ opacity: 0, scale: 0.9, y: -6 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, y: -6 }}
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.85 }}
                   transition={{ duration: 0.2 }}
                   onClick={() => setSearchModalOpen(true)}
-                  className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-full glass-card border border-slate-200/80 dark:border-white/10 hover:border-[#CDF22B]/60 text-xs text-muted-foreground hover:text-foreground shadow-xs transition-all cursor-pointer group"
+                  aria-label="Open search and filter modal (⌘K)"
+                  title="Search & Filter Showcase (⌘K)"
+                  className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer group shadow-2xs"
                 >
-                  <div className="flex items-center gap-2">
-                    <Search size={14} className="text-[#CDF22B] group-hover:scale-110 transition-transform" />
-                    <span className="truncate">Search & Filter works...</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <SlidersHorizontal size={12} className="text-muted-foreground group-hover:text-foreground" />
-                    <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-md bg-slate-200/70 dark:bg-[#1e231b] text-[10px] font-mono text-muted-foreground border border-slate-300/40 dark:border-white/10">
-                      ⌘K
-                    </kbd>
-                  </div>
+                  <Search size={16} className="text-foreground group-hover:scale-105 transition-transform" />
                 </motion.button>
               )}
             </AnimatePresence>
-          </div>
-
-          {/* Right: Actions & Auth */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Mobile / Compact Search Icon Button (visible always on small screens or when scrolled) */}
-            <button
-              onClick={() => setSearchModalOpen(true)}
-              aria-label="Open search and filter modal"
-              className="sm:hidden p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
-            >
-              <Search size={17} />
-            </button>
 
             {/* Quick Favorites / Moodboard Link */}
             <Link
               to="/favorites"
-              aria-label="View Saved Favorites"
+              aria-label="Saved Favorites"
               title="Saved Favorites"
-              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
+              className={`p-2 rounded-full transition-all cursor-pointer border ${
+                location.pathname === "/favorites"
+                  ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-foreground font-bold shadow-2xs"
+                  : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
+              }`}
             >
-              <Bookmark size={16} />
+              <Bookmark
+                size={16}
+                className={location.pathname === "/favorites" ? "fill-current text-foreground" : ""}
+              />
             </Link>
 
             {/* Theme Toggle */}
