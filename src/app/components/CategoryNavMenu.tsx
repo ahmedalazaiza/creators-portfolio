@@ -98,10 +98,10 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.15 }}
             onMouseLeave={() => setIsOpen(false)}
-            className="absolute left-0 mt-2 w-[540px] sm:w-[620px] rounded-3xl bg-white dark:bg-[#0B101B] border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-900/20 dark:shadow-black/60 z-50 overflow-hidden text-xs"
+            className="absolute left-0 mt-2 w-[540px] sm:w-[620px] rounded-3xl bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 shadow-2xl shadow-slate-900/20 dark:shadow-black/70 z-50 overflow-hidden text-xs"
           >
             {/* Header Bar */}
-            <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 flex items-center justify-between">
+            <div className="px-5 py-3 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#171915] flex items-center justify-between">
               <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
                 <div className="w-5 h-5 rounded-lg bg-[#CDF22B] text-slate-950 flex items-center justify-center font-bold">
                   <Sparkles size={11} />
@@ -118,9 +118,9 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
             </div>
 
             {/* 2-Column Split Layout */}
-            <div className="grid grid-cols-12 divide-x divide-slate-200 dark:divide-slate-800 min-h-[310px]">
+            <div className="grid grid-cols-12 divide-x divide-slate-200 dark:divide-white/10 min-h-[310px]">
               {/* Left Column: Categories List */}
-              <div className="col-span-5 p-2.5 space-y-1 max-h-[350px] overflow-y-auto bg-slate-50/50 dark:bg-[#0B101B]">
+              <div className="col-span-5 p-2.5 space-y-1 max-h-[350px] overflow-y-auto bg-slate-50/50 dark:bg-[#171915]">
                 {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => {
                   const isHovered = (activeCategory?.slug || "ui-ux") === cat.slug;
                   const icon = CATEGORY_ICONS[cat.icon || "Sparkles"] || <Sparkles size={14} />;
@@ -132,7 +132,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
                       className={`w-full text-left px-3 py-2.5 rounded-2xl transition-all flex items-center justify-between group cursor-pointer ${
                         isHovered
                           ? "bg-slate-900 text-white dark:bg-[#CDF22B] dark:text-slate-950 font-bold shadow-md"
-                          : "text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
+                          : "text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 font-semibold"
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -140,7 +140,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
                           className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                             isHovered
                               ? "bg-[#CDF22B] text-slate-950 dark:bg-slate-950 dark:text-[#CDF22B] font-bold"
-                              : "bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                              : "bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300"
                           }`}
                         >
                           {icon}
@@ -159,7 +159,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
               </div>
 
               {/* Right Column: Subcategories & View All */}
-              <div className="col-span-7 p-4 bg-white dark:bg-slate-950 flex flex-col justify-between">
+              <div className="col-span-7 p-4 bg-white dark:bg-[#070905] flex flex-col justify-between">
                 <div>
                   {/* Category Sub-Header */}
                   <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">

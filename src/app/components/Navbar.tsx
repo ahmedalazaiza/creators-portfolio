@@ -218,7 +218,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         initial={{ opacity: 0, scale: 0.95, y: 8 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 8 }}
-                        className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-white dark:bg-[#0B101B] border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-900/15 dark:shadow-black/60 z-50 text-xs space-y-1"
+                        className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 shadow-2xl shadow-slate-900/15 dark:shadow-black/70 z-50 text-xs space-y-1"
                       >
                         {/* Identity Header */}
                         <div className="p-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">

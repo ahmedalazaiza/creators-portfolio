@@ -241,10 +241,10 @@ export default function SearchModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ type: "spring", damping: 25, stiffness: 320 }}
-          className="relative w-full max-w-3xl bg-white dark:bg-[#0B101B] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl shadow-slate-900/20 dark:shadow-black/70 overflow-hidden z-10 flex flex-col max-h-[90vh]"
+          className="relative w-full max-w-3xl bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl shadow-slate-900/20 dark:shadow-black/70 overflow-hidden z-10 flex flex-col max-h-[90vh]"
         >
           {/* Header Search Field */}
-          <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90">
+          <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#070905]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center shrink-0 font-bold shadow-md shadow-[#CDF22B]/20">
                 <Search size={18} />
