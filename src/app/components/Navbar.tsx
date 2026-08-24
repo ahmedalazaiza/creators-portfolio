@@ -164,20 +164,24 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               <Search size={16} className="text-foreground group-hover:scale-105 transition-transform" />
             </button>
 
-            {/* 2. Favorites / Liked Projects (Heart Icon) */}
+            {/* 2. Favorites / Liked Projects (Heart Icon - Brand Colored) */}
             <Link
               to="/favorites"
               aria-label="My Favorites"
               title="My Favorites (المفضلة)"
               className={`p-2 rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/favorites"
-                  ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-rose-500 font-bold shadow-2xs"
-                  : "text-muted-foreground hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
+                  ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-[#0F172A] dark:text-[#CDF22B] font-bold shadow-2xs"
+                  : "text-muted-foreground hover:text-foreground dark:hover:text-[#CDF22B] hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
               }`}
             >
               <Heart
                 size={16}
-                className={location.pathname === "/favorites" ? "fill-current text-rose-500" : ""}
+                className={
+                  location.pathname === "/favorites"
+                    ? "fill-current text-[#0F172A] dark:text-[#CDF22B]"
+                    : ""
+                }
               />
             </Link>
 
@@ -369,7 +373,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
-                  <Heart size={15} className="text-rose-500" />
+                  <Heart size={15} className="text-foreground dark:text-[#CDF22B]" />
                   <span>My Favorites (المفضلة)</span>
                 </Link>
                 <Link
