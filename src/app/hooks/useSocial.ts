@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { getStorageItem, setStorageItem } from "../../lib/storage";
 
 const LOCAL_STORAGE_FOLLOWS_KEY = "portfolios_follows_v1";
 const LOCAL_STORAGE_FOLLOWERS_COUNT_KEY = "portfolios_followers_count_v1";
+const LOCAL_STORAGE_FOLLOWING_COUNT_KEY = "portfolios_following_count_v1";
 
 export function useSocial(currentUserId?: string) {
   // Map of targetUserId -> boolean (is current user following target)
@@ -16,6 +17,11 @@ export function useSocial(currentUserId?: string) {
     getStorageItem<Record<string, number>>(LOCAL_STORAGE_FOLLOWERS_COUNT_KEY, {})
   );
 
+  // Map of userId -> following count override
+  const [followingCountMap, setFollowingCountMap] = useState<Record<string, number>>(() =>
+    getStorageItem<Record<string, number>>(LOCAL_STORAGE_FOLLOWING_COUNT_KEY, {})
+  );
+
   // Save to localStorage
   useEffect(() => {
     setStorageItem(LOCAL_STORAGE_FOLLOWS_KEY, followingMap);
@@ -25,7 +31,11 @@ export function useSocial(currentUserId?: string) {
     setStorageItem(LOCAL_STORAGE_FOLLOWERS_COUNT_KEY, followersCountMap);
   }, [followersCountMap]);
 
-  // Load follows from Supabase if authenticated
+  useEffect(() => {
+    setStorageItem(LOCAL_STORAGE_FOLLOWING_COUNT_KEY, followingCountMap);
+  }, [followingCountMap]);
+
+  // Load follows and own profile counts from Supabase if authenticated
   useEffect(() => {
     if (!isSupabaseConfigured || !currentUserId || currentUserId.startsWith("guest-")) {
       return;
@@ -33,17 +43,32 @@ export function useSocial(currentUserId?: string) {
 
     const loadSupabaseFollows = async () => {
       try {
-        const { data, error } = await supabase
-          .from("follows")
-          .select("following_id")
-          .eq("follower_id", currentUserId);
+        const [followsRes, profileRes] = await Promise.all([
+          supabase
+            .from("follows")
+            .select("following_id")
+            .eq("follower_id", currentUserId),
+          supabase
+            .from("profiles")
+            .select("following_count, followers_count")
+            .eq("id", currentUserId)
+            .maybeSingle(),
+        ]);
 
-        if (!error && data) {
+        if (!followsRes.error && followsRes.data) {
           const map: Record<string, boolean> = {};
-          data.forEach((f: any) => {
+          followsRes.data.forEach((f: any) => {
             map[f.following_id] = true;
           });
           setFollowingMap((prev) => ({ ...prev, ...map }));
+
+          // Update current user's following count
+          const actualFollowingCount =
+            profileRes.data?.following_count ?? followsRes.data.length;
+          setFollowingCountMap((prev) => ({
+            ...prev,
+            [currentUserId]: actualFollowingCount,
+          }));
         }
       } catch (err) {
         console.warn("Error loading follows from Supabase:", err);
@@ -77,6 +102,28 @@ export function useSocial(currentUserId?: string) {
     [followersCountMap]
   );
 
+  // Get dynamic following count with fallback
+  const getFollowingCount = useCallback(
+    (userIdOrUsername?: string, initialCount = 0): number => {
+      if (!userIdOrUsername) return initialCount;
+      const key = userIdOrUsername.toLowerCase().replace(/^@/, "");
+      if (typeof followingCountMap[key] === "number") {
+        return followingCountMap[key];
+      }
+      if (typeof followingCountMap[userIdOrUsername] === "number") {
+        return followingCountMap[userIdOrUsername];
+      }
+      return initialCount;
+    },
+    [followingCountMap]
+  );
+
+  // Live following count for current active user
+  const liveFollowingCount = useMemo(() => {
+    if (!currentUserId) return 0;
+    return getFollowingCount(currentUserId, 0);
+  }, [currentUserId, getFollowingCount]);
+
   // Toggle follow
   const toggleFollow = useCallback(
     async (
@@ -96,27 +143,39 @@ export function useSocial(currentUserId?: string) {
       const currentFollowState = Boolean(followingMap[creatorKey] || followingMap[targetCreator.id]);
       const nextState = !currentFollowState;
 
-      // Update following map
+      // 1. Update following map
       setFollowingMap((prev) => ({
         ...prev,
         [creatorKey]: nextState,
         [targetCreator.id]: nextState,
       }));
 
-      // Update followers count
-      const currentCount =
+      // 2. Update target creator's followers count
+      const currentFollowersCount =
         typeof followersCountMap[creatorKey] === "number"
           ? followersCountMap[creatorKey]
           : targetCreator.followersCount || 0;
-      const nextCount = Math.max(0, currentCount + (nextState ? 1 : -1));
+      const nextFollowersCount = Math.max(0, currentFollowersCount + (nextState ? 1 : -1));
 
       setFollowersCountMap((prev) => ({
         ...prev,
-        [creatorKey]: nextCount,
-        [targetCreator.id]: nextCount,
+        [creatorKey]: nextFollowersCount,
+        [targetCreator.id]: nextFollowersCount,
       }));
 
-      // Sync with Supabase follows table
+      // 3. Update current user's following count
+      const currentFollowingCount =
+        typeof followingCountMap[userId] === "number"
+          ? followingCountMap[userId]
+          : 0;
+      const nextFollowingCount = Math.max(0, currentFollowingCount + (nextState ? 1 : -1));
+
+      setFollowingCountMap((prev) => ({
+        ...prev,
+        [userId]: nextFollowingCount,
+      }));
+
+      // 4. Sync with Supabase follows and profiles tables
       if (isSupabaseConfigured && userId) {
         try {
           if (nextState) {
@@ -131,11 +190,17 @@ export function useSocial(currentUserId?: string) {
               .match({ follower_id: userId, following_id: targetCreator.id });
           }
 
-          // Update profiles table followers_count
+          // Update target creator's followers_count in profiles table
           await supabase
             .from("profiles")
-            .update({ followers_count: nextCount })
+            .update({ followers_count: nextFollowersCount })
             .eq("id", targetCreator.id);
+
+          // Update current user's following_count in profiles table
+          await supabase
+            .from("profiles")
+            .update({ following_count: nextFollowingCount })
+            .eq("id", userId);
         } catch (err) {
           console.warn("Supabase follow sync error:", err);
         }
@@ -143,13 +208,15 @@ export function useSocial(currentUserId?: string) {
 
       return { nextState };
     },
-    [followingMap, followersCountMap]
+    [followingMap, followersCountMap, followingCountMap]
   );
 
   return {
     followingMap,
     isFollowing,
     getFollowersCount,
+    getFollowingCount,
+    liveFollowingCount,
     toggleFollow,
   };
 }

@@ -44,7 +44,7 @@ export default function CreatorProfilePage() {
   const { username } = useParams<{ username: string }>();
   const { user, isLoggedIn, loading: authLoading } = useAuth();
   const { allProjects } = useProjects(undefined, user?.id);
-  const { isFollowing, toggleFollow, getFollowersCount } = useSocial(user?.id);
+  const { isFollowing, toggleFollow, getFollowersCount, liveFollowingCount } = useSocial(user?.id);
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<"projects" | "about" | "saved">("projects");
@@ -350,6 +350,9 @@ export default function CreatorProfilePage() {
   const liveFollowersCount = profile
     ? getFollowersCount(profile.id || profile.username, profile.followersCount)
     : 0;
+  const displayFollowingCount = isOwnProfile
+    ? liveFollowingCount
+    : (profile?.followingCount || 0);
 
   // Total Appreciations received across creator's projects
   const totalAppreciations = useMemo(() => {
@@ -730,7 +733,7 @@ export default function CreatorProfilePage() {
               </div>
               <div className="min-w-0">
                 <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
-                  {profile.followingCount || 0}
+                  {displayFollowingCount}
                 </p>
                 <p className="text-xs text-muted-foreground font-medium truncate">Following</p>
               </div>
