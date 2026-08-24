@@ -19,9 +19,13 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   available_for_work BOOLEAN DEFAULT true,
   skills TEXT[] DEFAULT '{}',
   social_links JSONB DEFAULT '{}'::jsonb,
+  is_email_verified BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Ensure column exists if table was already created
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_email_verified BOOLEAN DEFAULT false;
 
 -- 3. Categories Table
 CREATE TABLE IF NOT EXISTS public.categories (

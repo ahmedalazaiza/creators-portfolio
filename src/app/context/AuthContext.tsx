@@ -86,13 +86,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check email verification status from Supabase Auth User object
-  const checkEmailVerified = (authUser?: User | null): boolean => {
+  // Check email verification status from Supabase Auth User object or profiles table
+  const checkEmailVerified = (authUser?: User | null, profileObj?: any): boolean => {
+    if (profileObj?.is_email_verified === true) return true;
     if (!authUser) return false;
     return Boolean(
       authUser.email_confirmed_at ||
       authUser.confirmed_at ||
-      (authUser.user_metadata as any)?.email_verified
+      (authUser.user_metadata as any)?.email_verified ||
+      (authUser.user_metadata as any)?.is_email_verified
     );
   };
 
@@ -105,14 +107,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     async (userId: string, email?: string, fallbackMeta?: any, authUser?: User | null) => {
       if (!isSupabaseConfigured) return;
 
-      const verified = checkEmailVerified(authUser);
-
       try {
         const { data: profile, error } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", userId)
           .single();
+
+        const verified = checkEmailVerified(authUser, profile);
 
         if (profile && !error) {
           const fullProfile: UserProfile = {
@@ -287,7 +289,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   availableForWork: profile.available_for_work ?? true,
                   skills: profile.skills || ["Design Systems", "UI/UX"],
                   socialLinks: profile.social_links || {},
-                  isEmailVerified: false,
+                  isEmailVerified: profile.is_email_verified === true,
                   createdAt: profile.created_at,
                   updatedAt: profile.updated_at,
                 };
