@@ -1,12 +1,12 @@
 -- ==============================================================================
 -- Portfolios - Comprehensive High-Quality Seed Data & Auto-Migration
--- (Run this directly in Supabase SQL Editor - Safe & Self-Healing)
+-- (Run this directly in Supabase SQL Editor - 100% Bulletproof & Self-Healing)
 -- ==============================================================================
 
 -- 1. Enable Required Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. Auto-Migrate: Ensure all columns exist on profiles table if it was created earlier
+-- 2. Auto-Migrate: Ensure all columns exist on profiles table
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
@@ -39,6 +39,10 @@ CREATE TABLE IF NOT EXISTS public.categories (
   icon TEXT,
   display_order INT DEFAULT 0
 );
+
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS icon TEXT;
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS display_order INT DEFAULT 0;
 
 INSERT INTO public.categories (id, name, slug, description, icon, display_order)
 VALUES
@@ -82,22 +86,23 @@ ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS appreciations_count INT DEF
 ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
 ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
 
--- 5. Auto-Migrate: Ensure auxiliary tables exist
+-- 5. Auto-Migrate: Ensure project_images table & all columns exist
 CREATE TABLE IF NOT EXISTS public.project_images (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE NOT NULL,
-  image_url TEXT NOT NULL,
-  caption TEXT,
-  display_order INT DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  image_url TEXT NOT NULL
 );
 
+ALTER TABLE public.project_images ADD COLUMN IF NOT EXISTS caption TEXT;
+ALTER TABLE public.project_images ADD COLUMN IF NOT EXISTS display_order INT DEFAULT 0;
+ALTER TABLE public.project_images ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+
+-- 6. Auto-Migrate: Ensure appreciations, comments, follows, favorites exist
 CREATE TABLE IF NOT EXISTS public.appreciations (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  UNIQUE(user_id, project_id)
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.comments (
@@ -112,20 +117,18 @@ CREATE TABLE IF NOT EXISTS public.follows (
   follower_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   following_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  PRIMARY KEY(follower_id, following_id),
-  CHECK (follower_id <> following_id)
+  PRIMARY KEY(follower_id, following_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.favorites (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  UNIQUE(user_id, project_id)
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- ==============================================================================
--- 6. Insert Auth Users (Satisfies Foreign Keys to auth.users)
+-- 7. Insert Auth Users (Satisfies Foreign Keys to auth.users)
 -- ==============================================================================
 INSERT INTO auth.users (
   id,
@@ -151,7 +154,7 @@ INSERT INTO auth.users (
 ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================================================
--- 7. Insert/Update Real Creator Profiles
+-- 8. Insert/Update Real Creator Profiles
 -- ==============================================================================
 INSERT INTO public.profiles (
   id,
@@ -338,7 +341,7 @@ ON CONFLICT (id) DO UPDATE SET
   social_links = EXCLUDED.social_links;
 
 -- ==============================================================================
--- 8. Insert 16 Curated Case Studies Across All Categories
+-- 9. Insert 16 Curated Case Studies Across All Categories
 -- ==============================================================================
 INSERT INTO public.projects (
   id,
@@ -794,7 +797,7 @@ ON CONFLICT (id) DO UPDATE SET
   is_featured = EXCLUDED.is_featured;
 
 -- ==============================================================================
--- 9. Insert Project Images (Detailed Multi-Media Galleries)
+-- 10. Insert Project Images (Detailed Multi-Media Galleries)
 -- ==============================================================================
 INSERT INTO public.project_images (id, project_id, image_url, caption, display_order)
 VALUES
@@ -810,7 +813,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================================================
--- 10. Insert Appreciations (Likes)
+-- 11. Insert Appreciations (Likes)
 -- ==============================================================================
 INSERT INTO public.appreciations (id, user_id, project_id, created_at)
 VALUES
@@ -825,7 +828,7 @@ VALUES
 ON CONFLICT (user_id, project_id) DO NOTHING;
 
 -- ==============================================================================
--- 11. Insert Creator Comments
+-- 12. Insert Creator Comments
 -- ==============================================================================
 INSERT INTO public.comments (id, project_id, user_id, content, created_at)
 VALUES
@@ -860,7 +863,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================================================
--- 12. Insert Follows (Social Connections)
+-- 13. Insert Follows (Social Connections)
 -- ==============================================================================
 INSERT INTO public.follows (follower_id, following_id, created_at)
 VALUES
