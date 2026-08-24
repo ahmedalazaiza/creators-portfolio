@@ -20,6 +20,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../hooks/useProjects";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import EmailVerificationModal from "../components/EmailVerificationModal";
 
 const CATEGORIES = [
   "UI/UX Systems",
@@ -50,10 +51,11 @@ const PRESET_TOOLS = [
 export default function ProjectEditorPage() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isEmailVerified } = useAuth();
   const { saveProject, getProjectBySlug, deleteProject } = useProjects();
 
   const isEditing = Boolean(id);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   // Form Fields
   const [title, setTitle] = useState("");
@@ -195,6 +197,12 @@ export default function ProjectEditorPage() {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
+
+    // Guard: Prevent unverified accounts from publishing projects
+    if (!isEmailVerified) {
+      setShowVerificationModal(true);
+      return;
+    }
 
     if (!title.trim()) {
       setErrorMsg("Please enter a project title.");
@@ -700,6 +708,12 @@ export default function ProjectEditorPage() {
           </button>
         </div>
       </form>
+
+      {/* Email Verification Modal Guard */}
+      <EmailVerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+      />
     </motion.main>
   );
 }

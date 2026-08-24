@@ -16,6 +16,7 @@ export interface UserProfile {
   availableForWork?: boolean;
   skills?: string[];
   socialLinks?: Record<string, string>;
+  isEmailVerified?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -24,14 +25,15 @@ interface AuthContextType {
   user: UserProfile | null;
   session: Session | null;
   loading: boolean;
+  isEmailVerified: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signUp: (
     email: string,
     password: string,
-    fullName: string,
-    username: string
-  ) => Promise<{ error?: string }>;
+    fullName: string
+  ) => Promise<{ error?: string; needsEmailVerification?: boolean }>;
   signOut: () => Promise<void>;
+  resendVerificationEmail: (targetEmail?: string) => Promise<{ error?: string; success?: boolean }>;
   refreshProfile: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error?: string }>;
   isLoggedIn: boolean;
@@ -39,7 +41,33 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_USER_KEY = "portfolios_user_profile_v2";
+const LOCAL_STORAGE_USER_KEY = "portfolios_user_profile_v3";
+
+// Helper function to auto-generate logical, clean username from Full Name and Email
+export function generateUsernameFromFullName(fullName: string, email: string): string {
+  // Try to create latin slug from full name
+  let slug = fullName
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
+    .replace(/[^a-z0-9]/g, "_") // replace non-alphanumeric with underscore
+    .replace(/_+/g, "_") // collapse underscores
+    .replace(/^_+|_+$/g, ""); // trim underscores
+
+  // If name was in Arabic or non-latin characters, fallback to email prefix
+  if (!slug || slug.length < 2) {
+    const emailPrefix = email.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_");
+    slug = emailPrefix || "creator";
+  }
+
+  // Ensure minimum length
+  if (slug.length < 3) {
+    slug = `${slug}_${Math.floor(100 + Math.random() * 900)}`;
+  }
+
+  return slug;
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
@@ -58,10 +86,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Check email verification status from Supabase Auth User object
+  const checkEmailVerified = (authUser?: User | null): boolean => {
+    if (!authUser) return false;
+    return Boolean(
+      authUser.email_confirmed_at ||
+      authUser.confirmed_at ||
+      (authUser.user_metadata as any)?.email_verified
+    );
+  };
+
+  const isEmailVerified = Boolean(
+    user?.isEmailVerified || checkEmailVerified(session?.user)
+  );
+
   // Fetch or create profile row in Supabase
   const fetchProfile = useCallback(
-    async (userId: string, email?: string, fallbackMeta?: any) => {
+    async (userId: string, email?: string, fallbackMeta?: any, authUser?: User | null) => {
       if (!isSupabaseConfigured) return;
+
+      const verified = checkEmailVerified(authUser);
 
       try {
         const { data: profile, error } = await supabase
@@ -87,6 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             availableForWork: profile.available_for_work ?? true,
             skills: profile.skills || ["Design Systems", "UI/UX"],
             socialLinks: profile.social_links || {},
+            isEmailVerified: verified,
             createdAt: profile.created_at,
             updatedAt: profile.updated_at,
           };
@@ -96,17 +141,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return fullProfile;
         } else {
           // If profile row doesn't exist yet, create it safely
-          const cleanUsername =
-            fallbackMeta?.username || (email ? email.split("@")[0].toLowerCase().replace(/[^a-z0-9_-]/g, "") : `user_${userId.substring(0, 6)}`);
+          const generatedUsername = fallbackMeta?.username || generateUsernameFromFullName(fallbackMeta?.full_name || "Creator", email || "");
           const fullName = fallbackMeta?.full_name || fallbackMeta?.fullName || (email ? email.split("@")[0] : "Creator");
           const avatarUrl =
             fallbackMeta?.avatar_url ||
-            `https://api.dicebear.com/7.x/shapes/svg?seed=${cleanUsername}`;
+            `https://api.dicebear.com/7.x/shapes/svg?seed=${generatedUsername}`;
 
           const newProfileData: UserProfile = {
             id: userId,
             email: email || "",
-            username: cleanUsername,
+            username: generatedUsername,
             fullName,
             avatarUrl,
             headline: "Creative Designer",
@@ -115,13 +159,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             website: "portfolios.space",
             availableForWork: true,
             skills: ["Design Systems", "UI/UX"],
+            isEmailVerified: verified,
             createdAt: new Date().toISOString(),
           };
 
           try {
             await supabase.from("profiles").upsert({
               id: userId,
-              username: cleanUsername,
+              username: generatedUsername,
               full_name: fullName,
               avatar_url: avatarUrl,
               created_at: new Date().toISOString(),
@@ -159,7 +204,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await fetchProfile(
               activeSession.user.id,
               activeSession.user.email,
-              activeSession.user.user_metadata
+              activeSession.user.user_metadata,
+              activeSession.user
             );
           } else {
             setSession(null);
@@ -176,7 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initSession();
 
-    // Listen to real-time auth changes (Sign in, Sign out, Token refreshed)
+    // Listen to real-time auth changes (Sign in, Sign out, Token refreshed, Email verification return)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
         if (!isMounted) return;
@@ -186,7 +232,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await fetchProfile(
             newSession.user.id,
             newSession.user.email,
-            newSession.user.user_metadata
+            newSession.user.user_metadata,
+            newSession.user
           );
         } else if (event === "SIGNED_OUT") {
           setUser(null);
@@ -217,14 +264,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (msg.includes("Invalid login credentials")) {
           msg = "Invalid email address or password. Please check your credentials.";
         } else if (msg.includes("Email not confirmed")) {
-          msg = "Please verify your email before signing in, or check your inbox.";
+          msg = "Please verify your email address. Check your inbox for the verification link.";
         }
         return { error: msg };
       }
 
       if (data.session && data.user) {
         setSession(data.session);
-        await fetchProfile(data.user.id, data.user.email, data.user.user_metadata);
+        await fetchProfile(data.user.id, data.user.email, data.user.user_metadata, data.user);
       }
 
       return {};
@@ -233,43 +280,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Sign Up Function
+  // Sign Up Function (Auto-generating unique username based on Full Name)
   const signUp = async (
     email: string,
     password: string,
-    fullName: string,
-    username: string
+    fullName: string
   ) => {
     try {
       const cleanEmail = email.trim().toLowerCase();
-      const cleanUsername = username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
       const cleanFullName = fullName.trim();
-      const avatarUrl = `https://api.dicebear.com/7.x/shapes/svg?seed=${cleanUsername}`;
-
-      if (!cleanUsername) {
-        return { error: "Please enter a valid alphanumeric username." };
-      }
 
       if (!cleanFullName) {
         return { error: "Please enter your full name." };
       }
 
-      // Check if username already exists in profiles
+      // Auto-generate logical username
+      let baseUsername = generateUsernameFromFullName(cleanFullName, cleanEmail);
+      let uniqueUsername = baseUsername;
+
+      // Check collision and add suffix if needed
       if (isSupabaseConfigured) {
         try {
-          const { data: existingUser } = await supabase
+          const { data: existing } = await supabase
             .from("profiles")
             .select("id")
-            .eq("username", cleanUsername)
+            .eq("username", uniqueUsername)
             .maybeSingle();
 
-          if (existingUser) {
-            return { error: `The username "@${cleanUsername}" is already taken. Please choose another.` };
+          if (existing) {
+            uniqueUsername = `${baseUsername}_${Math.floor(100 + Math.random() * 900)}`;
           }
         } catch {
-          // Ignore if table check query fails
+          // Ignore
         }
       }
+
+      const avatarUrl = `https://api.dicebear.com/7.x/shapes/svg?seed=${uniqueUsername}`;
 
       const { data, error } = await supabase.auth.signUp({
         email: cleanEmail,
@@ -277,9 +323,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           data: {
             full_name: cleanFullName,
-            username: cleanUsername,
+            username: uniqueUsername,
             avatar_url: avatarUrl,
           },
+          emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
         },
       });
 
@@ -296,7 +343,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           await supabase.from("profiles").upsert({
             id: data.user.id,
-            username: cleanUsername,
+            username: uniqueUsername,
             full_name: cleanFullName,
             avatar_url: avatarUrl,
             created_at: new Date().toISOString(),
@@ -305,10 +352,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.warn("Profile table insert note:", dbErr);
         }
 
+        const isVerified = checkEmailVerified(data.user);
+
         const newProfile: UserProfile = {
           id: data.user.id,
           email: cleanEmail,
-          username: cleanUsername,
+          username: uniqueUsername,
           fullName: cleanFullName,
           avatarUrl,
           headline: "Creative Designer",
@@ -317,6 +366,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           website: "portfolios.space",
           availableForWork: true,
           skills: ["Design Systems", "UI/UX"],
+          isEmailVerified: isVerified,
           createdAt: new Date().toISOString(),
         };
 
@@ -326,11 +376,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.session) {
           setSession(data.session);
         }
+
+        // If email confirmation is required and user is not verified yet
+        if (!isVerified) {
+          return { needsEmailVerification: true };
+        }
       }
 
       return {};
     } catch (err: any) {
       return { error: err.message || "Failed to create account. Please try again." };
+    }
+  };
+
+  // Resend Email Verification
+  const resendVerificationEmail = async (targetEmail?: string) => {
+    const emailToSend = targetEmail || user?.email || session?.user?.email;
+    if (!emailToSend) return { error: "No email address found to send verification link." };
+
+    try {
+      if (isSupabaseConfigured) {
+        const { error } = await supabase.auth.resend({
+          type: "signup",
+          email: emailToSend,
+          options: {
+            emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
+          },
+        });
+
+        if (error) return { error: error.message };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { error: err.message || "Failed to resend verification email." };
     }
   };
 
@@ -352,7 +430,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Refresh Profile
   const refreshProfile = async () => {
     if (session?.user?.id) {
-      await fetchProfile(session.user.id, session.user.email);
+      await fetchProfile(session.user.id, session.user.email, null, session.user);
     }
   };
 
@@ -398,9 +476,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         session,
         loading,
+        isEmailVerified,
         signIn,
         signUp,
         signOut,
+        resendVerificationEmail,
         refreshProfile,
         updateProfile,
         isLoggedIn: Boolean(user || session),
