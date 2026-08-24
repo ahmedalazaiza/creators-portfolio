@@ -44,6 +44,7 @@ export default function CategorySectionSlider({
 
   if (projects.length === 0) return null;
 
+  const displayProjects = projects.slice(0, 10);
   const icon = CATEGORY_ICONS[category.icon || "Sparkles"] || <Sparkles size={16} />;
 
   const scroll = (direction: "left" | "right") => {
@@ -81,14 +82,9 @@ export default function CategorySectionSlider({
             {icon}
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
-                {category.name}
-              </h2>
-              <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-[11px] font-mono font-semibold text-muted-foreground">
-                {projects.length} Works
-              </span>
-            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
+              {category.name}
+            </h2>
             {category.description && (
               <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
                 {category.description}
@@ -122,7 +118,7 @@ export default function CategorySectionSlider({
             onClick={() => onExploreCategory(category.slug)}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full btn-secondary text-xs font-bold transition-all cursor-pointer group shadow-2xs"
           >
-            <span>Explore All {category.name.split(" ")[0]}</span>
+            <span>Explore All {category.name}</span>
             <ArrowRight
               size={13}
               className="group-hover:translate-x-0.5 transition-transform"
@@ -131,7 +127,7 @@ export default function CategorySectionSlider({
         </div>
       </div>
 
-      {/* Free Full-Bleed Horizontal Slider Track (No margin lock, edge to edge, no scrollbars) */}
+      {/* Free Full-Bleed Horizontal Slider Track (Up to 10 projects) */}
       <div
         ref={scrollContainerRef}
         onMouseDown={handleMouseDown}
@@ -146,7 +142,7 @@ export default function CategorySectionSlider({
           isDragging ? "cursor-grabbing scroll-auto" : "cursor-grab scroll-smooth"
         }`}
       >
-        {projects.map((project) => (
+        {displayProjects.map((project) => (
           <div
             key={project.id}
             className="w-[260px] sm:w-[320px] md:w-[360px] lg:w-[380px] shrink-0 flex flex-col pointer-events-auto"

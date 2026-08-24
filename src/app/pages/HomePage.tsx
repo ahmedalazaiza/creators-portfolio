@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useSearchParams, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Sparkles,
@@ -25,6 +25,7 @@ import { SortOption } from "../types";
 export default function HomePage() {
   const { isLoggedIn, user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // Search & Filter State from URL or defaults
   const paramQuery = searchParams.get("q") || "";
@@ -338,33 +339,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Category Pills - Wrapped nicely without ugly horizontal scrollbars */}
-        <div className="flex flex-wrap items-center justify-center gap-2 max-w-7xl mx-auto py-1">
-          {CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat.slug;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryChange(cat.slug)}
-                className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  isActive
-                    ? "bg-[#CDF22B] text-slate-900 font-bold shadow-sm shadow-[#CDF22B]/30 scale-105"
-                    : "glass-card text-muted-foreground hover:text-foreground border border-slate-200/70 dark:border-white/10 hover:border-[#CDF22B]/70"
-                }`}
-              >
-                <span>{cat.name}</span>
-                <span
-                  className={`text-[10px] opacity-75 font-mono ${
-                    isActive ? "text-slate-900 font-bold" : "text-muted-foreground"
-                  }`}
-                >
-                  ({getCategoryCount(cat.slug)})
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
         {/* Active Filters Summary Bar */}
         {activeFiltersCount > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-100/60 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-xs max-w-7xl mx-auto">
@@ -475,7 +449,7 @@ export default function HomePage() {
                     key={category.id}
                     category={category}
                     projects={catProjects}
-                    onExploreCategory={handleCategoryChange}
+                    onExploreCategory={(slug) => navigate(`/search?category=${slug}`)}
                   />
                 );
               })
