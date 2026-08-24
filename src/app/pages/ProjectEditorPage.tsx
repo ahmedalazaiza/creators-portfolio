@@ -604,15 +604,16 @@ export default function ProjectEditorPage() {
                 {tools.map((tool) => (
                   <span
                     key={tool}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground text-xs font-medium"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground text-xs font-medium"
                   >
                     <span>{tool}</span>
                     <button
                       type="button"
                       onClick={() => removeTool(tool)}
-                      className="hover:text-rose-500 cursor-pointer"
+                      aria-label={`Remove ${tool}`}
+                      className="w-4 h-4 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
                     >
-                      <X size={11} />
+                      <X size={10} strokeWidth={2.5} />
                     </button>
                   </span>
                 ))}
@@ -649,15 +650,16 @@ export default function ProjectEditorPage() {
                 {tags.map((t) => (
                   <span
                     key={t}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-xs font-medium border border-[#CDF22B]/40"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#CDF22B]/15 text-slate-900 dark:text-[#CDF22B] text-xs font-semibold border border-[#CDF22B]/35 transition-colors"
                   >
                     <span>#{t}</span>
                     <button
                       type="button"
                       onClick={() => removeTag(t)}
-                      className="hover:text-rose-500 cursor-pointer"
+                      aria-label={`Remove ${t}`}
+                      className="w-4 h-4 rounded-full flex items-center justify-center text-slate-600 dark:text-[#CDF22B]/80 hover:text-slate-950 dark:hover:text-[#CDF22B] hover:bg-[#CDF22B]/30 transition-colors cursor-pointer"
                     >
-                      <X size={11} />
+                      <X size={10} strokeWidth={2.5} />
                     </button>
                   </span>
                 ))}

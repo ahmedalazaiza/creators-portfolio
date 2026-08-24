@@ -316,15 +316,16 @@ export default function EditProfileModal({
                 {skills.map((skill) => (
                   <span
                     key={skill}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground text-xs font-semibold"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground text-xs font-semibold"
                   >
                     <span>{skill}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveSkill(skill)}
-                      className="hover:text-rose-500 cursor-pointer ml-1"
+                      aria-label={`Remove ${skill}`}
+                      className="w-4 h-4 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
                     >
-                      <X size={12} />
+                      <X size={10} strokeWidth={2.5} />
                     </button>
                   </span>
                 ))}

@@ -346,55 +346,59 @@ export default function HomePage() {
               <span className="text-muted-foreground font-semibold">Active filters:</span>
 
               {searchQuery && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground font-medium text-[11px]">
-                  Keyword: "{searchQuery}"
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground font-medium text-[11px]">
+                  <span>Keyword: "{searchQuery}"</span>
                   <button
                     onClick={() => {
                       setSearchQuery("");
                       updateParams({ q: "" });
                     }}
-                    className="hover:text-rose-500 cursor-pointer"
+                    aria-label="Clear keyword"
+                    className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
                   >
-                    <X size={12} />
+                    <X size={10} strokeWidth={2.5} />
                   </button>
                 </span>
               )}
 
               {activeCategory !== "all" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground font-medium text-[11px]">
-                  Field: {currentCategoryObj.name}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground font-medium text-[11px]">
+                  <span>Field: {currentCategoryObj.name}</span>
                   <button
                     onClick={() => handleCategoryChange("all")}
-                    className="hover:text-rose-500 cursor-pointer"
+                    aria-label="Clear category"
+                    className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
                   >
-                    <X size={12} />
+                    <X size={10} strokeWidth={2.5} />
                   </button>
                 </span>
               )}
 
               {activeSubCategory !== "all" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground font-medium text-[11px]">
-                  Sub: {activeSubCategory}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground font-medium text-[11px]">
+                  <span>Sub: {activeSubCategory}</span>
                   <button
                     onClick={() => handleSubCategoryChange("all")}
-                    className="hover:text-rose-500 cursor-pointer"
+                    aria-label="Clear subcategory"
+                    className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
                   >
-                    <X size={12} />
+                    <X size={10} strokeWidth={2.5} />
                   </button>
                 </span>
               )}
 
               {activeTool && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground font-medium text-[11px]">
-                  Tool: {activeTool}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground font-medium text-[11px]">
+                  <span>Tool: {activeTool}</span>
                   <button
                     onClick={() => {
                       setActiveTool("");
                       updateParams({ tool: "" });
                     }}
-                    className="hover:text-rose-500 cursor-pointer"
+                    aria-label="Clear tool"
+                    className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
                   >
-                    <X size={12} />
+                    <X size={10} strokeWidth={2.5} />
                   </button>
                 </span>
               )}
