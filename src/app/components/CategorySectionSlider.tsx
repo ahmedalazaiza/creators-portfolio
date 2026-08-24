@@ -118,7 +118,7 @@ export default function CategorySectionSlider({
             onClick={() => onExploreCategory(category.slug)}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full btn-secondary text-xs font-bold transition-all cursor-pointer group shadow-2xs"
           >
-            <span>Explore All {category.name}</span>
+            <span>Explore all</span>
             <ArrowRight
               size={13}
               className="group-hover:translate-x-0.5 transition-transform"
