@@ -172,7 +172,7 @@ export default function AuthPage() {
                 type="button"
                 onClick={handleResendFromScreen}
                 disabled={resending}
-                className="w-full py-2.5 rounded-full border border-slate-200 dark:border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="w-full py-2.5 rounded-full btn-secondary text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {resending ? (
                   <Loader2 size={13} className="animate-spin" />

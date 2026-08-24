@@ -129,8 +129,8 @@ export default function ShareModal({
                 onClick={handleCopy}
                 className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
                   copied
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card border border-border hover:border-primary/50 text-foreground"
+                    ? "btn-primary text-slate-950"
+                    : "btn-secondary"
                 }`}
               >
                 {copied ? (

@@ -157,7 +157,7 @@ export default function FavoritesPage() {
         {/* Explore More CTA */}
         <Link
           to="/"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-[#CDF22B] hover:text-slate-900 text-xs font-bold text-foreground transition-all cursor-pointer shadow-2xs self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full btn-secondary text-xs font-bold transition-all cursor-pointer shadow-2xs self-start sm:self-auto"
         >
           <Compass size={14} />
           <span>Discover More Works</span>

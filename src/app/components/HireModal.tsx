@@ -251,7 +251,7 @@ export default function HireModal({ isOpen, onClose, creator }: HireModalProps) 
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="px-4 py-2 rounded-full border border-border text-xs font-semibold text-muted-foreground hover:text-foreground"
+                  className="px-5 py-2 rounded-full btn-secondary text-xs font-semibold"
                 >
                   Cancel
                 </button>

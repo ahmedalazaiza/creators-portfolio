@@ -389,7 +389,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-end gap-3 pt-4">
             <button
               type="submit"
-              className="px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-[0_0_25px_rgba(170,255,56,0.35)] hover:opacity-90 active:scale-98 transition-all flex items-center gap-2 cursor-pointer"
+              className="px-8 py-3.5 rounded-full btn-primary text-xs font-bold shadow-md active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
               <Check size={16} />
               <span>Save Settings</span>

@@ -138,7 +138,7 @@ export default function SaveToCollectionModal({
                 <button
                   type="button"
                   onClick={() => setShowCreateInput(false)}
-                  className="px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
+                  className="px-3.5 py-1 rounded-full btn-secondary text-xs font-semibold"
                 >
                   Cancel
                 </button>

@@ -389,7 +389,7 @@ export default function EditProfileModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="px-5 py-2.5 rounded-full btn-secondary text-xs font-semibold cursor-pointer"
             >
               Cancel
             </button>

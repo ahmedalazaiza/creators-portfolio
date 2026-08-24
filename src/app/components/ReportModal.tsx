@@ -151,7 +151,7 @@ export default function ReportModal({
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="px-4 py-1.5 rounded-full border border-border text-xs font-semibold text-muted-foreground hover:text-foreground"
+                  className="px-5 py-1.5 rounded-full btn-secondary text-xs font-semibold"
                 >
                   Cancel
                 </button>

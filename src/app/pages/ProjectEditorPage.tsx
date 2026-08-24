@@ -670,7 +670,7 @@ export default function ProjectEditorPage() {
                 <button
                   type="button"
                   onClick={handleAddTag}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-xs font-semibold text-foreground cursor-pointer"
+                  className="px-4 py-2 rounded-xl btn-secondary text-xs font-semibold cursor-pointer"
                 >
                   Add
                 </button>
@@ -684,7 +684,7 @@ export default function ProjectEditorPage() {
           <button
             type="button"
             onClick={() => navigate("/dashboard")}
-            className="px-6 py-3 rounded-full border border-slate-200 dark:border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="px-6 py-3 rounded-full btn-secondary text-xs font-semibold cursor-pointer"
           >
             Cancel
           </button>

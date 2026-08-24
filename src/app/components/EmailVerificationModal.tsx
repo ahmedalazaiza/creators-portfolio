@@ -138,7 +138,7 @@ export default function EmailVerificationModal({
             type="button"
             onClick={handleResend}
             disabled={sending}
-            className="w-full py-2.5 rounded-full bg-slate-100 dark:bg-[#1e231b] hover:bg-slate-200 dark:hover:bg-[#2E3823] text-foreground font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-2.5 rounded-full btn-secondary font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {sending ? (
               <Loader2 size={14} className="animate-spin text-foreground" />
