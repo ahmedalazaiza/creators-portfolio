@@ -98,3 +98,14 @@ body {
   color: var(--foreground);
   min-height: 100vh;
 }
+
+/* Universal Brand Selection: Radiant Volt Lime + Obsidian Black for ultra-crisp AAA contrast */
+::selection {
+  background-color: #CDF22B !important;
+  color: #070905 !important;
+}
+
+::-moz-selection {
+  background-color: #CDF22B !important;
+  color: #070905 !important;
+}

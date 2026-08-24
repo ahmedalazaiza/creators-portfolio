@@ -78,7 +78,7 @@ function AppContent({
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-[#CDF22B]/30 selection:text-slate-900">
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-[#CDF22B] selection:text-[#070905]">
       <PageTitleHandler />
       {!isAuthPage && <Navbar isDark={isDark} onToggleTheme={onToggleTheme} />}
 
