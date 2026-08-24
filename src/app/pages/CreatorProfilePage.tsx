@@ -569,7 +569,7 @@ export default function CreatorProfilePage() {
               <div className="flex flex-wrap items-center gap-2.5 text-muted-foreground">
                 {profile.location && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs font-medium text-foreground">
-                    <MapPin size={13} className="text-slate-700 dark:text-[#CDF22B]" />
+                    <MapPin size={13} className="text-slate-900 dark:text-white" />
                     <span>{profile.location}</span>
                   </span>
                 )}
@@ -578,9 +578,9 @@ export default function CreatorProfilePage() {
                     href={profile.website}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs font-medium text-foreground hover:text-slate-900 dark:hover:text-[#CDF22B] transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs font-medium text-foreground hover:text-slate-950 dark:hover:text-white transition-colors"
                   >
-                    <Globe size={13} className="text-slate-700 dark:text-[#CDF22B]" />
+                    <Globe size={13} className="text-slate-900 dark:text-white" />
                     <span>{profile.website.replace(/^https?:\/\//, "")}</span>
                   </a>
                 )}
@@ -595,7 +595,7 @@ export default function CreatorProfilePage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label="Twitter / X"
-                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:border-sky-500/40 hover:bg-sky-500/10 text-slate-700 dark:text-slate-300 hover:text-sky-500 transition-all cursor-pointer"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-900 dark:text-white transition-all cursor-pointer"
                     >
                       <Twitter size={14} />
                     </a>
@@ -606,7 +606,7 @@ export default function CreatorProfilePage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label="Dribbble"
-                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:border-pink-500/40 hover:bg-pink-500/10 text-slate-700 dark:text-slate-300 hover:text-pink-500 transition-all cursor-pointer"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-900 dark:text-white transition-all cursor-pointer"
                     >
                       <Dribbble size={14} />
                     </a>
@@ -617,7 +617,7 @@ export default function CreatorProfilePage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label="LinkedIn"
-                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:border-blue-600/40 hover:bg-blue-600/10 text-slate-700 dark:text-slate-300 hover:text-blue-600 transition-all cursor-pointer"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-900 dark:text-white transition-all cursor-pointer"
                     >
                       <Linkedin size={14} />
                     </a>
@@ -628,7 +628,7 @@ export default function CreatorProfilePage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label="GitHub"
-                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:border-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-foreground transition-all cursor-pointer"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-900 dark:text-white transition-all cursor-pointer"
                     >
                       <Github size={14} />
                     </a>
@@ -656,53 +656,53 @@ export default function CreatorProfilePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-slate-200/80 dark:border-white/10">
             {/* Projects */}
             <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
-              <div className="w-10 h-10 rounded-xl bg-slate-200/70 dark:bg-white/10 text-slate-800 dark:text-white flex items-center justify-center shrink-0">
-                <Layers size={18} />
+              <div className="w-9 h-9 rounded-xl bg-slate-200/60 dark:bg-white/10 text-slate-900 dark:text-white flex items-center justify-center shrink-0">
+                <Layers size={17} />
               </div>
               <div className="min-w-0">
                 <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
                   {creatorProjects.length}
                 </p>
-                <p className="text-[11px] text-muted-foreground font-medium truncate">Projects</p>
+                <p className="text-xs text-muted-foreground font-medium truncate">Projects</p>
               </div>
             </div>
 
             {/* Appreciations */}
             <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center shrink-0">
-                <Heart size={18} className="fill-rose-500" />
+              <div className="w-9 h-9 rounded-xl bg-slate-200/60 dark:bg-white/10 text-slate-900 dark:text-white flex items-center justify-center shrink-0">
+                <Heart size={17} className="fill-current" />
               </div>
               <div className="min-w-0">
                 <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
                   {totalAppreciations}
                 </p>
-                <p className="text-[11px] text-muted-foreground font-medium truncate">Appreciations</p>
+                <p className="text-xs text-muted-foreground font-medium truncate">Appreciations</p>
               </div>
             </div>
 
             {/* Followers */}
             <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-                <Users size={18} />
+              <div className="w-9 h-9 rounded-xl bg-slate-200/60 dark:bg-white/10 text-slate-900 dark:text-white flex items-center justify-center shrink-0">
+                <Users size={17} />
               </div>
               <div className="min-w-0">
                 <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
                   {liveFollowersCount}
                 </p>
-                <p className="text-[11px] text-muted-foreground font-medium truncate">Followers</p>
+                <p className="text-xs text-muted-foreground font-medium truncate">Followers</p>
               </div>
             </div>
 
             {/* Following */}
             <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all hover:border-slate-300 dark:hover:border-white/20">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <UserCheck size={18} />
+              <div className="w-9 h-9 rounded-xl bg-slate-200/60 dark:bg-white/10 text-slate-900 dark:text-white flex items-center justify-center shrink-0">
+                <UserCheck size={17} />
               </div>
               <div className="min-w-0">
                 <p className="text-lg sm:text-xl font-bold font-display text-foreground leading-tight">
                   {profile.followingCount || 0}
                 </p>
-                <p className="text-[11px] text-muted-foreground font-medium truncate">Following</p>
+                <p className="text-xs text-muted-foreground font-medium truncate">Following</p>
               </div>
             </div>
           </div>
