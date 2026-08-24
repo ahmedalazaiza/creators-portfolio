@@ -54,17 +54,58 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
 
     setLoading(true);
     try {
-      // 1. Fetch published projects with creator profiles
-      const { data, error } = await supabase
-        .from("projects")
-        .select(`
-          *,
-          creator:profiles(*)
-        `)
-        .order("created_at", { ascending: false });
+      // 1. Fetch in parallel: projects, comments, and (if logged in) user appreciations & saves
+      const fetchPromises: Promise<any>[] = [
+        supabase
+          .from("projects")
+          .select(`
+            *,
+            creator:profiles(*)
+          `)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("comments")
+          .select(`
+            *,
+            user:profiles(*)
+          `)
+          .order("created_at", { ascending: false }),
+      ];
 
-      if (!error && data) {
-        const mapped: Project[] = data.map((item: any) => ({
+      const isAuthenticated = Boolean(currentUserId && !currentUserId.startsWith("guest-"));
+      if (isAuthenticated) {
+        fetchPromises.push(
+          supabase.from("appreciations").select("project_id").eq("user_id", currentUserId)
+        );
+        fetchPromises.push(
+          supabase.from("favorites").select("project_id").eq("user_id", currentUserId)
+        );
+      }
+
+      const results = await Promise.all(fetchPromises);
+      const { data: projectsData, error: projectsError } = results[0];
+      const { data: commentsData } = results[1];
+      const appData = isAuthenticated ? results[2]?.data : null;
+      const favData = isAuthenticated ? results[3]?.data : null;
+
+      const appMap: Record<string, boolean> = {};
+      if (appData) {
+        appData.forEach((a: any) => {
+          appMap[a.project_id] = true;
+        });
+        setAppreciatedMap(appMap);
+      }
+
+      const favMap: Record<string, boolean> = {};
+      if (favData) {
+        favData.forEach((f: any) => {
+          favMap[f.project_id] = true;
+        });
+        setSavedMap(favMap);
+      }
+
+      if (!projectsError && projectsData) {
+        const mapped: Project[] = projectsData.map((item: any) => ({
           id: item.id,
           slug: item.slug || item.id,
           title: item.title,
@@ -109,51 +150,12 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
           appreciationsCount: item.appreciations_count || 0,
           createdAt: item.created_at,
           updatedAt: item.updated_at,
-          isAppreciated: Boolean(appreciatedMap[item.id]),
-          isSaved: Boolean(savedMap[item.id]),
+          isAppreciated: Boolean(appMap[item.id] ?? appreciatedMap[item.id]),
+          isSaved: Boolean(favMap[item.id] ?? savedMap[item.id]),
         }));
 
         setProjects(mapped);
       }
-
-      // 2. Fetch user's appreciations if authenticated
-      if (currentUserId && !currentUserId.startsWith("guest-")) {
-        const { data: appData } = await supabase
-          .from("appreciations")
-          .select("project_id")
-          .eq("user_id", currentUserId);
-
-        if (appData) {
-          const appMap: Record<string, boolean> = {};
-          appData.forEach((a: any) => {
-            appMap[a.project_id] = true;
-          });
-          setAppreciatedMap((prev) => ({ ...prev, ...appMap }));
-        }
-
-        // 3. Fetch user's saved favorites
-        const { data: favData } = await supabase
-          .from("favorites")
-          .select("project_id")
-          .eq("user_id", currentUserId);
-
-        if (favData) {
-          const favMap: Record<string, boolean> = {};
-          favData.forEach((f: any) => {
-            favMap[f.project_id] = true;
-          });
-          setSavedMap((prev) => ({ ...prev, ...favMap }));
-        }
-      }
-
-      // 4. Fetch all comments from Supabase
-      const { data: commentsData } = await supabase
-        .from("comments")
-        .select(`
-          *,
-          user:profiles(*)
-        `)
-        .order("created_at", { ascending: false });
 
       if (commentsData) {
         const mappedComments: CommentItem[] = commentsData.map((c: any) => ({
@@ -178,7 +180,7 @@ export function useProjects(filters?: ProjectFilters, currentUserId?: string) {
     } finally {
       setLoading(false);
     }
-  }, [currentUserId, appreciatedMap, savedMap]);
+  }, [currentUserId]);
 
   // Initial load
   useEffect(() => {
