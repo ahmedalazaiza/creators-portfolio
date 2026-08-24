@@ -305,7 +305,7 @@ export default function CreatorProfilePage() {
   if (notFound || !profile) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="glass-card rounded-3xl p-8 sm:p-12 text-center max-w-md space-y-4 border border-slate-200 dark:border-slate-800 shadow-xl">
+        <div className="glass-card rounded-3xl p-8 sm:p-12 text-center max-w-md space-y-4 border border-slate-200 dark:border-white/10 shadow-xl">
           <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-500 flex items-center justify-center mx-auto">
             <AlertCircle size={28} />
           </div>
@@ -325,7 +325,7 @@ export default function CreatorProfilePage() {
             </Link>
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-foreground text-xs font-semibold hover:bg-slate-200"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground text-xs font-semibold hover:bg-slate-200"
             >
               <ArrowLeft size={14} />
               <span>Return Home</span>
@@ -345,7 +345,7 @@ export default function CreatorProfilePage() {
       className="min-h-screen pt-4 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"
     >
       {/* ─── 1. Hero Cover Banner & Profile Card ──────────────────────── */}
-      <div className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800/80 shadow-md relative">
+      <div className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-md relative">
         {/* Cover Banner Image */}
         <div className="relative h-44 sm:h-60 w-full overflow-hidden bg-slate-900">
           <img
@@ -365,7 +365,7 @@ export default function CreatorProfilePage() {
                 <img
                   src={profile.avatarUrl}
                   alt={profile.fullName}
-                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl object-cover bg-slate-100 dark:bg-slate-800 shadow-2xl border-4 border-background shrink-0"
+                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl object-cover bg-slate-100 dark:bg-[#171915] shadow-2xl border-4 border-background shrink-0"
                 />
                 {profile.availableForWork && (
                   <span
@@ -413,7 +413,7 @@ export default function CreatorProfilePage() {
 
                   <Link
                     to="/create"
-                    className="px-4 py-2.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-foreground text-xs font-bold transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-foreground text-xs font-bold transition-colors flex items-center gap-1.5"
                   >
                     <Plus size={14} />
                     <span>New Project</span>
@@ -422,7 +422,7 @@ export default function CreatorProfilePage() {
                   <Link
                     to="/settings"
                     aria-label="Settings"
-                    className="p-2.5 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground transition-colors"
+                    className="p-2.5 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Settings size={15} />
                   </Link>
@@ -435,7 +435,7 @@ export default function CreatorProfilePage() {
                     disabled={followLoading}
                     className={`px-6 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-md active:scale-95 ${
                       following
-                        ? "bg-slate-200 dark:bg-slate-800 text-foreground hover:bg-rose-500 hover:text-white"
+                        ? "bg-slate-200 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground hover:bg-rose-500 hover:text-white"
                         : "btn-primary text-slate-950"
                     }`}
                   >
@@ -455,7 +455,7 @@ export default function CreatorProfilePage() {
                   {/* Hire / Inquire Button */}
                   <a
                     href={`mailto:hello@${profile.username}.design?subject=Project Inquiry via Portfolios`}
-                    className="px-4 py-2.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-foreground text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    className="px-4 py-2.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-foreground text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
                   >
                     <Mail size={14} />
                     <span>Contact</span>
@@ -465,7 +465,7 @@ export default function CreatorProfilePage() {
                   <button
                     onClick={handleShareProfile}
                     aria-label="Share profile link"
-                    className="p-2.5 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    className="p-2.5 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
                     {copiedLink ? <Check size={15} className="text-emerald-500" /> : <Share2 size={15} />}
                   </button>
@@ -475,7 +475,7 @@ export default function CreatorProfilePage() {
           </div>
 
           {/* Bio & Details Snippet */}
-          <div className="space-y-4 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+          <div className="space-y-4 pt-2 border-t border-slate-200/80 dark:border-white/10">
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-3xl">
               {profile.bio}
             </p>
@@ -553,7 +553,7 @@ export default function CreatorProfilePage() {
                 {profile.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-foreground"
+                    className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-[11px] font-semibold text-foreground"
                   >
                     {skill}
                   </span>
@@ -649,8 +649,8 @@ export default function CreatorProfilePage() {
                 ))}
               </div>
             ) : (
-              <div className="glass-card rounded-3xl p-12 sm:p-16 text-center space-y-4 border border-slate-200/80 dark:border-slate-800/80 max-w-lg mx-auto">
-                <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-muted-foreground flex items-center justify-center mx-auto">
+              <div className="glass-card rounded-3xl p-12 sm:p-16 text-center space-y-4 border border-slate-200/80 dark:border-white/10 max-w-lg mx-auto">
+                <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-[#1e231b] text-muted-foreground flex items-center justify-center mx-auto">
                   <Grid size={24} />
                 </div>
                 <div className="space-y-1">
@@ -678,14 +678,14 @@ export default function CreatorProfilePage() {
         {/* About Tab */}
         {activeTab === "about" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-5">
+            <div className="md:col-span-2 glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-5">
               <h3 className="text-base font-bold text-foreground">Biography & Creative Focus</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                 {profile.bio}
               </p>
 
               {profile.skills && profile.skills.length > 0 && (
-                <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-white/10">
                   <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
                     Core Disciplines & Skills
                   </h4>
@@ -693,7 +693,7 @@ export default function CreatorProfilePage() {
                     {profile.skills.map((s) => (
                       <span
                         key={s}
-                        className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-foreground border border-slate-200 dark:border-slate-700"
+                        className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-[#1e231b] text-xs font-semibold text-foreground border border-slate-200 dark:border-white/10"
                       >
                         {s}
                       </span>
@@ -703,7 +703,7 @@ export default function CreatorProfilePage() {
               )}
             </div>
 
-            <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-5 h-fit">
+            <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-5 h-fit">
               <h3 className="text-base font-bold text-foreground">Contact & Channels</h3>
               <div className="space-y-3 text-xs">
                 {profile.location && (
@@ -744,7 +744,7 @@ export default function CreatorProfilePage() {
                 ))}
               </div>
             ) : (
-              <div className="glass-card rounded-3xl p-12 text-center space-y-4 border border-slate-200/80 dark:border-slate-800/80 max-w-lg mx-auto">
+              <div className="glass-card rounded-3xl p-12 text-center space-y-4 border border-slate-200/80 dark:border-white/10 max-w-lg mx-auto">
                 <Bookmark size={24} className="text-muted-foreground mx-auto" />
                 <p className="text-xs text-muted-foreground">No saved favorites yet.</p>
               </div>

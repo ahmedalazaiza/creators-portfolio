@@ -62,7 +62,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       viewport={{ once: true }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.25 }}
-      className="group flex flex-col rounded-3xl overflow-hidden glass-card border border-slate-200/80 dark:border-slate-800/80 hover:border-[#CDF22B]/80 shadow-xs hover:shadow-xl hover:shadow-[#CDF22B]/10 transition-all"
+      className="group flex flex-col rounded-3xl overflow-hidden glass-card border border-slate-200/80 dark:border-white/10 hover:border-[#CDF22B]/80 shadow-xs hover:shadow-xl hover:shadow-[#CDF22B]/10 transition-all"
     >
       {/* Cover Image Container */}
       <Link to={projectUrl} className="relative aspect-4/3 overflow-hidden bg-slate-100 dark:bg-[#171915] block">
@@ -125,7 +125,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </Link>
 
         {/* Creator & Metrics Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/10 text-xs">
           {/* Creator Profile Link */}
           <Link
             to={`/@${creatorUsername}`}
@@ -134,7 +134,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <img
               src={creatorAvatar}
               alt={creatorName}
-              className="w-5 h-5 rounded-full object-cover bg-slate-100 shrink-0 border border-white dark:border-slate-700"
+              className="w-5 h-5 rounded-full object-cover bg-slate-100 shrink-0 border border-white dark:border-white/10"
             />
             <span className="font-semibold text-foreground truncate text-[11px]">
               {creatorName}

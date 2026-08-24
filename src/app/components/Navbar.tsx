@@ -104,8 +104,8 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 to="/"
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                   location.pathname === "/"
-                    ? "bg-slate-100 dark:bg-slate-800 text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-slate-50 dark:hover:bg-slate-900"
+                    ? "bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-slate-50 dark:hover:bg-[#1e231b]/60"
                 }`}
               >
                 Explore
@@ -118,8 +118,8 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 to="/creators"
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                   location.pathname === "/creators"
-                    ? "bg-slate-100 dark:bg-slate-800 text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-slate-50 dark:hover:bg-slate-900"
+                    ? "bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-slate-50 dark:hover:bg-[#1e231b]/60"
                 }`}
               >
                 Creators
@@ -137,7 +137,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   exit={{ opacity: 0, scale: 0.9, y: -6 }}
                   transition={{ duration: 0.2 }}
                   onClick={() => setSearchModalOpen(true)}
-                  className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-full glass-card border border-slate-200/80 dark:border-slate-800/80 hover:border-[#CDF22B]/60 text-xs text-muted-foreground hover:text-foreground shadow-xs transition-all cursor-pointer group"
+                  className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-full glass-card border border-slate-200/80 dark:border-white/10 hover:border-[#CDF22B]/60 text-xs text-muted-foreground hover:text-foreground shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-2">
                     <Search size={14} className="text-[#CDF22B] group-hover:scale-110 transition-transform" />
@@ -145,7 +145,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   </div>
                   <div className="flex items-center gap-1.5">
                     <SlidersHorizontal size={12} className="text-muted-foreground group-hover:text-foreground" />
-                    <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-md bg-slate-200/70 dark:bg-slate-800 text-[10px] font-mono text-muted-foreground border border-slate-300/40 dark:border-slate-700/50">
+                    <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-md bg-slate-200/70 dark:bg-[#1e231b] text-[10px] font-mono text-muted-foreground border border-slate-300/40 dark:border-white/10">
                       ⌘K
                     </kbd>
                   </div>
@@ -200,7 +200,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center gap-2 p-1 rounded-full border border-slate-200 dark:border-slate-800 hover:border-[#CDF22B] transition-colors cursor-pointer"
+                    className="flex items-center gap-2 p-1 rounded-full border border-slate-200 dark:border-white/10 hover:border-[#CDF22B] transition-colors cursor-pointer"
                   >
                     <img
                       src={
@@ -221,7 +221,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-white dark:bg-[#171915] border border-slate-200 dark:border-white/10 shadow-2xl shadow-slate-900/15 dark:shadow-black/70 z-50 text-xs space-y-1"
                       >
                         {/* Identity Header */}
-                        <div className="p-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <div className="p-2.5 pb-2 border-b border-slate-100 dark:border-white/10">
                           <p className="font-bold text-foreground truncate">
                             {user?.fullName || "Creative Member"}
                           </p>
@@ -233,7 +233,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         <Link
                           to="/profile"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
                         >
                           <User size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>My Profile</span>
@@ -242,7 +242,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         <Link
                           to="/favorites"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
                         >
                           <Bookmark size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>My Favorites</span>
@@ -251,7 +251,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         <Link
                           to="/dashboard"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
                         >
                           <LayoutDashboard size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>Creator Dashboard</span>
@@ -260,13 +260,13 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                         <Link
                           to="/create"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground transition-colors font-medium"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
                         >
                           <Plus size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>Upload Project</span>
                         </Link>
 
-                        <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+                        <div className="pt-1 border-t border-slate-100 dark:border-white/10">
                           <button
                             onClick={handleSignOut}
                             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 transition-colors font-medium text-left cursor-pointer"
@@ -285,7 +285,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   to="/login"
-                  className="px-4 py-2 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="px-4 py-2 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors"
                 >
                   Log In
                 </Link>
@@ -315,7 +315,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-background/95 backdrop-blur-2xl px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto"
+              className="md:hidden border-t border-slate-200 dark:border-white/10 bg-background/95 backdrop-blur-2xl px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto"
             >
               {/* Quick Search Button in Mobile Drawer */}
               <button
@@ -323,7 +323,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   setMobileMenuOpen(false);
                   setSearchModalOpen(true);
                 }}
-                className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-foreground cursor-pointer"
+                className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-xs font-semibold text-foreground cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <Search size={15} className="text-slate-800 dark:text-slate-200" />
@@ -337,14 +337,14 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 <Link
                   to="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="block px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
                   Explore Showcase
                 </Link>
                 <Link
                   to="/favorites"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
                   <Bookmark size={15} className="text-slate-800 dark:text-slate-200" />
                   <span>My Favorites</span>
@@ -352,14 +352,14 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                 <Link
                   to="/creators"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="block px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
                   Creators Directory
                 </Link>
               </div>
 
               {/* Expandable Categories Accordion */}
-              <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800/80 space-y-1">
+              <div className="pt-2 border-t border-slate-200/80 dark:border-white/10 space-y-1">
                 <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                   Creative Categories
                 </div>
@@ -368,7 +368,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   const isExpanded = expandedMobileCategory === cat.slug;
                   return (
                     <div key={cat.id} className="rounded-xl overflow-hidden">
-                      <div className="flex items-center justify-between px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs text-foreground font-medium">
+                      <div className="flex items-center justify-between px-3 py-2 hover:bg-slate-100 dark:hover:bg-[#1e231b] text-xs text-foreground font-medium">
                         <Link
                           to={`/?category=${cat.slug}`}
                           onClick={() => setMobileMenuOpen(false)}

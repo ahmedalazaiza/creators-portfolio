@@ -63,7 +63,7 @@ export default function FavoritesPage() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full glass-card p-8 sm:p-10 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl text-center space-y-6 relative overflow-hidden"
+          className="max-w-md w-full glass-card p-8 sm:p-10 rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-2xl text-center space-y-6 relative overflow-hidden"
         >
           {/* Ambient Glow */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#CDF22B]/20 rounded-full blur-3xl pointer-events-none" />
@@ -228,8 +228,8 @@ export default function FavoritesPage() {
         </div>
       ) : (
         /* Empty State */
-        <div className="glass-card rounded-3xl p-10 sm:p-16 border border-slate-200/80 dark:border-slate-800/80 text-center space-y-5 max-w-lg mx-auto">
-          <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 text-muted-foreground flex items-center justify-center mx-auto">
+        <div className="glass-card rounded-3xl p-10 sm:p-16 border border-slate-200/80 dark:border-white/10 text-center space-y-5 max-w-lg mx-auto">
+          <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-[#1e231b] text-muted-foreground flex items-center justify-center mx-auto">
             <Bookmark size={28} />
           </div>
 

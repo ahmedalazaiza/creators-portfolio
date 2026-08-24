@@ -77,8 +77,8 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
         onMouseEnter={() => setIsOpen(true)}
         className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
           isOpen
-            ? "bg-slate-900 text-white dark:bg-slate-800 dark:text-white"
-            : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+            ? "bg-slate-900 text-white dark:bg-[#1e231b] dark:text-[#CDF22B] border border-transparent dark:border-white/10"
+            : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
         }`}
       >
         <Compass size={14} className={isOpen ? "text-[#CDF22B]" : "text-foreground"} />
@@ -131,7 +131,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
                       onClick={() => handleNavigate(cat.slug)}
                       className={`w-full text-left px-3 py-2.5 rounded-2xl transition-all flex items-center justify-between group cursor-pointer ${
                         isHovered
-                          ? "bg-slate-900 text-white dark:bg-[#CDF22B] dark:text-slate-950 font-bold shadow-md"
+                          ? "bg-slate-900 text-[#CDF22B] dark:bg-[#1e231b] dark:text-[#CDF22B] border border-transparent dark:border-white/10 font-bold shadow-md"
                           : "text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 font-semibold"
                       }`}
                     >
@@ -139,7 +139,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
                         <div
                           className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                             isHovered
-                              ? "bg-[#CDF22B] text-slate-950 dark:bg-slate-950 dark:text-[#CDF22B] font-bold"
+                              ? "bg-[#CDF22B] text-slate-950 font-bold shadow-xs"
                               : "bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300"
                           }`}
                         >
@@ -162,7 +162,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
               <div className="col-span-7 p-4 bg-white dark:bg-[#070905] flex flex-col justify-between">
                 <div>
                   {/* Category Sub-Header */}
-                  <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100 dark:border-white/10">
                     <div className="min-w-0 pr-2">
                       <h4 className="font-bold text-slate-900 dark:text-white text-xs truncate">
                         {activeCategory.name}
@@ -185,7 +185,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
                       <button
                         key={sub.id}
                         onClick={() => handleNavigate(activeCategory.slug, sub.slug)}
-                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors group cursor-pointer"
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors group cursor-pointer"
                       >
                         <div className="font-bold text-xs text-slate-900 dark:text-slate-100 group-hover:text-slate-950 dark:group-hover:text-[#CDF22B] flex items-center justify-between">
                           <span>{sub.name}</span>
@@ -205,7 +205,7 @@ export default function CategoryNavMenu({ onCategorySelect }: CategoryNavMenuPro
                 </div>
 
                 {/* Footer Insight */}
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] flex items-center justify-between font-medium">
+                <div className="pt-3 border-t border-slate-100 dark:border-white/10 text-[11px] flex items-center justify-between font-medium">
                   <span className="text-slate-500 dark:text-slate-400">
                     {activeCategory.projectCount || 10}+ curated works
                   </span>

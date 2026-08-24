@@ -126,20 +126,20 @@ export default function AuthPage() {
     <div className="min-h-[90vh] flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
       {/* Soft Ambient Brand Glow in Background */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#CDF22B]/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-slate-200/40 dark:bg-slate-800/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-slate-200/40 dark:bg-[#1e231b]/40 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main Glass Card Container */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="glass-card rounded-3xl p-8 sm:p-10 max-w-md w-full relative z-10 border border-white/80 dark:border-slate-800/80 shadow-2xl space-y-6"
+        className="glass-card rounded-3xl p-8 sm:p-10 max-w-md w-full relative z-10 border border-white/80 dark:border-white/10 shadow-2xl space-y-6"
       >
         {/* Verification Pending Screen */}
         {emailVerificationPending ? (
           <div className="text-center space-y-5">
-            <div className="w-16 h-16 rounded-3xl bg-[#CDF22B]/20 text-slate-950 dark:text-[#CDF22B] flex items-center justify-center mx-auto shadow-inner">
-              <Inbox size={30} />
+            <div className="w-16 h-16 rounded-3xl bg-[#CDF22B] text-slate-950 flex items-center justify-center mx-auto shadow-md">
+              <MailCheck size={32} />
             </div>
 
             <div className="space-y-1.5">
@@ -147,16 +147,9 @@ export default function AuthPage() {
                 Check Your Email
               </h1>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                We've sent a verification link to <strong className="text-foreground">{registeredEmail}</strong>. Please click the link to activate your account and publish projects.
+                We've sent a verification link to your email. Please click the link to activate your account and publish projects.
               </p>
             </div>
-
-            {successMessage && (
-              <div className="p-3 rounded-2xl bg-[#CDF22B]/20 border border-[#CDF22B]/50 text-slate-950 dark:text-[#CDF22B] text-xs flex items-center gap-2 font-medium justify-center">
-                <CheckCircle2 size={15} className="text-emerald-600 dark:text-[#CDF22B]" />
-                <span>{successMessage}</span>
-              </div>
-            )}
 
             {errorMessage && (
               <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2 justify-center">
@@ -179,7 +172,7 @@ export default function AuthPage() {
                 type="button"
                 onClick={handleResendFromScreen}
                 disabled={resending}
-                className="w-full py-2.5 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="w-full py-2.5 rounded-full border border-slate-200 dark:border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {resending ? (
                   <Loader2 size={13} className="animate-spin" />
@@ -209,7 +202,7 @@ export default function AuthPage() {
             </div>
 
             {/* Tab Switcher (Log In / Sign Up) */}
-            <div className="p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 flex items-center gap-1 border border-slate-200/50 dark:border-slate-700/50">
+            <div className="p-1 rounded-2xl bg-slate-100 dark:bg-[#1e231b] flex items-center gap-1 border border-slate-200/50 dark:border-white/10">
               <Link
                 to="/login"
                 className={`flex-1 py-2 text-center rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -345,7 +338,7 @@ export default function AuthPage() {
             </form>
 
             {/* Footer info */}
-            <div className="text-center pt-2 border-t border-slate-100 dark:border-slate-800/80">
+            <div className="text-center pt-2 border-t border-slate-100 dark:border-white/10">
               <p className="text-[11px] text-muted-foreground">
                 {isSignUp ? (
                   <>

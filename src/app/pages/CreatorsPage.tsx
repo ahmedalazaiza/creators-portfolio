@@ -132,7 +132,7 @@ export default function CreatorsPage() {
     >
       {/* Page Header */}
       <div className="text-center max-w-2xl mx-auto space-y-3">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 dark:bg-slate-800 text-[#CDF22B] text-xs font-mono font-bold border border-slate-800 dark:border-slate-700 shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 dark:bg-[#171915] text-[#CDF22B] text-xs font-mono font-bold border border-slate-800 dark:border-white/10 shadow-2xs">
           <Users size={13} />
           <span>Creators Network</span>
         </div>
@@ -153,7 +153,7 @@ export default function CreatorsPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search creators by name, discipline, or skill..."
-          className="w-full pl-11 pr-4 py-3 rounded-2xl glass-card border border-slate-200/80 dark:border-slate-800/80 text-foreground placeholder:text-muted-foreground text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#CDF22B]/30 focus:border-[#CDF22B] shadow-sm transition-all"
+          className="w-full pl-11 pr-4 py-3 rounded-2xl glass-card border border-slate-200/80 dark:border-white/10 text-foreground placeholder:text-muted-foreground text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#CDF22B]/30 focus:border-[#CDF22B] shadow-sm transition-all"
         />
       </div>
 
@@ -188,7 +188,7 @@ export default function CreatorsPage() {
                 key={creator.id}
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.2 }}
-                className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-xl hover:border-[#CDF22B]/60 transition-all flex flex-col justify-between"
+                className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-xl hover:border-[#CDF22B]/60 transition-all flex flex-col justify-between"
               >
                 {/* Creator Header Banner & Avatar */}
                 <div>

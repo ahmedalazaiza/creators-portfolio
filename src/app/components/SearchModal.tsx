@@ -273,20 +273,20 @@ export default function SearchModal({
               {/* Close Button */}
               <button
                 onClick={onClose}
-                className="p-2 rounded-2xl bg-slate-200/60 dark:bg-slate-800/60 hover:bg-slate-300 dark:hover:bg-slate-700 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                className="p-2 rounded-2xl bg-slate-200/60 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-300 dark:hover:bg-[#2E3823] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
             {/* Quick Tabs: All Filters vs Quick Mode */}
-            <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-200/50 dark:border-slate-800/50 text-xs">
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-200/50 dark:border-white/10 text-xs">
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setActiveTab("search")}
                   className={`px-3 py-1.5 rounded-full font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeTab === "search"
-                      ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs"
+                      ? "bg-slate-900 text-[#CDF22B] dark:bg-[#1e231b] dark:text-[#CDF22B] border border-slate-900 dark:border-white/10 shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -368,24 +368,24 @@ export default function SearchModal({
                       }}
                       className={`p-3 rounded-2xl border text-left transition-all flex items-start gap-2.5 cursor-pointer ${
                         isSelected
-                          ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-md"
+                          ? "bg-slate-900 dark:bg-[#1e231b] text-white border-slate-900 dark:border-[#CDF22B] shadow-md ring-1 ring-slate-900 dark:ring-[#CDF22B]"
                           : "border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e231b]/50 text-foreground hover:border-slate-400 hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                       }`}
                     >
                       <div
                         className={`p-2 rounded-xl shrink-0 transition-colors ${
                           isSelected
-                            ? "bg-[#CDF22B] text-slate-950"
+                            ? "bg-[#CDF22B] text-slate-950 shadow-xs"
                             : "bg-slate-100 dark:bg-[#171915] text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-white/10"
                         }`}
                       >
                         {icon}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="font-bold text-xs truncate">{cat.name}</div>
+                        <div className={`font-bold text-xs truncate ${isSelected ? "text-white dark:text-[#CDF22B]" : "text-foreground"}`}>{cat.name}</div>
                         <div
                           className={`text-[10px] truncate ${
-                            isSelected ? "text-slate-300 dark:text-slate-600 font-medium" : "text-muted-foreground"
+                            isSelected ? "text-slate-300 dark:text-slate-300 font-medium" : "text-muted-foreground"
                           }`}
                         >
                           {cat.subCategories?.length || 0} sub-fields
@@ -504,12 +504,12 @@ export default function SearchModal({
                       onClick={() => setSelectedTimeframe(tf.value)}
                       className={`px-4 py-2 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                         isTfSelected
-                          ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent font-bold"
-                          : "border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e231b]/60 text-muted-foreground hover:text-foreground"
+                          ? "bg-slate-900 text-[#CDF22B] dark:bg-[#CDF22B] dark:text-slate-950 border-slate-900 dark:border-[#CDF22B] font-bold shadow-xs"
+                          : "border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#1e231b]/60 text-muted-foreground hover:text-foreground hover:border-slate-300"
                       }`}
                     >
                       <span>{tf.label}</span>
-                      {isTfSelected && <Check size={13} />}
+                      {isTfSelected && <Check size={13} className="text-[#CDF22B] dark:text-slate-950" />}
                     </button>
                   );
                 })}

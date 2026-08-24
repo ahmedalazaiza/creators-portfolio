@@ -237,7 +237,7 @@ export default function ProjectDetailPage() {
           {isOwner && (
             <Link
               to={`/project/edit/${project.id}`}
-              className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-foreground text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 hover:bg-slate-200 text-foreground text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Edit3 size={13} />
               <span>Edit Project</span>
@@ -246,7 +246,7 @@ export default function ProjectDetailPage() {
 
           <button
             onClick={handleShare}
-            className="p-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="p-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             title="Copy link"
           >
             {copied ? <Check size={15} className="text-emerald-500" /> : <Share2 size={15} />}
@@ -272,7 +272,7 @@ export default function ProjectDetailPage() {
         </h1>
 
         {/* Creator Info Snippet */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 dark:border-white/10">
           <Link
             to={`/@${project.creator?.username || "creator"}`}
             className="flex items-center gap-3 group"
@@ -283,7 +283,7 @@ export default function ProjectDetailPage() {
                 `https://api.dicebear.com/7.x/shapes/svg?seed=${project.creator?.username}`
               }
               alt={project.creator?.fullName || "Creator"}
-              className="w-10 h-10 rounded-full object-cover bg-slate-100 border border-white dark:border-slate-700 shadow-xs group-hover:scale-105 transition-transform"
+              className="w-10 h-10 rounded-full object-cover bg-slate-100 border border-white dark:border-white/10 shadow-xs group-hover:scale-105 transition-transform"
             />
             <div>
               <p className="text-xs font-bold text-foreground group-hover:text-[#CDF22B] transition-colors">
@@ -304,7 +304,7 @@ export default function ProjectDetailPage() {
               className={`p-2.5 rounded-full text-xs font-bold flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95 ${
                 isSaved
                   ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/30 font-bold"
-                  : "glass-card hover:bg-[#CDF22B] hover:text-slate-950 text-foreground border border-slate-200 dark:border-slate-800"
+                  : "glass-card hover:bg-[#CDF22B] hover:text-slate-950 text-foreground border border-slate-200 dark:border-white/10"
               }`}
             >
               <Bookmark size={15} className={isSaved ? "fill-current text-slate-950" : ""} />
@@ -315,7 +315,7 @@ export default function ProjectDetailPage() {
               className={`px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
                 isLiked
                   ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/35 border border-[#CDF22B]"
-                  : "glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground border border-slate-200 dark:border-slate-800 hover:border-[#CDF22B]/60"
+                  : "glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground border border-slate-200 dark:border-white/10 hover:border-[#CDF22B]/60"
               }`}
             >
               <Heart size={15} className={isLiked ? "fill-slate-950 text-slate-950" : "text-foreground"} />

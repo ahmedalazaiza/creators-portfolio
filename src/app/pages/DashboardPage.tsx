@@ -54,7 +54,7 @@ export default function DashboardPage() {
       className="min-h-screen pt-8 sm:pt-10 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"
     >
       {/* Top Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200/80 dark:border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200/80 dark:border-white/10">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold text-slate-900 dark:text-[#CDF22B] bg-[#CDF22B]/20 px-2 py-0.5 rounded-md">
@@ -72,7 +72,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <Link
             to="/profile"
-            className="px-4 py-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground text-xs font-semibold border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1.5 transition-colors"
+            className="px-4 py-2 rounded-full glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground text-xs font-semibold border border-slate-200 dark:border-white/10 shadow-xs flex items-center gap-1.5 transition-colors"
           >
             <User size={14} className="text-foreground" />
             <span>Public Profile</span>
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/10 text-xs">
                     <div className="flex items-center gap-3 text-muted-foreground text-[11px] font-medium">
                       <span className="flex items-center gap-1">
                         <Heart size={12} className="text-slate-900 dark:text-[#CDF22B] fill-current" /> {p.appreciationsCount || 0}
@@ -187,7 +187,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-1">
                       <Link
                         to={`/project/${p.slug || p.id}`}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground"
+                        className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground"
                         title="View Live"
                       >
                         <ExternalLink size={14} />
@@ -195,7 +195,7 @@ export default function DashboardPage() {
 
                       <Link
                         to={`/project/edit/${p.id}`}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground"
+                        className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground"
                         title="Edit Project"
                       >
                         <Edit3 size={14} />
@@ -215,7 +215,7 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : (
-          <div className="glass-card rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 p-12 sm:p-16 text-center space-y-4 shadow-sm">
+          <div className="glass-card rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 sm:p-16 text-center space-y-4 shadow-sm">
             <div className="w-14 h-14 rounded-2xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto">
               <FolderPlus size={26} />
             </div>

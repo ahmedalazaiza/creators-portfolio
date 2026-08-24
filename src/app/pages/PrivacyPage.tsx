@@ -64,7 +64,7 @@ export default function PrivacyPage() {
           </ul>
         </div>
 
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <CheckCircle2 size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>3. How We Use & Protect Your Data</h2>
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
           </p>
         </div>
 
-        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-white/10 space-y-4">
           <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
             <FileText size={18} className="text-slate-900 dark:text-[#CDF22B]" />
             <h2>4. Your Rights (GDPR & Global Standards)</h2>

@@ -49,7 +49,7 @@ export default function AppreciationButton({
       className={`relative group inline-flex items-center justify-center rounded-full font-bold transition-all duration-200 cursor-pointer select-none ${
         isAppreciated
           ? "bg-[#CDF22B] text-slate-950 shadow-md shadow-[#CDF22B]/35 border border-[#CDF22B]"
-          : "glass-card hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-foreground hover:border-[#CDF22B]/60 shadow-xs"
+          : "glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] border border-slate-200 dark:border-white/10 text-foreground hover:border-[#CDF22B]/60 shadow-xs"
       } ${buttonClasses[size]} ${className}`}
     >
       {/* Burst particles */}

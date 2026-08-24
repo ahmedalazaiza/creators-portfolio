@@ -9,7 +9,7 @@ export default function NotFoundPage() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass-card rounded-3xl p-10 sm:p-12 max-w-md w-full text-center space-y-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 relative overflow-hidden"
+        className="glass-card rounded-3xl p-10 sm:p-12 max-w-md w-full text-center space-y-6 shadow-xl border border-slate-200/80 dark:border-white/10 relative overflow-hidden"
       >
         <div className="w-16 h-16 rounded-3xl bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] flex items-center justify-center mx-auto text-2xl font-bold font-mono">
           404

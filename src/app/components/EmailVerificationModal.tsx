@@ -44,11 +44,11 @@ export default function EmailVerificationModal({
         initial={{ opacity: 0, scale: 0.92, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.92, y: 15 }}
-        className="glass-card rounded-3xl p-6 sm:p-8 max-w-md w-full border border-white/80 dark:border-slate-800 shadow-2xl space-y-5 relative"
+        className="glass-card rounded-3xl p-6 sm:p-8 max-w-md w-full border border-white/80 dark:border-white/10 shadow-2xl space-y-5 relative"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-[#1e231b] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <X size={16} />
         </button>
@@ -108,7 +108,7 @@ export default function EmailVerificationModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="w-full py-2.5 rounded-full border border-slate-200 dark:border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             I'll Verify Later
           </button>

@@ -344,7 +344,7 @@ export default function ProjectEditorPage() {
 
       {/* Main Upload Form Card */}
       <form onSubmit={handleSaveProject} className="space-y-8">
-        <div className="glass-card rounded-3xl p-6 sm:p-10 border border-slate-200/80 dark:border-slate-800/80 shadow-md space-y-6">
+        <div className="glass-card rounded-3xl p-6 sm:p-10 border border-slate-200/80 dark:border-white/10 shadow-md space-y-6">
           {/* Section 1: Basic Information */}
           <div className="space-y-4">
             <h2 className="text-sm font-bold font-display text-foreground flex items-center gap-2">
@@ -558,7 +558,7 @@ export default function ProjectEditorPage() {
                 <button
                   type="button"
                   onClick={() => galleryInputRef.current?.click()}
-                  className="aspect-video rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-[#CDF22B] flex flex-col items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  className="aspect-video rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 hover:border-[#CDF22B] flex flex-col items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   {uploadingGallery ? (
                     <Loader2 size={18} className="animate-spin text-slate-900 dark:text-[#CDF22B]" />
@@ -573,7 +573,7 @@ export default function ProjectEditorPage() {
             ) : (
               <div
                 onClick={() => galleryInputRef.current?.click()}
-                className="p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-center text-xs text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-900/30 cursor-pointer transition-colors"
+                className="p-6 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 text-center text-xs text-muted-foreground hover:bg-slate-50 dark:hover:bg-[#1e231b]/60 cursor-pointer transition-colors"
               >
                 <span>No gallery images added yet. Click to upload extra images.</span>
               </div>
@@ -581,7 +581,7 @@ export default function ProjectEditorPage() {
           </div>
 
           {/* Section 4: Tags & Tools */}
-          <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/10">
             {/* Tools Used */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
@@ -594,7 +594,7 @@ export default function ProjectEditorPage() {
                 {tools.map((tool) => (
                   <span
                     key={tool}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-foreground text-xs font-medium"
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-foreground text-xs font-medium"
                   >
                     <span>{tool}</span>
                     <button
@@ -620,7 +620,7 @@ export default function ProjectEditorPage() {
                       key={preset}
                       type="button"
                       onClick={() => handleAddTool(preset)}
-                      className="px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-800 hover:border-[#CDF22B] text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      className="px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/10 hover:border-[#CDF22B] text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                     >
                       + {preset}
                     </button>
@@ -684,7 +684,7 @@ export default function ProjectEditorPage() {
           <button
             type="button"
             onClick={() => navigate("/dashboard")}
-            className="px-6 py-3 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="px-6 py-3 rounded-full border border-slate-200 dark:border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             Cancel
           </button>
