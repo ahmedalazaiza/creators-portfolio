@@ -24,6 +24,7 @@ import GuidelinesPage from "./pages/GuidelinesPage";
 import BrandAssetsPage from "./pages/BrandAssetsPage";
 import CookiePolicyPage from "./pages/CookiePolicyPage";
 import FavoritesPage from "./pages/FavoritesPage";
+import SavedPage from "./pages/SavedPage";
 import AboutPage from "./pages/AboutPage";
 import TeamPage from "./pages/TeamPage";
 import ContactPage from "./pages/ContactPage";
@@ -56,6 +57,10 @@ function PageTitleHandler() {
       document.title = "Creators Directory — Portfolios";
     } else if (path === "/search") {
       document.title = "Search & Filter — Portfolios";
+    } else if (path === "/favorites") {
+      document.title = "My Favorites — Portfolios";
+    } else if (path === "/saved") {
+      document.title = "Saved Collections — Portfolios";
     } else if (path === "/about" || path === "/story") {
       document.title = "About Us — Portfolios";
     } else if (path === "/team" || path === "/our-team") {
@@ -168,9 +173,9 @@ function AppContent({
             }
           />
 
-          {/* 5. Favorites / Saved Projects */}
+          {/* 5. Separate Favorites (Liked) & Saved (Collections) */}
           <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/saved" element={<FavoritesPage />} />
+          <Route path="/saved" element={<SavedPage />} />
 
           {/* 6. Company & Business Pages (Must be before wildcard :username) */}
           <Route path="/about" element={<AboutPage />} />

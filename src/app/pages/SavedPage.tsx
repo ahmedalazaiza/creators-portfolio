@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  Heart,
+  Bookmark,
   Search,
   Sparkles,
   ArrowRight,
@@ -12,13 +12,15 @@ import {
   Compass,
   ArrowLeft,
   X,
+  FolderOpen,
+  Plus,
 } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../context/AuthContext";
 import ProjectCard from "../components/ProjectCard";
 import { CATEGORIES, matchesCategory } from "../data/categories";
 
-export default function FavoritesPage() {
+export default function SavedPage() {
   const { allProjects, loading } = useProjects();
   const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -26,14 +28,14 @@ export default function FavoritesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Filter projects favorited/liked by the user
-  const favoriteProjects = useMemo(() => {
-    return allProjects.filter((p) => Boolean(p.isLiked));
+  // Filter bookmarked/saved projects
+  const savedProjects = useMemo(() => {
+    return allProjects.filter((p) => Boolean(p.isSaved));
   }, [allProjects]);
 
-  // Apply search & category filter inside favorites
-  const filteredFavorites = useMemo(() => {
-    return favoriteProjects.filter((project) => {
+  // Apply search & category filter inside saved projects
+  const filteredSaved = useMemo(() => {
+    return savedProjects.filter((project) => {
       // Category match
       if (selectedCategory !== "all") {
         if (!matchesCategory(project.category, project.categoryId, project.tags, selectedCategory)) {
@@ -55,7 +57,7 @@ export default function FavoritesPage() {
 
       return true;
     });
-  }, [favoriteProjects, selectedCategory, searchQuery]);
+  }, [savedProjects, selectedCategory, searchQuery]);
 
   // ─── 1. Guest Screen (User is not logged in) ───────────────────────────
   if (!isLoggedIn) {
@@ -70,8 +72,8 @@ export default function FavoritesPage() {
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#CDF22B]/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[#CDF22B]/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="w-16 h-16 rounded-3xl bg-[#0F172A] text-[#CDF22B] dark:bg-[#CDF22B] dark:text-[#070905] flex items-center justify-center mx-auto shadow-lg font-bold">
-            <Heart size={28} className="fill-current" />
+          <div className="w-16 h-16 rounded-3xl bg-[#CDF22B] text-slate-950 flex items-center justify-center mx-auto shadow-lg shadow-[#CDF22B]/30 font-bold">
+            <Bookmark size={28} className="fill-current" />
           </div>
 
           <div className="space-y-2">
@@ -80,10 +82,10 @@ export default function FavoritesPage() {
               <span>Registered Members Only</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold font-display text-foreground tracking-tight">
-              My Favorites
+              Saved Collections
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Sign in with your creative profile to appreciate exceptional case studies, support designers, and build your inspiration feed.
+              Sign in with your creative profile to bookmark inspiring case studies, organize custom moodboards, and sync across all your devices.
             </p>
           </div>
 
@@ -91,15 +93,15 @@ export default function FavoritesPage() {
           <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-[#171915]/90 border border-slate-200/60 dark:border-white/10 text-left text-xs space-y-2.5">
             <div className="flex items-center gap-2 text-foreground font-medium">
               <div className="w-1.5 h-1.5 rounded-full bg-[#CDF22B]" />
-              <span>Appreciate and favorite inspiring case studies</span>
+              <span>Bookmark unlimited UI/UX & 3D projects</span>
             </div>
             <div className="flex items-center gap-2 text-foreground font-medium">
               <div className="w-1.5 h-1.5 rounded-full bg-[#CDF22B]" />
-              <span>Direct feedback and creator connections</span>
+              <span>Organize design references and moodboards</span>
             </div>
             <div className="flex items-center gap-2 text-foreground font-medium">
               <div className="w-1.5 h-1.5 rounded-full bg-[#CDF22B]" />
-              <span>Sync across all your devices instantly</span>
+              <span>Real-time cloud sync with your profile</span>
             </div>
           </div>
 
@@ -107,10 +109,10 @@ export default function FavoritesPage() {
           <div className="space-y-2.5 pt-2">
             <Link
               to="/login"
-              state={{ from: "/favorites" }}
+              state={{ from: "/saved" }}
               className="w-full py-3 rounded-full btn-primary text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-98 text-[#0F172A]"
             >
-              <span>Sign In to View Favorites</span>
+              <span>Sign In to View Saved Works</span>
               <ArrowRight size={14} />
             </Link>
 
@@ -127,27 +129,27 @@ export default function FavoritesPage() {
     );
   }
 
-  // ─── 2. Authenticated User Favorites Screen ────────────────────────────
+  // ─── 2. Authenticated User Saved Screen ────────────────────────────────
   return (
     <main className="min-h-screen pt-6 pb-20 max-w-[1720px] mx-auto px-3 sm:px-6 lg:px-10 space-y-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-white/10">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#0F172A] text-[#CDF22B] dark:bg-[#CDF22B] dark:text-[#070905] flex items-center justify-center shrink-0 shadow-md font-bold">
-              <Heart size={20} className="fill-current" />
+            <div className="w-10 h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center shrink-0 shadow-md shadow-[#CDF22B]/25 font-bold">
+              <Bookmark size={20} className="fill-current" />
             </div>
             <div>
               <div className="flex items-center gap-2.5">
                 <h1 className="text-2xl sm:text-3xl font-bold font-display text-foreground tracking-tight">
-                  My Favorites
+                  Saved Collections
                 </h1>
                 <span className="px-2.5 py-0.5 rounded-full bg-slate-900 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-[#CDF22B] text-xs font-mono font-bold">
-                  {favoriteProjects.length}
+                  {savedProjects.length}
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Case studies and digital masterworks you have appreciated.
+                Your bookmarked case studies and design references saved for later exploration.
               </p>
             </div>
           </div>
@@ -163,8 +165,8 @@ export default function FavoritesPage() {
         </Link>
       </div>
 
-      {/* Filter & Search Bar (Only shown if user has favorited items) */}
-      {favoriteProjects.length > 0 && (
+      {/* Filter & Search Bar (Only shown if user has saved items) */}
+      {savedProjects.length > 0 && (
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           {/* Category Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto overflow-y-hidden no-scrollbar w-full md:w-auto pb-1">
@@ -176,11 +178,11 @@ export default function FavoritesPage() {
                   : "bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-muted-foreground hover:text-foreground"
               }`}
             >
-              All ({favoriteProjects.length})
+              All ({savedProjects.length})
             </button>
 
             {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => {
-              const count = favoriteProjects.filter((p) =>
+              const count = savedProjects.filter((p) =>
                 matchesCategory(p.category, p.categoryId, p.tags, cat.slug)
               ).length;
               if (count === 0) return null;
@@ -209,7 +211,7 @@ export default function FavoritesPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search your favorites..."
+              placeholder="Search your saved works..."
               className="w-full pl-9 pr-8 py-1.5 rounded-full bg-slate-100 dark:bg-[#171915] border border-slate-200/80 dark:border-white/10 text-xs text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:border-[#CDF22B]"
             />
             {searchQuery && (
@@ -231,16 +233,16 @@ export default function FavoritesPage() {
             <div key={n} className="glass-card rounded-3xl aspect-4/3 animate-pulse border border-slate-200 dark:border-white/10" />
           ))}
         </div>
-      ) : filteredFavorites.length > 0 ? (
+      ) : filteredSaved.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredFavorites.map((project) => (
+          {filteredSaved.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
-      ) : favoriteProjects.length > 0 ? (
+      ) : savedProjects.length > 0 ? (
         /* Search/Filter Yielded No Results */
         <div className="glass-card rounded-3xl p-12 text-center border border-slate-200/80 dark:border-white/10 max-w-md mx-auto space-y-4">
-          <p className="text-sm font-semibold text-foreground">No favorites match your search</p>
+          <p className="text-sm font-semibold text-foreground">No saved works match your search</p>
           <button
             onClick={() => {
               setSearchQuery("");
@@ -252,18 +254,18 @@ export default function FavoritesPage() {
           </button>
         </div>
       ) : (
-        /* User Has Zero Favorites */
+        /* User Has Zero Saved Projects */
         <div className="glass-card rounded-3xl p-12 sm:p-16 text-center border border-slate-200/80 dark:border-white/10 max-w-xl mx-auto space-y-6">
           <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-[#1e231b] flex items-center justify-center mx-auto text-muted-foreground">
-            <Heart size={28} />
+            <Bookmark size={28} />
           </div>
 
           <div className="space-y-2">
             <h2 className="text-xl font-bold font-display text-foreground">
-              You haven't favorited any projects yet
+              You haven't saved any projects yet
             </h2>
             <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
-              Explore the showcase, appreciate exceptional design craft, and hit the heart icon to save your favorite works here.
+              Bookmark case studies to create your custom moodboards and reference collections anytime.
             </p>
           </div>
 
