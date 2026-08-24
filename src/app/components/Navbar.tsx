@@ -271,8 +271,17 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
                         >
-                          <Bookmark size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
+                          <Heart size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
                           <span>My Favorites</span>
+                        </Link>
+
+                        <Link
+                          to="/saved"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground transition-colors font-medium"
+                        >
+                          <Bookmark size={15} className="text-slate-800 dark:text-slate-200 shrink-0" />
+                          <span>Saved Collections</span>
                         </Link>
 
                         <Link
