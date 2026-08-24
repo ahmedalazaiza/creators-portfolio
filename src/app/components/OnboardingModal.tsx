@@ -11,7 +11,15 @@ export default function OnboardingModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>(["ui-ux", "3d-motion"]);
-  const { allCreators, toggleFollow } = useCreator();
+  const { allCreators } = useCreator();
+  const [followedIds, setFollowedIds] = useState<Record<string, boolean>>({});
+
+  const toggleFollow = (creatorId: string) => {
+    setFollowedIds((prev) => ({
+      ...prev,
+      [creatorId]: !prev[creatorId],
+    }));
+  };
 
   useEffect(() => {
     const completed = localStorage.getItem(LOCAL_STORAGE_ONBOARDING_KEY);
@@ -139,40 +147,43 @@ export default function OnboardingModal() {
               </div>
 
               <div className="space-y-2 max-h-60 overflow-y-auto pr-1 no-scrollbar">
-                {allCreators.slice(0, 4).map((c) => (
-                  <div
-                    key={c.id}
-                    className="flex items-center justify-between p-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 hover:border-slate-300 dark:hover:border-white/20 transition-all"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <img
-                        src={c.avatarUrl}
-                        alt={c.fullName}
-                        className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-white/15 shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-foreground truncate">
-                          {c.fullName}
-                        </div>
-                        <div className="text-[11px] text-muted-foreground font-mono truncate">
-                          @{c.username}
+                {allCreators.slice(0, 4).map((c) => {
+                  const isFollowing = Boolean(followedIds[c.id]);
+                  return (
+                    <div
+                      key={c.id}
+                      className="flex items-center justify-between p-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 hover:border-slate-300 dark:hover:border-white/20 transition-all"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img
+                          src={c.avatarUrl}
+                          alt={c.fullName}
+                          className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-white/15 shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-foreground truncate">
+                            {c.fullName}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground font-mono truncate">
+                            @{c.username}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <button
-                      type="button"
-                      onClick={() => toggleFollow(c.id)}
-                      className={`text-xs px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer ${
-                        c.isFollowing
-                          ? "border border-slate-200 dark:border-white/15 text-muted-foreground hover:text-foreground"
-                          : "btn-primary text-slate-950 font-bold"
-                      }`}
-                    >
-                      {c.isFollowing ? "Following" : "Follow"}
-                    </button>
-                  </div>
-                ))}
+                      <button
+                        type="button"
+                        onClick={() => toggleFollow(c.id)}
+                        className={`text-xs px-3.5 py-1.5 rounded-full font-bold transition-all cursor-pointer ${
+                          isFollowing
+                            ? "border border-slate-200 dark:border-white/15 text-muted-foreground hover:text-foreground"
+                            : "btn-primary text-slate-950 font-bold"
+                        }`}
+                      >
+                        {isFollowing ? "Following" : "Follow"}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="pt-2 flex items-center justify-between">
