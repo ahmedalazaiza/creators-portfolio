@@ -269,7 +269,7 @@ export default function ProjectEditorPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen pt-24 pb-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"
+      className="min-h-screen pt-8 sm:pt-10 pb-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8"
     >
       {/* Top Bar */}
       <div className="flex items-center justify-between">

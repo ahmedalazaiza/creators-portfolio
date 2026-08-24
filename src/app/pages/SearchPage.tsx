@@ -112,7 +112,7 @@ export default function SearchPage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="min-h-screen pt-14 sm:pt-16 pb-20 bg-background"
+      className="min-h-screen pt-4 sm:pt-6 pb-20 bg-background"
     >
       {/* Search Header Stage */}
       <section className="border-b border-border/40 bg-gradient-to-b from-[#CDF22B]/15 via-card/20 to-background py-8">
