@@ -1,75 +1,61 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import {
   Sparkles,
   ArrowLeft,
   ArrowRight,
+  Facebook,
+  Instagram,
   Twitter,
-  Dribbble,
   Linkedin,
   Github,
-  Instagram,
-  Youtube,
-  Globe,
   Plus,
-  Users,
 } from "lucide-react";
 
 interface TeamMember {
   id: string;
   name: string;
   role: string;
-  avatar: string;
+  bio: string;
   department: string;
+  avatar: string;
+  bgColor: string;
   socials: {
     facebook?: string;
     instagram?: string;
-    youtube?: string;
     twitter?: string;
     linkedin?: string;
     github?: string;
-    dribbble?: string;
   };
 }
 
 const ALL_TEAM_MEMBERS: TeamMember[] = [
   {
-    id: "edward-gilmore",
-    name: "Edward Gilmore",
-    role: "Founder and CEO",
-    department: "Leadership",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80",
+    id: "jocelyn-schleifer",
+    name: "Jocelyn Schleifer",
+    role: "Software Engineer",
+    bio: "There are many variations of passages of Lorem Ipsum available",
+    department: "Engineering",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
+    bgColor: "bg-[#9ec8e2]",
     socials: {
       facebook: "https://facebook.com",
       instagram: "https://instagram.com",
-      youtube: "https://youtube.com",
-      linkedin: "https://linkedin.com",
+      twitter: "https://twitter.com",
     },
   },
   {
-    id: "lucy-kims",
-    name: "Lucy Kims",
-    role: "Member Experience Manager",
-    department: "Community",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop&q=80",
+    id: "martin-donin",
+    name: "Martin Donin",
+    role: "Software Engineer",
+    bio: "There are many variations of passages of Lorem Ipsum available",
+    department: "Engineering",
+    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&auto=format&fit=crop&q=80",
+    bgColor: "bg-[#f0a996]",
     socials: {
       facebook: "https://facebook.com",
       instagram: "https://instagram.com",
-      youtube: "https://youtube.com",
-      dribbble: "https://dribbble.com",
-    },
-  },
-  {
-    id: "dan-wilson",
-    name: "Dan Wilson",
-    role: "Senior Community Manager",
-    department: "Community",
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&auto=format&fit=crop&q=80",
-    socials: {
-      facebook: "https://facebook.com",
-      instagram: "https://instagram.com",
-      youtube: "https://youtube.com",
       twitter: "https://twitter.com",
     },
   },
@@ -77,38 +63,55 @@ const ALL_TEAM_MEMBERS: TeamMember[] = [
     id: "elena-rostova",
     name: "Elena Rostova",
     role: "Head of 3D & Visual Experience",
+    bio: "There are many variations of passages of Lorem Ipsum available",
     department: "Design & CGI",
-    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80",
+    bgColor: "bg-[#e6beae]",
     socials: {
+      facebook: "https://facebook.com",
       instagram: "https://instagram.com",
-      linkedin: "https://linkedin.com",
-      dribbble: "https://dribbble.com",
       twitter: "https://twitter.com",
-    },
-  },
-  {
-    id: "marcus-vance",
-    name: "Marcus Vance",
-    role: "Principal Infrastructure Architect",
-    department: "Engineering",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80",
-    socials: {
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      twitter: "https://twitter.com",
-      youtube: "https://youtube.com",
     },
   },
   {
     id: "sophia-chen",
     name: "Sophia Chen",
     role: "Lead Editorial & Design Curator",
+    bio: "There are many variations of passages of Lorem Ipsum available",
     department: "Curation",
-    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&auto=format&fit=crop&q=80",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=80",
+    bgColor: "bg-[#9a91f5]",
     socials: {
+      facebook: "https://facebook.com",
       instagram: "https://instagram.com",
-      dribbble: "https://dribbble.com",
+      twitter: "https://twitter.com",
+    },
+  },
+  {
+    id: "edward-gilmore",
+    name: "Edward Gilmore",
+    role: "Founder and CEO",
+    bio: "There are many variations of passages of Lorem Ipsum available",
+    department: "Leadership",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80",
+    bgColor: "bg-[#8ed0bf]",
+    socials: {
+      facebook: "https://facebook.com",
+      instagram: "https://instagram.com",
       linkedin: "https://linkedin.com",
+    },
+  },
+  {
+    id: "lucy-kims",
+    name: "Lucy Kims",
+    role: "Member Experience Manager",
+    bio: "There are many variations of passages of Lorem Ipsum available",
+    department: "Community",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&auto=format&fit=crop&q=80",
+    bgColor: "bg-[#f4d08e]",
+    socials: {
+      facebook: "https://facebook.com",
+      instagram: "https://instagram.com",
       twitter: "https://twitter.com",
     },
   },
@@ -116,72 +119,28 @@ const ALL_TEAM_MEMBERS: TeamMember[] = [
     id: "tarik-mansour",
     name: "Tarik Mansour",
     role: "Senior Frontend Engineer",
+    bio: "There are many variations of passages of Lorem Ipsum available",
     department: "Engineering",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop&q=80",
+    bgColor: "bg-[#b8d5e5]",
     socials: {
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
+      facebook: "https://facebook.com",
       twitter: "https://twitter.com",
+      github: "https://github.com",
     },
   },
   {
     id: "maya-patel",
     name: "Maya Patel",
     role: "Product Strategy & Growth",
+    bio: "There are many variations of passages of Lorem Ipsum available",
     department: "Product",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80",
+    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop&q=80",
+    bgColor: "bg-[#d7bde2]",
     socials: {
-      linkedin: "https://linkedin.com",
-      twitter: "https://twitter.com",
+      facebook: "https://facebook.com",
       instagram: "https://instagram.com",
-    },
-  },
-  {
-    id: "oliver-schmidt",
-    name: "Oliver Schmidt",
-    role: "Motion & Interaction Designer",
-    department: "Design & CGI",
-    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&auto=format&fit=crop&q=80",
-    socials: {
-      dribbble: "https://dribbble.com",
-      instagram: "https://instagram.com",
-      twitter: "https://twitter.com",
-    },
-  },
-  {
-    id: "aria-tanaka",
-    name: "Aria Tanaka",
-    role: "Brand Identity Specialist",
-    department: "Design & CGI",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80",
-    socials: {
-      instagram: "https://instagram.com",
-      dribbble: "https://dribbble.com",
       linkedin: "https://linkedin.com",
-    },
-  },
-  {
-    id: "liam-oconnor",
-    name: "Liam O'Connor",
-    role: "Security & Systems Lead",
-    department: "Engineering",
-    avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&auto=format&fit=crop&q=80",
-    socials: {
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      twitter: "https://twitter.com",
-    },
-  },
-  {
-    id: "zahra-al-hassan",
-    name: "Zahra Al-Hassan",
-    role: "Global Studio Partnerships",
-    department: "Community",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop&q=80",
-    socials: {
-      linkedin: "https://linkedin.com",
-      twitter: "https://twitter.com",
-      instagram: "https://instagram.com",
     },
   },
 ];
@@ -213,7 +172,7 @@ export default function TeamPage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="min-h-screen pt-8 pb-24 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-14"
+      className="min-h-screen pt-8 pb-24 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-12"
     >
       {/* Top Navigation Breadcrumbs */}
       <div className="flex items-center justify-between">
@@ -277,16 +236,16 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* ─── Compact & Tasteful Team Grid (Vertical List) ───────────── */}
+      {/* ─── Team Grid (Exact User Image Reference Layout) ───────────── */}
       <section className="space-y-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7">
           {visibleMembers.map((member) => (
             <div
               key={member.id}
-              className="bg-white dark:bg-[#171915] rounded-3xl p-4 sm:p-5 border border-slate-200/90 dark:border-white/10 shadow-xs hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all text-center flex flex-col justify-between group"
+              className="bg-white dark:bg-[#151813] rounded-2xl border border-slate-200/90 dark:border-white/10 overflow-hidden shadow-xs hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all flex flex-col group"
             >
-              {/* Square Portrait Image with Refined Aspect Ratio */}
-              <div className="aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-[#070905] relative shadow-inner">
+              {/* Top: Portrait Image with Pastel Background */}
+              <div className={`w-full h-64 sm:h-72 relative overflow-hidden ${member.bgColor} flex items-end justify-center`}>
                 <img
                   src={member.avatar}
                   alt={member.name}
@@ -295,28 +254,31 @@ export default function TeamPage() {
                 />
               </div>
 
-              {/* Name, Role & Social Links */}
-              <div className="pt-4 pb-1 space-y-2.5">
-                <div className="space-y-0.5">
-                  <h3 className="text-sm sm:text-base font-bold font-display text-[#0F172A] dark:text-white tracking-tight">
+              {/* Bottom: Name, Role, Bio & Left-Aligned Social Icons */}
+              <div className="p-5 sm:p-6 text-left flex-1 flex flex-col justify-between space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-base sm:text-lg font-bold font-display text-slate-900 dark:text-white tracking-tight leading-snug">
                     {member.name}
                   </h3>
-                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <p className="text-xs sm:text-sm font-normal text-slate-500 dark:text-slate-400">
                     {member.role}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 pt-1 leading-relaxed line-clamp-2">
+                    {member.bio}
                   </p>
                 </div>
 
-                {/* Social Circle Icons (Tasteful 28px circles) */}
-                <div className="flex items-center justify-center gap-2 pt-1">
+                {/* Social Circle Icons (Left Aligned) */}
+                <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
                   {member.socials.facebook && (
                     <a
                       href={member.socials.facebook}
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on Facebook`}
-                      className="w-7 h-7 rounded-full border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-[#CDF22B] hover:border-[#0F172A] dark:hover:border-[#CDF22B] transition-colors"
+                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <span className="font-serif font-bold text-[11px]">f</span>
+                      <Facebook size={14} />
                     </a>
                   )}
 
@@ -326,21 +288,9 @@ export default function TeamPage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on Instagram`}
-                      className="w-7 h-7 rounded-full border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-pink-500 hover:border-pink-500 dark:hover:text-[#CDF22B] dark:hover:border-[#CDF22B] transition-colors"
+                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Instagram size={13} />
-                    </a>
-                  )}
-
-                  {member.socials.youtube && (
-                    <a
-                      href={member.socials.youtube}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`${member.name} on YouTube`}
-                      className="w-7 h-7 rounded-full border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-rose-500 hover:border-rose-500 dark:hover:text-[#CDF22B] dark:hover:border-[#CDF22B] transition-colors"
-                    >
-                      <Youtube size={13} />
+                      <Instagram size={14} />
                     </a>
                   )}
 
@@ -349,10 +299,10 @@ export default function TeamPage() {
                       href={member.socials.twitter}
                       target="_blank"
                       rel="noreferrer"
-                      aria-label={`${member.name} on Twitter`}
-                      className="w-7 h-7 rounded-full border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:border-sky-500 dark:hover:text-[#CDF22B] dark:hover:border-[#CDF22B] transition-colors"
+                      aria-label={`${member.name} on Twitter / X`}
+                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Twitter size={13} />
+                      <Twitter size={14} />
                     </a>
                   )}
 
@@ -362,21 +312,9 @@ export default function TeamPage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on LinkedIn`}
-                      className="w-7 h-7 rounded-full border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-sky-600 hover:border-sky-600 dark:hover:text-[#CDF22B] dark:hover:border-[#CDF22B] transition-colors"
+                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Linkedin size={13} />
-                    </a>
-                  )}
-
-                  {member.socials.dribbble && (
-                    <a
-                      href={member.socials.dribbble}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`${member.name} on Dribbble`}
-                      className="w-7 h-7 rounded-full border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-pink-500 hover:border-pink-500 dark:hover:text-[#CDF22B] dark:hover:border-[#CDF22B] transition-colors"
-                    >
-                      <Dribbble size={13} />
+                      <Linkedin size={14} />
                     </a>
                   )}
 
@@ -386,9 +324,9 @@ export default function TeamPage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={`${member.name} on GitHub`}
-                      className="w-7 h-7 rounded-full border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-[#0F172A] dark:hover:text-[#CDF22B] hover:border-[#0F172A] dark:hover:border-[#CDF22B] transition-colors"
+                      className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer"
                     >
-                      <Github size={13} />
+                      <Github size={14} />
                     </a>
                   )}
                 </div>
@@ -438,3 +376,4 @@ export default function TeamPage() {
     </motion.main>
   );
 }
+
