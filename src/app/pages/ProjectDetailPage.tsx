@@ -336,7 +336,7 @@ export default function ProjectDetailPage() {
               onClick={handleAppreciate}
               className={`min-h-[40px] px-5 py-2 rounded-full text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
                 isLiked
-                  ? "bg-rose-500 text-white border border-rose-500 shadow-md shadow-rose-500/25 dark:bg-[#CDF22B] dark:text-slate-950 dark:border-[#CDF22B]"
+                  ? "bg-[#CDF22B] text-slate-950 border border-[#CDF22B] shadow-md shadow-[#CDF22B]/25"
                   : "glass-card hover:bg-slate-100 dark:hover:bg-[#1e231b] text-foreground border border-slate-200 dark:border-white/10 hover:border-[#CDF22B]/60"
               }`}
             >
@@ -344,7 +344,7 @@ export default function ProjectDetailPage() {
                 size={15}
                 className={
                   isLiked
-                    ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                    ? "fill-slate-950 text-slate-950"
                     : "text-foreground"
                 }
               />
@@ -649,7 +649,7 @@ export default function ProjectDetailPage() {
               aria-label="Appreciate project"
               className={`min-h-[40px] px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer ${
                 isLiked
-                  ? "bg-rose-500 text-white shadow-rose-500/25 dark:bg-[#CDF22B] dark:text-slate-950 dark:border-[#CDF22B]"
+                  ? "bg-[#CDF22B] text-slate-950 border border-[#CDF22B] shadow-[#CDF22B]/25"
                   : "btn-primary text-slate-950"
               }`}
             >
@@ -657,7 +657,7 @@ export default function ProjectDetailPage() {
                 size={15}
                 className={
                   isLiked
-                    ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                    ? "fill-slate-950 text-slate-950"
                     : "text-slate-950"
                 }
               />

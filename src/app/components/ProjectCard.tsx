@@ -49,7 +49,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         particleCount: 22,
         spread: 40,
         origin: { x: Math.max(0.1, Math.min(0.9, x)), y: Math.max(0.1, Math.min(0.9, y)) },
-        colors: ["#CDF22B", "#f43f5e", "#0F172A", "#ffffff"],
+        colors: ["#CDF22B", "#bfe61e", "#0F172A", "#ffffff"],
         ticks: 150,
         scalar: 0.65,
       });
@@ -111,15 +111,15 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             title={isLoggedIn ? (isSaved ? "Saved to Favorites" : "Save to Favorites") : "Sign in to save"}
             className={`w-9 h-9 sm:w-8 sm:h-8 min-w-[36px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] rounded-full backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95 ${
               isSaved
-                ? "bg-slate-900 text-white border border-slate-900 dark:bg-[#CDF22B] dark:text-slate-950 dark:border-[#CDF22B] font-bold"
-                : "bg-slate-900/85 text-white hover:bg-slate-900 hover:text-white dark:hover:bg-[#CDF22B] dark:hover:text-slate-950 border border-white/25 hover:border-white/40"
+                ? "bg-[#CDF22B] text-slate-950 border border-[#CDF22B] shadow-[#CDF22B]/30 font-bold"
+                : "bg-slate-900/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 hover:border-[#CDF22B] border border-white/25"
             }`}
           >
             <Bookmark
               size={14}
               className={
                 isSaved
-                  ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                  ? "fill-slate-950 text-slate-950"
                   : "text-white"
               }
             />
@@ -132,15 +132,15 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             title={isLoggedIn ? "Appreciate project" : "Sign in to appreciate"}
             className={`w-9 h-9 sm:w-8 sm:h-8 min-w-[36px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] rounded-full backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95 ${
               isLiked
-                ? "bg-rose-500 text-white border border-rose-500 dark:bg-[#CDF22B] dark:text-slate-950 dark:border-[#CDF22B] font-bold"
-                : "bg-slate-900/85 text-white hover:bg-rose-500 hover:text-white dark:hover:bg-[#CDF22B] dark:hover:text-slate-950 border border-white/25 hover:border-transparent"
+                ? "bg-[#CDF22B] text-slate-950 border border-[#CDF22B] shadow-[#CDF22B]/30 font-bold"
+                : "bg-slate-900/85 text-white hover:bg-[#CDF22B] hover:text-slate-950 hover:border-[#CDF22B] border border-white/25"
             }`}
           >
             <Heart
               size={14}
               className={
                 isLiked
-                  ? "fill-white text-white dark:fill-slate-950 dark:text-slate-950"
+                  ? "fill-slate-950 text-slate-950"
                   : "text-white"
               }
             />
@@ -183,9 +183,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <button
               onClick={handleAppreciate}
               aria-label={isLiked ? "Unlike project" : "Appreciate project"}
-              className={`flex items-center gap-1 min-h-[36px] px-1.5 sm:px-2 py-1 -my-1 rounded-lg transition-colors cursor-pointer active:scale-95 ${
+              className={`flex items-center gap-1 min-h-[36px] px-2 py-1 -my-1 rounded-lg transition-colors cursor-pointer active:scale-95 ${
                 isLiked
-                  ? "text-rose-600 dark:text-[#CDF22B] font-bold"
+                  ? "text-slate-950 dark:text-[#CDF22B] font-bold bg-[#CDF22B]/20 dark:bg-[#CDF22B]/15"
                   : "hover:text-slate-900 dark:hover:text-[#CDF22B]"
               }`}
             >
@@ -193,7 +193,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 size={13}
                 className={
                   isLiked
-                    ? "fill-rose-500 text-rose-500 dark:fill-[#CDF22B] dark:text-[#CDF22B]"
+                    ? "fill-[#CDF22B] text-slate-900 dark:fill-[#CDF22B] dark:text-[#CDF22B]"
                     : "text-muted-foreground"
                 }
               />
