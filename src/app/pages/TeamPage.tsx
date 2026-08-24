@@ -219,7 +219,7 @@ export default function TeamPage() {
               viewport={{ once: true }}
               whileHover={{ y: -3 }}
               transition={{ duration: 0.2 }}
-              className="group flex flex-col rounded-[28px] overflow-hidden bg-white dark:bg-[#151813] border border-slate-300 dark:border-[#CDF22B] hover:border-slate-400 dark:hover:border-[#CDF22B] transition-colors"
+              className="group flex flex-col rounded-[28px] overflow-hidden bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 hover:border-slate-400 dark:hover:border-[#CDF22B] transition-colors"
             >
               {/* Top: Portrait Image with Pastel Background */}
               <div className={`w-full h-72 sm:h-80 relative overflow-hidden ${member.bgColor} flex items-end justify-center`}>

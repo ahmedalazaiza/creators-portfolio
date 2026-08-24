@@ -152,7 +152,7 @@ export default function DashboardPage() {
             {userProjects.map((p) => (
               <div
                 key={p.id}
-                className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-[#CDF22B] shadow-xs flex flex-col justify-between"
+                className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 hover:border-slate-300 dark:hover:border-[#CDF22B] shadow-xs flex flex-col justify-between transition-colors"
               >
                 <div className="relative aspect-video bg-slate-100 dark:bg-[#171915]">
                   <img

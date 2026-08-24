@@ -2,7 +2,7 @@ import React from "react";
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="bg-white dark:bg-[#151813] rounded-[28px] overflow-hidden border border-slate-300 dark:border-[#CDF22B]/40 flex flex-col justify-between animate-pulse">
+    <div className="bg-white dark:bg-[#151813] rounded-[28px] overflow-hidden border border-slate-300 dark:border-white/15 flex flex-col justify-between animate-pulse">
       <div className="space-y-3">
         {/* Cover Image Aspect Skeleton */}
         <div className="aspect-4/3 w-full bg-slate-200 dark:bg-[#1e231b]/80 relative" />

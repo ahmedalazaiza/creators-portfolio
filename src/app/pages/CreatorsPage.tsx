@@ -204,7 +204,7 @@ export default function CreatorsPage() {
                 key={creator.id}
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.2 }}
-                className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-[#CDF22B] shadow-xs hover:shadow-xl hover:border-[#CDF22B] transition-all flex flex-col justify-between"
+                className="glass-card rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-xl dark:hover:border-[#CDF22B] hover:border-slate-400 transition-all flex flex-col justify-between"
               >
                 {/* Creator Header Banner & Avatar */}
                 <div>
