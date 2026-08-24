@@ -8,6 +8,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import EmailVerificationBanner from "./components/EmailVerificationBanner";
+import AppLoadingScreen from "./components/AppLoadingScreen";
+import RouteProgressTopBar from "./components/RouteProgressTopBar";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // Pages
@@ -99,10 +101,17 @@ function AppContent({
   onToggleTheme: () => void;
 }) {
   const location = useLocation();
+  const { loading: authLoading } = useAuth();
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-[#CDF22B] selection:text-[#070905]">
+      {/* 1. App Launch / Cold Start Loading Screen */}
+      <AppLoadingScreen isLoading={authLoading} />
+
+      {/* 2. Top Route Progress Bar for Page Transitions */}
+      <RouteProgressTopBar />
+
       <ScrollToTop />
       <PageTitleHandler />
       {!isAuthPage && <Navbar isDark={isDark} onToggleTheme={onToggleTheme} />}
