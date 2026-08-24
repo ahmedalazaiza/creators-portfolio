@@ -228,13 +228,19 @@ export default function ProjectDetailPage() {
     >
       {/* Top Navigation & Actions Bar */}
       <div className="flex items-center justify-between">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        <button
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/");
+            }
+          }}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <ArrowLeft size={14} />
-          <span>Back to Explore</span>
-        </Link>
+          <span>Back</span>
+        </button>
 
         <div className="flex items-center gap-2">
           {isOwner && (
