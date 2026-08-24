@@ -145,8 +145,8 @@ const ALL_TEAM_MEMBERS: TeamMember[] = [
   },
 ];
 
-const INITIAL_BATCH_SIZE = 8;
-const BATCH_INCREMENT = 4;
+const INITIAL_BATCH_SIZE = 6;
+const BATCH_INCREMENT = 3;
 
 export default function TeamPage() {
   const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH_SIZE);
@@ -208,9 +208,9 @@ export default function TeamPage() {
         </p>
       </section>
 
-      {/* ─── Team Grid (Styled with ProjectCard standard tokens & hover effects) ───────────── */}
+      {/* ─── Team Grid (3 Cards Per Row on Desktop) ───────────── */}
       <section className="space-y-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {visibleMembers.map((member) => (
             <motion.div
               key={member.id}
@@ -222,7 +222,7 @@ export default function TeamPage() {
               className="group flex flex-col rounded-[28px] overflow-hidden bg-white dark:bg-[#151813] border border-slate-300 dark:border-white/15 hover:border-slate-400 dark:hover:border-white/30 transition-colors"
             >
               {/* Top: Portrait Image with Pastel Background */}
-              <div className={`w-full aspect-4/3 sm:h-72 relative overflow-hidden ${member.bgColor} flex items-end justify-center`}>
+              <div className={`w-full h-72 sm:h-80 relative overflow-hidden ${member.bgColor} flex items-end justify-center`}>
                 <img
                   src={member.avatar}
                   alt={member.name}
