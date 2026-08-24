@@ -311,7 +311,7 @@ export default function SearchModal({
             <div className="space-y-2.5">
               <div className="flex items-center gap-2 font-bold text-foreground text-xs uppercase tracking-wider">
                 <ArrowUpDown size={15} className="text-slate-900 dark:text-white" />
-                <span>Sort Projects (الترتيب)</span>
+                <span>Sort Projects</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {SORT_OPTIONS.map((opt) => {
@@ -339,7 +339,7 @@ export default function SearchModal({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-foreground text-xs uppercase tracking-wider">
                   <Layers size={15} className="text-slate-900 dark:text-white" />
-                  <span>Creative Discipline (التصنيف الرئيسي)</span>
+                  <span>Creative Discipline</span>
                 </div>
                 {selectedCategory !== "all" && (
                   <button
@@ -455,7 +455,7 @@ export default function SearchModal({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-foreground text-xs uppercase tracking-wider">
                   <Wrench size={15} className="text-slate-900 dark:text-white" />
-                  <span>Software & Creative Tools (البرامج المستخدمة)</span>
+                  <span>Software & Creative Tools</span>
                 </div>
                 {selectedTool && (
                   <button
@@ -492,7 +492,7 @@ export default function SearchModal({
             <div className="space-y-2.5">
               <div className="flex items-center gap-2 font-bold text-foreground text-xs uppercase tracking-wider">
                 <Calendar size={15} className="text-slate-900 dark:text-white" />
-                <span>Time Period (الفترة الزمنية)</span>
+                <span>Time Period</span>
               </div>
               <div className="flex items-center gap-2">
                 {TIMEFRAMES.map((tf) => {

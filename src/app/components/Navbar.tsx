@@ -168,7 +168,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             <Link
               to="/favorites"
               aria-label="My Favorites"
-              title="My Favorites (المفضلة)"
+              title="My Favorites"
               className={`p-2 rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/favorites"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-[#0F172A] dark:text-[#CDF22B] font-bold shadow-2xs"
@@ -189,7 +189,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
             <Link
               to="/saved"
               aria-label="Saved Collections"
-              title="Saved Collections (المحفوظات)"
+              title="Saved Collections"
               className={`p-2 rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/saved"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-foreground font-bold shadow-2xs"
@@ -374,7 +374,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
                   <Heart size={15} className="text-foreground dark:text-[#CDF22B]" />
-                  <span>My Favorites (المفضلة)</span>
+                  <span>My Favorites</span>
                 </Link>
                 <Link
                   to="/saved"
@@ -382,7 +382,7 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
                   <Bookmark size={15} className="text-slate-800 dark:text-slate-200" />
-                  <span>Saved Collections (المحفوظات)</span>
+                  <span>Saved Collections</span>
                 </Link>
                 <Link
                   to="/creators"
