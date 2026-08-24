@@ -228,10 +228,15 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="text-4xl sm:text-6xl lg:text-7xl font-bold font-display tracking-tight text-foreground leading-[1.1]"
+          className="text-4xl sm:text-6xl lg:text-7xl font-bold font-display tracking-tight text-foreground leading-[1.15]"
         >
-          Discover & publish <br className="hidden sm:inline" />
-          <span>exceptional case studies.</span>
+          <span className="relative inline-block my-1">
+            <span className="px-3.5 sm:px-5 py-0.5 sm:py-1 rounded-2xl sm:rounded-3xl bg-[#0F172A] text-[#CDF22B] dark:bg-[#CDF22B] dark:text-[#070905] shadow-xl inline-block font-extrabold tracking-tight">
+              Discover & publish
+            </span>
+          </span>
+          <br className="hidden sm:inline" />
+          <span className="inline-block mt-1 sm:mt-0">exceptional case studies.</span>
         </motion.h1>
 
         {/* Subtitle */}

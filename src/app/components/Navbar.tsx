@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Layers,
   Bookmark,
+  Heart,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import CategoryNavMenu from "./CategoryNavMenu";
@@ -151,8 +152,8 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
           <div className="flex-1" />
 
           {/* Right: Actions & Auth */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* Search Icon Trigger (Always accessible, opens Search Modal) */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* 1. Search Icon Trigger */}
             <button
               type="button"
               onClick={() => setSearchModalOpen(true)}
@@ -163,24 +164,41 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               <Search size={16} className="text-foreground group-hover:scale-105 transition-transform" />
             </button>
 
-            {/* Quick Favorites / Moodboard Link */}
+            {/* 2. Favorites / Liked Projects (Heart Icon) */}
             <Link
               to="/favorites"
-              aria-label="Saved Favorites"
-              title="Saved Favorites"
+              aria-label="My Favorites"
+              title="My Favorites (المفضلة)"
               className={`p-2 rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/favorites"
+                  ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-rose-500 font-bold shadow-2xs"
+                  : "text-muted-foreground hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
+              }`}
+            >
+              <Heart
+                size={16}
+                className={location.pathname === "/favorites" ? "fill-current text-rose-500" : ""}
+              />
+            </Link>
+
+            {/* 3. Saved Collections / Bookmarks (Bookmark Icon) */}
+            <Link
+              to="/saved"
+              aria-label="Saved Collections"
+              title="Saved Collections (المحفوظات)"
+              className={`p-2 rounded-full transition-all cursor-pointer border ${
+                location.pathname === "/saved"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-foreground font-bold shadow-2xs"
                   : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
               }`}
             >
               <Bookmark
                 size={16}
-                className={location.pathname === "/favorites" ? "fill-current text-foreground" : ""}
+                className={location.pathname === "/saved" ? "fill-current text-foreground" : ""}
               />
             </Link>
 
-            {/* Theme Toggle */}
+            {/* 4. Theme Toggle */}
             <button
               onClick={onToggleTheme}
               aria-label="Toggle color theme"
@@ -351,8 +369,16 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
                 >
+                  <Heart size={15} className="text-rose-500" />
+                  <span>My Favorites (المفضلة)</span>
+                </Link>
+                <Link
+                  to="/saved"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
+                >
                   <Bookmark size={15} className="text-slate-800 dark:text-slate-200" />
-                  <span>My Favorites</span>
+                  <span>Saved Collections (المحفوظات)</span>
                 </Link>
                 <Link
                   to="/creators"
