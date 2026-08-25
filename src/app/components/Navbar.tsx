@@ -372,176 +372,333 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
           </div>
         </div>
 
-        {/* Mobile Drawer with Category Accordions */}
+        {/* Mobile Navigation Bottom Sheet */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden border-t border-slate-200 dark:border-white/10 bg-background/95 backdrop-blur-2xl px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto"
-            >
-              {/* Quick Search Button in Mobile Drawer */}
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setSearchModalOpen(true);
-                }}
-                className="w-full flex items-center justify-between p-3 rounded-2xl bg-slate-100 dark:bg-[#1e231b] border border-transparent dark:border-white/10 text-xs font-semibold text-foreground cursor-pointer"
+            <div className="fixed inset-0 z-[99999] md:hidden flex items-end justify-center p-0 overflow-hidden">
+              {/* Dark Blur Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMobileMenuOpen(false)}
+                className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
+              />
+
+              {/* Bottom Sheet Modal Window */}
+              <motion.div
+                initial={{ opacity: 0, y: 40, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 40, scale: 0.98 }}
+                transition={{ type: "spring", damping: 28, stiffness: 320 }}
+                className="relative w-full bg-white dark:bg-[#12150f] border-t border-slate-200/90 dark:border-white/15 rounded-t-[32px] shadow-2xl overflow-hidden z-10 flex flex-col max-h-[88vh] pb-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))]"
               >
-                <div className="flex items-center gap-2">
-                  <Search size={15} className="text-slate-800 dark:text-slate-200" />
-                  <span>Search & Filter Projects</span>
-                </div>
-                <SlidersHorizontal size={14} className="text-muted-foreground" />
-              </button>
+                {/* Mobile Drag Handle */}
+                <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-white/20 mx-auto mt-3 mb-1 shrink-0" />
 
-              {/* Main Links */}
-              <div className="space-y-1">
-                <Link
-                  to="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  Explore Showcase
-                </Link>
-                <Link
-                  to="/favorites"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  <div className="flex items-center gap-2">
-                    <Heart size={15} className="text-foreground dark:text-[#CDF22B]" />
-                    <span>My Favorites</span>
+                {/* Sheet Header */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200/80 dark:border-white/10 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#CDF22B] text-slate-950 flex items-center justify-center font-bold shadow-xs">
+                      <Sparkles size={18} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-sm text-foreground tracking-tight">Navigation & Explore</h3>
+                      <p className="text-[11px] text-muted-foreground">Discover creative craft & categories</p>
+                    </div>
                   </div>
-                  {isLoggedIn && favoritesCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-foreground text-[10px] font-mono font-bold">
-                      {favoritesCount}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  to="/saved"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  <div className="flex items-center gap-2">
-                    <Bookmark size={15} className="text-slate-800 dark:text-slate-200" />
-                    <span>Saved Collections</span>
-                  </div>
-                  {isLoggedIn && savedCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-foreground text-[10px] font-mono font-bold">
-                      {savedCount}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  to="/creators"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  Creators Directory
-                </Link>
-              </div>
 
-              {/* Expandable Categories Accordion */}
-              <div className="pt-2 border-t border-slate-200/80 dark:border-white/10 space-y-1">
-                <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Creative Categories
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-label="Close menu"
+                    className="w-9 h-9 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer active:scale-90"
+                  >
+                    <X size={18} />
+                  </button>
                 </div>
 
-                {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => {
-                  const isExpanded = expandedMobileCategory === cat.slug;
-                  return (
-                    <div key={cat.id} className="rounded-xl overflow-hidden">
-                      <div className="flex items-center justify-between px-3 py-2 hover:bg-slate-100 dark:hover:bg-[#1e231b] text-xs text-foreground font-medium">
-                        <Link
-                          to={`/?category=${cat.slug}`}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex-1"
-                        >
-                          {cat.name}
-                        </Link>
-                        {cat.subCategories && cat.subCategories.length > 0 && (
-                          <button
-                            onClick={() =>
-                              setExpandedMobileCategory(isExpanded ? null : cat.slug)
-                            }
-                            className="p-1 text-muted-foreground hover:text-foreground"
-                          >
-                            <ChevronDown
-                              size={14}
-                              className={`transition-transform duration-200 ${
-                                isExpanded ? "rotate-180" : ""
-                              }`}
+                {/* Scrollable Sheet Content */}
+                <div className="overflow-y-auto px-5 py-4 space-y-4 no-scrollbar">
+                  {/* User Profile Card / Auth CTA */}
+                  {isLoggedIn ? (
+                    <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 min-w-0">
+                          {user?.avatarUrl ? (
+                            <img
+                              src={user.avatarUrl}
+                              alt={user.fullName || "User"}
+                              className="w-10 h-10 rounded-full object-cover border border-slate-300 dark:border-white/20 shrink-0"
                             />
-                          </button>
-                        )}
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-[#CDF22B] text-slate-950 flex items-center justify-center font-bold shrink-0">
+                              <User size={18} />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold text-foreground truncate">
+                              {user?.fullName || "Creative Member"}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground font-mono truncate">
+                              @{user?.username || "creator"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Link
+                          to={user?.username ? `/@${user.username}` : "/profile"}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="px-3 py-1.5 rounded-xl btn-secondary text-[11px] font-bold shrink-0"
+                        >
+                          View Profile
+                        </Link>
                       </div>
 
-                      {/* Subcategories list */}
-                      {isExpanded && cat.subCategories && (
-                        <div className="bg-slate-50/70 dark:bg-[#070905]/70 pl-6 pr-3 py-1.5 space-y-1 text-[11px]">
-                          {cat.subCategories.map((sub) => (
-                            <Link
-                              key={sub.id}
-                              to={`/?category=${cat.slug}&sub=${sub.slug}`}
-                              onClick={() => setMobileMenuOpen(false)}
-                              className="block py-1 text-muted-foreground hover:text-[#CDF22B] transition-colors"
-                            >
-                              • {sub.name}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
+                      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/60 dark:border-white/10">
+                        <Link
+                          to="/create"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="py-2 px-3 rounded-xl btn-primary text-slate-950 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                        >
+                          <Plus size={14} />
+                          <span>New Project</span>
+                        </Link>
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="py-2 px-3 rounded-xl bg-slate-200/70 dark:bg-white/10 hover:bg-slate-300/70 dark:hover:bg-white/15 text-foreground text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                        >
+                          <LayoutDashboard size={14} />
+                          <span>Dashboard</span>
+                        </Link>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-[#CDF22B]/15 via-slate-50 to-white dark:from-[#181c15] dark:via-[#131611] dark:to-[#181c15] border border-slate-200 dark:border-white/10 space-y-3">
+                      <div>
+                        <h4 className="text-xs font-bold text-foreground">Join Portfolios Space</h4>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          Publish your design case studies & join the benchmark directory.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to="/login"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex-1 py-2 rounded-xl btn-secondary text-xs font-bold text-center"
+                        >
+                          Log In
+                        </Link>
+                        <Link
+                          to="/signup"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex-1 py-2 rounded-xl btn-primary text-slate-950 text-xs font-bold text-center"
+                        >
+                          Sign Up Free
+                        </Link>
+                      </div>
+                    </div>
+                  )}
 
-              {/* Company & Support Links */}
-              <div className="pt-2 border-t border-slate-200/80 dark:border-white/10 space-y-1">
-                <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Company & Studio
+                  {/* 1-Tap Quick Search Button */}
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setSearchModalOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs font-semibold text-foreground cursor-pointer group active:scale-[0.99] transition-transform"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 flex items-center justify-center shadow-2xs">
+                        <Search size={14} className="text-slate-800 dark:text-slate-200" />
+                      </div>
+                      <span>Search projects, creators & tools...</span>
+                    </div>
+                    <SlidersHorizontal size={14} className="text-muted-foreground group-hover:text-foreground" />
+                  </button>
+
+                  {/* Primary Navigation Chips */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      to="/"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-xs font-bold text-foreground transition-all active:scale-95"
+                    >
+                      <Compass size={17} className="text-slate-800 dark:text-[#CDF22B]" />
+                      <span>Explore Feed</span>
+                    </Link>
+
+                    <Link
+                      to="/creators"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-xs font-bold text-foreground transition-all active:scale-95"
+                    >
+                      <Users size={17} className="text-slate-800 dark:text-[#CDF22B]" />
+                      <span>Creators Directory</span>
+                    </Link>
+
+                    <Link
+                      to="/favorites"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-xs font-bold text-foreground transition-all active:scale-95"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Heart size={17} className="text-slate-800 dark:text-[#CDF22B]" />
+                        <span>My Favorites</span>
+                      </div>
+                      {isLoggedIn && favoritesCount > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold leading-none">
+                          {favoritesCount}
+                        </span>
+                      )}
+                    </Link>
+
+                    <Link
+                      to="/saved"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 text-xs font-bold text-foreground transition-all active:scale-95"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Bookmark size={17} className="text-slate-800 dark:text-[#CDF22B]" />
+                        <span>Saved Collections</span>
+                      </div>
+                      {isLoggedIn && savedCount > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-[10px] font-mono font-bold leading-none">
+                          {savedCount}
+                        </span>
+                      )}
+                    </Link>
+                  </div>
+
+                  {/* Expandable Creative Categories Accordion */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 space-y-2">
+                    <div className="flex items-center justify-between px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      <span>Creative Disciplines</span>
+                      <span className="text-[10px] text-muted-foreground font-mono font-normal">7 Fields</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      {CATEGORIES.filter((c) => c.slug !== "all").map((cat) => {
+                        const isExpanded = expandedMobileCategory === cat.slug;
+                        return (
+                          <div key={cat.id} className="rounded-xl overflow-hidden bg-white/70 dark:bg-[#161a12] border border-slate-200/60 dark:border-white/5">
+                            <div className="flex items-center justify-between px-3 py-2 text-xs text-foreground font-medium">
+                              <Link
+                                to={`/?category=${cat.slug}`}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex-1 font-semibold hover:text-[#CDF22B] transition-colors"
+                              >
+                                {cat.name}
+                              </Link>
+                              {cat.subCategories && cat.subCategories.length > 0 && (
+                                <button
+                                  onClick={() =>
+                                    setExpandedMobileCategory(isExpanded ? null : cat.slug)
+                                  }
+                                  className="p-1 text-muted-foreground hover:text-foreground cursor-pointer"
+                                >
+                                  <ChevronDown
+                                    size={14}
+                                    className={`transition-transform duration-200 ${
+                                      isExpanded ? "rotate-180 text-[#CDF22B]" : ""
+                                    }`}
+                                  />
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Subcategories pills */}
+                            {isExpanded && cat.subCategories && (
+                              <div className="bg-slate-50 dark:bg-[#0c0e0a] px-3 py-2 space-y-1 border-t border-slate-200/50 dark:border-white/5 text-[11px]">
+                                {cat.subCategories.map((sub) => (
+                                  <Link
+                                    key={sub.id}
+                                    to={`/?category=${cat.slug}&sub=${sub.slug}`}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="block py-1 text-muted-foreground hover:text-foreground dark:hover:text-[#CDF22B] transition-colors"
+                                  >
+                                    • {sub.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Company & Support Links */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 space-y-1.5">
+                    <div className="px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Company & Studio
+                    </div>
+                    <div className="grid grid-cols-2 gap-1 text-xs">
+                      <Link
+                        to="/about"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white dark:hover:bg-white/5 font-medium transition-colors"
+                      >
+                        About Us
+                      </Link>
+                      <Link
+                        to="/team"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white dark:hover:bg-white/5 font-medium transition-colors"
+                      >
+                        Our Team
+                      </Link>
+                      <Link
+                        to="/contact"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white dark:hover:bg-white/5 font-medium transition-colors"
+                      >
+                        Contact & Support
+                      </Link>
+                      <Link
+                        to="/faq"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white dark:hover:bg-white/5 font-medium transition-colors"
+                      >
+                        FAQ & Help
+                      </Link>
+                      <Link
+                        to="/careers"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="col-span-2 flex items-center justify-between p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white dark:hover:bg-white/5 font-medium transition-colors"
+                      >
+                        <span>Careers & Jobs</span>
+                        <span className="px-2 py-0.5 rounded-full bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-[9px] font-mono font-bold">Hiring</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Bottom Action Row: Theme Switcher & Logout */}
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 dark:border-white/10">
+                    <button
+                      onClick={onToggleTheme}
+                      className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-xs font-semibold text-foreground cursor-pointer transition-colors"
+                    >
+                      {isDark ? <Sun size={15} className="text-[#CDF22B]" /> : <Moon size={15} />}
+                      <span>{isDark ? "Light Mode" : "Dark Mode"}</span>
+                    </button>
+
+                    {isLoggedIn && (
+                      <button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          signOut();
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      >
+                        <LogOut size={15} />
+                        <span>Sign Out</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <Link
-                  to="/about"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  About Us
-                </Link>
-                <Link
-                  to="/team"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  Our Team
-                </Link>
-                <Link
-                  to="/contact"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  Contact & Support
-                </Link>
-                <Link
-                  to="/careers"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  <span>Careers</span>
-                  <span className="px-1.5 py-0.5 rounded bg-[#CDF22B]/20 text-slate-900 dark:text-[#CDF22B] text-[9px] font-mono font-bold">Hiring</span>
-                </Link>
-                <Link
-                  to="/faq"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-1.5 rounded-xl text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b]"
-                >
-                  FAQ & Help
-                </Link>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </header>
