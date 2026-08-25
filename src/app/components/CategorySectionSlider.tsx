@@ -75,18 +75,18 @@ export default function CategorySectionSlider({
 
   return (
     <section className="space-y-4 py-4">
-      {/* Category Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-2 border-b border-slate-200/60 dark:border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center shrink-0 shadow-md shadow-[#CDF22B]/25 font-bold">
+      {/* Category Section Header: Clean One-Line Layout on Mobile & Desktop */}
+      <div className="flex items-center justify-between gap-2.5 sm:gap-4 pb-2.5 border-b border-slate-200/60 dark:border-white/10">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#CDF22B] text-slate-950 flex items-center justify-center shrink-0 shadow-md shadow-[#CDF22B]/25 font-bold">
             {icon}
           </div>
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base sm:text-xl font-bold text-foreground tracking-tight truncate">
               {category.name}
             </h2>
             {category.description && (
-              <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-muted-foreground truncate mt-0.5">
                 {category.description}
               </p>
             )}
@@ -94,8 +94,8 @@ export default function CategorySectionSlider({
         </div>
 
         {/* Controls: Prev/Next Arrows & Explore More Button */}
-        <div className="flex items-center gap-3 self-end sm:self-auto">
-          {/* Slider Prev/Next Controls */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Slider Prev/Next Controls (Desktop) */}
           <div className="hidden sm:flex items-center gap-1.5">
             <button
               onClick={() => scroll("left")}
@@ -113,15 +113,17 @@ export default function CategorySectionSlider({
             </button>
           </div>
 
-          {/* Explore More Button */}
+          {/* Explore More Button: Icon-only on mobile aligned in one line, full text on desktop */}
           <button
             onClick={() => onExploreCategory(category.slug)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full btn-secondary text-xs font-bold transition-all cursor-pointer group shadow-2xs"
+            aria-label={`Explore all ${category.name} projects`}
+            title={`Explore all ${category.name} projects`}
+            className="flex items-center justify-center gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-4 sm:py-2 rounded-full btn-secondary text-xs font-bold transition-all cursor-pointer group shadow-2xs active:scale-90"
           >
-            <span>Explore all</span>
+            <span className="hidden sm:inline">Explore all</span>
             <ArrowRight
-              size={13}
-              className="group-hover:translate-x-0.5 transition-transform"
+              size={15}
+              className="sm:w-3.5 sm:h-3.5 group-hover:translate-x-0.5 transition-transform"
             />
           </button>
         </div>
