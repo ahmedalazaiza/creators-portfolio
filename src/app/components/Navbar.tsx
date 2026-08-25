@@ -89,6 +89,23 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   const handleSignOut = async () => {
     setDropdownOpen(false);
     await signOut();
@@ -363,27 +380,29 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
 
             {/* Mobile Menu Toggle */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              className="md:hidden w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer"
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open navigation menu"
+              className="md:hidden w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] transition-colors cursor-pointer active:scale-90"
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              <Menu size={20} />
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Navigation Bottom Sheet */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <div className="fixed inset-0 z-[99999] md:hidden flex items-end justify-center p-0 overflow-hidden">
-              {/* Dark Blur Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setMobileMenuOpen(false)}
-                className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
-              />
+      {/* Mobile Navigation Bottom Sheet (Rendered outside header to avoid stacking context issues) */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-[999999] md:hidden flex items-end justify-center p-0 overflow-hidden">
+            {/* Dark Blur Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
+            />
 
               {/* Bottom Sheet Modal Window */}
               <motion.div
@@ -698,10 +717,9 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
                   </div>
                 </div>
               </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-      </header>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Global Search & Filter Modal */}
       <SearchModal
