@@ -166,12 +166,12 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               <Search size={17} className="text-foreground group-hover:scale-105 transition-transform" />
             </button>
 
-            {/* 2. Favorites / Liked Projects (Heart Icon - Brand Colored) */}
+            {/* 2. Favorites / Liked Projects (Heart Icon - Desktop / Tablet only, hidden on mobile) */}
             <Link
               to="/favorites"
               aria-label="My Favorites"
               title={favoritesCount > 0 ? `My Favorites (${favoritesCount})` : "My Favorites"}
-              className={`relative w-10 h-10 flex items-center justify-center rounded-full transition-all cursor-pointer border ${
+              className={`relative w-10 h-10 hidden sm:flex items-center justify-center rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/favorites"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-[#0F172A] dark:text-[#CDF22B] font-bold shadow-2xs"
                   : "text-muted-foreground hover:text-foreground dark:hover:text-[#CDF22B] hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
@@ -192,12 +192,12 @@ export default function Navbar({ isDark, onToggleTheme }: NavbarProps) {
               )}
             </Link>
 
-            {/* 3. Saved Collections / Bookmarks (Bookmark Icon) */}
+            {/* 3. Saved Collections / Bookmarks (Bookmark Icon - Desktop / Tablet only, hidden on mobile) */}
             <Link
               to="/saved"
               aria-label="Saved Collections"
               title={isLoggedIn && savedCount > 0 ? `Saved Collections (${savedCount})` : "Saved Collections"}
-              className={`relative w-10 h-10 flex items-center justify-center rounded-full transition-all cursor-pointer border ${
+              className={`relative w-10 h-10 hidden sm:flex items-center justify-center rounded-full transition-all cursor-pointer border ${
                 location.pathname === "/saved"
                   ? "bg-slate-100 dark:bg-[#1e231b] border-slate-300 dark:border-white/20 text-foreground font-bold shadow-2xs"
                   : "text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-[#1e231b] border-transparent"
